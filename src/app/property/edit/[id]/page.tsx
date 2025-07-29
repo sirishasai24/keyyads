@@ -629,7 +629,7 @@ export default function EditPropertyPage() {
         </div>
 
         {/* Premium Status */}
-        <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
+        {/* <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
           <div className="flex items-center">
             <input
               type="checkbox"
@@ -643,7 +643,7 @@ export default function EditPropertyPage() {
               Mark as **Premium Listing** (Higher Visibility)
             </label>
           </div>
-        </div>
+        </div> */}
 
         {/* Images */}
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">

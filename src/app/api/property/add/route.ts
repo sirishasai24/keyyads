@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDb } from "@/dbConfig/dbConfig";
 import Property from "@/models/propertyModel"; // Ensure this path is correct
+import User from "@/models/userModel"; // Import the User model
 import { getDataFromToken } from "@/helpers/getDataFromToken";
 import mongoose from "mongoose";
 
@@ -22,11 +23,11 @@ export async function POST(req: NextRequest) {
       type, // 'land' or 'building'
       saleType, // Frontend uses 'saleType', backend maps to 'transactionType'
       landCategory, // Will be undefined if type is 'building' from frontend
-      floors,       // Will be undefined if type is 'land'
-      bedrooms,     // Will be undefined if type is 'land'
-      bathrooms,    // Will be undefined if type is 'land'
-      propertyAge,  // Will be undefined if type is 'land'
-      furnishing,   // Will be undefined if type is 'land'
+      floors, // Will be undefined if type is 'land'
+      bedrooms, // Will be undefined if type is 'land'
+      bathrooms, // Will be undefined if type is 'land'
+      propertyAge, // Will be undefined if type is 'land'
+      furnishing, // Will be undefined if type is 'land'
       facing,
       otherDetails,
       description,
@@ -34,7 +35,7 @@ export async function POST(req: NextRequest) {
       areaUnit,
       price,
       discount,
-      parking,      // Will be undefined if type is 'land'
+      parking, // Will be undefined if type is 'land'
       state,
       city,
       images,
@@ -102,7 +103,7 @@ export async function POST(req: NextRequest) {
       description: description || undefined,
       discount: discount || undefined, // Discount applies to both
       facing: facing === 'Not Specified' ? undefined : facing, // Don't save "Not Specified"
-      
+
       // Building specific fields - pass them directly.
       // If `type` is 'land', these will be undefined and Mongoose won't require them.
       floors: floors || undefined,
@@ -121,6 +122,31 @@ export async function POST(req: NextRequest) {
     await newProperty.save();
 
     console.log("Property saved successfully:", newProperty);
+
+    // --- Update user's listings and premiumBadging ---
+    const user = await User.findById(userId);
+
+    if (user) {
+      // Decrement listings count
+      if (user.listings > 0) {
+        user.listings -= 1;
+      } else {
+        // Handle case where listings might already be 0, though client-side should prevent this
+        console.warn("User listings already 0 for user:", userId);
+      }
+
+      // Decrement premiumBadging if property is premium
+      if (isPremium && user.premiumBadging > 0) {
+        user.premiumBadging -= 1;
+      } else if (isPremium && user.premiumBadging === 0) {
+        console.warn("User premium badging already 0 for user:", userId);
+      }
+      await user.save();
+      console.log("User listings and premium badging updated successfully.");
+    } else {
+      console.warn("User not found with ID:", userId, "Cannot update listings/badging.");
+    }
+    // --- End of user update logic ---
 
     return NextResponse.json(
       {
@@ -142,12 +168,12 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    
+
     if (error instanceof Error) {
-        return NextResponse.json(
-            { success: false, message: error.message || "An unexpected error occurred." },
-            { status: 400 }
-        );
+      return NextResponse.json(
+        { success: false, message: error.message || "An unexpected error occurred." },
+        { status: 400 }
+      );
     }
 
     return NextResponse.json(

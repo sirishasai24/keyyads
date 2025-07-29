@@ -10,32 +10,48 @@ import { format } from "date-fns";
 import toast from "react-hot-toast"; // Ensure react-hot-toast is set up
 import ConfirmationModal from "@/components/ConfirmationalModal"; // Import your new modal component
 
+// Define a User type based on your Mongoose model
+interface User {
+    _id: string;
+    username: string;
+    email: string;
+    plan: "Free" | "Quarterly Plan" | "Half Yearly Plan" | "Annual Plan";
+    // Add other user properties you might need from your User model if necessary
+}
+
 export default function ManagePropertiesPage() {
     const [properties, setProperties] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [filterStatus, setFilterStatus] = useState<string>("All"); // Filters by transactionType
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [user, setUser] = useState<User | null>(null); // State to store user data
 
     // State for the custom confirmation modal
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [propertyToDelete, setPropertyToDelete] = useState<Property | null>(null);
 
-    // Memoize fetchProperties to prevent unnecessary re-creations
-    const fetchProperties = useCallback(async () => {
+    // Memoize fetchProperties and user data to prevent unnecessary re-creations
+    const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get("/api/user/properties"); // Your GET route
-            setProperties(response.data.properties);
+            // Fetch properties
+            const propertiesResponse = await axios.get("/api/user/properties"); // Your GET route
+            setProperties(propertiesResponse.data.properties);
+
+            // Fetch user data
+            const userResponse = await axios.get("/api/auth/me");
+            setUser(userResponse.data.user); // Assuming your /api/auth/me returns { user: userData }
+
         } catch (err: any) {
-            console.error("Error fetching properties:", err);
+            console.error("Error fetching data:", err);
             if (err.response && err.response.data && err.response.data.error) {
                 setError(err.response.data.error);
                 toast.error(err.response.data.error);
             } else {
-                setError("Failed to fetch properties. Please try again.");
-                toast.error("Failed to fetch properties. Please try again.");
+                setError("Failed to fetch data. Please try again.");
+                toast.error("Failed to fetch data. Please try again.");
             }
         } finally {
             setLoading(false);
@@ -43,8 +59,8 @@ export default function ManagePropertiesPage() {
     }, []); // Empty dependency array means this function is created once
 
     useEffect(() => {
-        fetchProperties();
-    }, [fetchProperties]); // Depend on fetchProperties
+        fetchData();
+    }, [fetchData]); // Depend on fetchData
 
     // Function to open the confirmation modal
     const confirmDelete = (property: Property) => {
@@ -94,10 +110,14 @@ export default function ManagePropertiesPage() {
         return matchesStatus && matchesSearch;
     });
 
+    // Check if the user is on a free plan
+    const isFreePlanUser = user?.plan === "Free";
+
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-[calc(100vh-80px)] bg-gray-50">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2180d3]"></div> {/* Changed color */}
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2180d3]"></div>{" "}
+                {/* Changed color */}
                 <p className="ml-4 text-lg text-gray-700">Loading your properties...</p>
             </div>
         );
@@ -108,7 +128,7 @@ export default function ManagePropertiesPage() {
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] bg-gray-50 text-red-600">
                 <p className="text-xl font-semibold mb-4">Error: {error}</p>
                 <button
-                    onClick={fetchProperties}
+                    onClick={fetchData} // Changed to fetchData
                     className="px-6 py-3 bg-[#2180d3] text-white rounded-lg hover:bg-[#1a6fb0] transition-colors shadow-md" // Changed color
                 >
                     Retry
@@ -128,7 +148,9 @@ export default function ManagePropertiesPage() {
 
             <div className="flex flex-col md:flex-row justify-between items-center mb-8 space-y-4 md:space-y-0 md:space-x-6">
                 <Link href="/property/add" className="w-full md:w-auto">
-                    <button className="w-full md:w-auto bg-[#2180d3] hover:bg-[#1a6fb0] text-white font-semibold py-3 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center text-lg"> {/* Changed color */}
+                    <button className="w-full md:w-auto bg-[#2180d3] hover:bg-[#1a6fb0] text-white font-semibold py-3 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center text-lg">
+                        {" "}
+                        {/* Changed color */}
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                         </svg>
@@ -156,6 +178,19 @@ export default function ManagePropertiesPage() {
                 </div>
             </div>
 
+            {isFreePlanUser && (
+                <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-lg mb-8 text-center shadow-sm">
+                    <p className="font-semibold text-lg mb-2">You're on the Free Plan!</p>
+                    <p className="text-md">
+                        Editing properties is a premium feature. Upgrade your plan to unlock full editing capabilities.
+                    </p>
+                    {/* Optionally, add a link to your pricing/upgrade page */}
+                    {/* <Link href="/pricing" className="text-blue-600 hover:underline mt-2 inline-block">
+                        View Plans
+                    </Link> */}
+                </div>
+            )}
+
             {filteredProperties.length === 0 && !loading && !error && (
                 <div className="text-center py-20 bg-white rounded-xl shadow-md border border-gray-100">
                     <p className="text-2xl font-semibold text-gray-700 mb-4">
@@ -165,7 +200,9 @@ export default function ManagePropertiesPage() {
                         It looks like you haven't posted any properties yet, or your search/filters yielded no results.
                     </p>
                     <Link href="/post-property">
-                        <button className="mt-6 px-8 py-3 bg-[#2180d3] text-white font-semibold rounded-full hover:bg-[#1a6fb0] transition duration-300 shadow-md"> {/* Changed color */}
+                        <button className="mt-6 px-8 py-3 bg-[#2180d3] text-white font-semibold rounded-full hover:bg-[#1a6fb0] transition duration-300 shadow-md">
+                            {" "}
+                            {/* Changed color */}
                             Start Listing Your Property Now!
                         </button>
                     </Link>
@@ -276,14 +313,29 @@ export default function ManagePropertiesPage() {
                                             View
                                         </button>
                                     </Link>
-                                    <Link href={`/property/edit/${property._id}`} className="flex-1">
-                                        <button className="w-full px-4 py-2 bg-[#2180d3] text-white rounded-md hover:bg-[#1a6fb0] transition-colors text-sm font-medium flex items-center justify-center"> {/* Changed color */}
+                                    {isFreePlanUser ? (
+                                        <button
+                                            disabled
+                                            className="flex-1 px-4 py-2 bg-gray-300 text-gray-500 rounded-md cursor-not-allowed text-sm font-medium flex items-center justify-center"
+                                            title="Upgrade your plan to edit properties"
+                                        >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                             </svg>
                                             Edit
                                         </button>
-                                    </Link>
+                                    ) : (
+                                        <Link href={`/property/edit/${property._id}`} className="flex-1">
+                                            <button className="w-full px-4 py-2 bg-[#2180d3] text-white rounded-md hover:bg-[#1a6fb0] transition-colors text-sm font-medium flex items-center justify-center">
+                                                {" "}
+                                                {/* Changed color */}
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                </svg>
+                                                Edit
+                                            </button>
+                                        </Link>
+                                    )}
                                     <button
                                         onClick={() => confirmDelete(property)} // Use the new confirmDelete function
                                         className="flex-1 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm font-medium flex items-center justify-center"

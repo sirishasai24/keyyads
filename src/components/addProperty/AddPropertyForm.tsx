@@ -1,52 +1,58 @@
 'use client'
 
-import { useState } from 'react'
-import { useForm, SubmitHandler } from 'react-hook-form' // Import SubmitHandler
+import { useState, useEffect } from 'react'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
 import { Dialog, DialogTrigger, DialogContent, DialogTitle } from '@radix-ui/react-dialog'
 import clsx from 'clsx'
 import axios from 'axios'
-import { cloudinaryUpload } from '@/lib/cloudinary' // Ensure this path is correct
+import { cloudinaryUpload } from '@/lib/cloudinary'
 
-import FormSteps from './AddPropertyFormUI' // This component will contain the steps, including PropertyDetailsStep
+import FormSteps from './AddPropertyFormUI'
 
-// Define the exact shape of your form values
 export type FormValues = {
     username: string
     contact: string
-    state: string // Direct field for state
-    city: string  // Direct field for city
+    state: string
+    city: string
     address: string
     title: string
     type: 'building' | 'land'
     saleType: 'sale' | 'rent'
     landCategory?: 'Agricultural' | 'Residential' | 'Commercial'
     floors?: number
-    bedrooms?: string // Use string for "6+"
-    bathrooms?: string // Use string for "6+"
+    bedrooms?: string
+    bathrooms?: string
     propertyAge?: 'New' | '<5 Years' | '5-10 Years' | '>10 Years'
     furnishing?: 'Unfurnished' | 'Semi-furnished' | 'Fully-furnished'
     facing?: 'North' | 'South' | 'East' | 'West' | 'North-East' | 'North-West' | 'South-East' | 'South-West' | 'Not Specified'
     otherDetails?: string
-    area: number // Must be a number
-    areaUnit: 'sqft' | 'sqyd' | 'sqm' | 'acres' // Separate field for unit
-    location: { lat: number; lng: number } // For map coordinates
+    area: number
+    areaUnit: 'sqft' | 'sqyd' | 'sqm' | 'acres'
+    location: { lat: number; lng: number }
     images: string[]
     description: string
-    price: number // Must be a number
+    price: number
     discount?: number
     parking?: number
-    isPremium: 'yes' | 'no' // Value from radio buttons
+    isPremium: 'yes' | 'no'
 }
 
-const center = { lat: 17.385044, lng: 78.486671 } // Surampalem's approximate coordinates
+const center = { lat: 17.385044, lng: 78.486671 }
 
 export default function AddPropertyForm() {
+    const router = useRouter()
     const [images, setImages] = useState<string[]>([])
     const [uploading, setUploading] = useState(false)
     const [currentStep, setCurrentStep] = useState(0)
     const [showModal, setShowModal] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
+
+    const [userListingQuota, setUserListingQuota] = useState<number | null>(null);
+    const [isLoadingUserQuota, setIsLoadingUserQuota] = useState(true);
+    const [fetchError, setFetchError] = useState<string | null>(null);
+
 
     const {
         register,
@@ -55,23 +61,46 @@ export default function AddPropertyForm() {
         setValue,
         trigger,
         getValues,
-        formState: { errors, isValid } // Added isValid for overall form validity
+        formState: { errors, isValid }
     } = useForm<FormValues>({
-        mode: "onTouched", // Validate on blur
+        mode: "onTouched",
         defaultValues: {
             type: 'land',
             saleType: 'sale',
-            location: center, // Default to Surampalem coordinates
+            location: center,
             images: [],
             areaUnit: 'sqft',
             isPremium: 'no',
             facing: 'Not Specified',
-            state: '', // Initial empty string for dropdown
-            city: ''  // Initial empty string for dropdown
+            state: '',
+            city: ''
         }
     })
 
-    const selectedType = watch('type') // Watch property type to conditionally render fields
+    const selectedType = watch('type')
+
+    useEffect(() => {
+        const fetchUserQuota = async () => {
+            try {
+                const response = await axios.get('/api/auth/me');
+                if (response.data && response.data.user) {
+                    setUserListingQuota(response.data.user.listings);
+                } else {
+                    console.warn("User data or 'listings' field not found in /api/auth/me response.");
+                    setUserListingQuota(0);
+                    setFetchError("Could not retrieve user listing quota. Please try again.");
+                }
+            } catch (error) {
+                console.error('Failed to fetch user listing quota:', error);
+                setFetchError('Failed to load user data. Please try again.');
+                setUserListingQuota(0);
+            } finally {
+                setIsLoadingUserQuota(false);
+            }
+        };
+
+        fetchUserQuota();
+    }, []);
 
     const handleImageUpload = async (files: FileList | null) => {
         if (!files || files.length === 0) return
@@ -88,11 +117,11 @@ export default function AddPropertyForm() {
             }
         })
 
-        await Promise.all(uploadPromises) // Wait for all uploads to complete
+        await Promise.all(uploadPromises)
 
         const updatedImages = [...images, ...uploaded]
         setImages(updatedImages)
-        setValue('images', updatedImages, { shouldValidate: true }) // Update RHF state and trigger validation
+        setValue('images', updatedImages, { shouldValidate: true })
         setUploading(false)
         toast.success(`${uploaded.length} image(s) uploaded successfully!`);
     }
@@ -101,7 +130,7 @@ export default function AddPropertyForm() {
         const updated = [...images]
         updated.splice(index, 1)
         setImages(updated)
-        setValue('images', updated, { shouldValidate: true }) // Update RHF state and trigger validation
+        setValue('images', updated, { shouldValidate: true })
         toast('Image removed.', { icon: '🗑️' });
     }
 
@@ -110,7 +139,6 @@ export default function AddPropertyForm() {
     const goToNextStep = async () => {
         let fieldsToValidate: (keyof FormValues)[] = []
 
-        // Define fields to validate for each step
         if (currentStep === 0) {
             fieldsToValidate = ['username', 'contact']
         } else if (currentStep === 1) {
@@ -121,16 +149,14 @@ export default function AddPropertyForm() {
         } else if (currentStep === 2) {
             fieldsToValidate = ['images']
         } else if (currentStep === 3) {
-            fieldsToValidate = ['location'] // Assuming location includes lat/lng based on your map component
+            fieldsToValidate = ['location']
         }
-        // No specific validation needed for step 4 (Review & Submit), as `handleSubmit(onSubmit)` will do it all
 
-        const isStepValid = await trigger(fieldsToValidate, { shouldFocus: true }); // Focus on the first invalid field
+        const isStepValid = await trigger(fieldsToValidate, { shouldFocus: true });
 
         if (isStepValid) {
             setCurrentStep((prev) => prev + 1)
         } else {
-            // Find the first field with an error and scroll to it
             const firstErrorField = fieldsToValidate.find(field => errors[field]);
             if (firstErrorField) {
                 const element = document.getElementsByName(firstErrorField as string)[0] || document.getElementById(firstErrorField as string);
@@ -147,29 +173,28 @@ export default function AddPropertyForm() {
         if (currentStep > 0) setCurrentStep((prev) => prev - 1)
     }
 
-    const onSubmit: SubmitHandler<FormValues> = async (formData) => { // Use formData directly from RHF
+    const onSubmit: SubmitHandler<FormValues> = async (formData) => {
         setIsSubmitting(true)
+
+        if (userListingQuota !== null && userListingQuota <= 0) {
+            toast.error('You have exhausted your property listing quota. Please upgrade your plan to list more properties.');
+            setIsSubmitting(false);
+            setShowModal(false);
+            return;
+        }
+
         try {
-            // Prepare data for the API call
-            const dataToSubmit: any = { // Use 'any' temporarily for conditional deletions
-                ...formData, // Start with all valid form data
+            const dataToSubmit: any = {
+                ...formData,
             }
 
-            // 1. Convert isPremium from 'yes'/'no' string to boolean
             dataToSubmit.isPremium = formData.isPremium === 'yes'
 
-            // 2. Ensure area and price are numbers (they should be due to valueAsNumber: true)
-            //    No need to concatenate area and areaUnit here; they are separate fields now.
-            //    No need to convert price to string; it's a Number in schema.
-
-            // 3. Handle 'facing' - send null if 'Not Specified'
             if (dataToSubmit.facing === 'Not Specified') {
-                dataToSubmit.facing = null; // Backend expects null or undefined if not specified
+                dataToSubmit.facing = null;
             }
 
-            // 4. Conditionally remove fields not relevant to the property type
             if (dataToSubmit.type === 'land') {
-                // These fields are specific to 'building' type in the schema
                 delete dataToSubmit.bedrooms
                 delete dataToSubmit.bathrooms
                 delete dataToSubmit.floors
@@ -178,41 +203,30 @@ export default function AddPropertyForm() {
                 delete dataToSubmit.otherDetails
                 delete dataToSubmit.parking
             } else if (dataToSubmit.type === 'building') {
-                // This field is specific to 'land' type in the schema
                 delete dataToSubmit.landCategory
             }
 
-            // 5. Ensure `images` array is not empty (already validated in `goToNextStep` for step 2, but good to double check)
             if (!dataToSubmit.images || dataToSubmit.images.length === 0) {
                 toast.error('Please upload at least one image for the property.');
                 setIsSubmitting(false);
-                setCurrentStep(2); // Direct user back to image upload step
+                setCurrentStep(2);
+                setShowModal(false);
                 return;
             }
 
-            // Log final data before sending for debugging
             console.log('Sending data to API:', dataToSubmit)
 
             const response = await axios.post('/api/property/add', dataToSubmit)
 
             console.log('Form data submitted successfully:', response.data.data)
             toast.success('Property submitted successfully!')
-            // Optionally reset the form and go back to the first step
-            // reset();
-            // setCurrentStep(0);
-            setShowModal(false) // Close the modal on success
-            // Optionally, redirect the user
-            // router.push('/dashboard/my-properties');
+            setShowModal(false)
 
         } catch (error) {
             console.error('Submission error:', error)
             if (axios.isAxiosError(error) && error.response) {
-                // Handle API validation errors or other server responses
                 const errorMessage = error.response.data.message || error.response.data.error || 'Something went wrong. Please try again.';
                 toast.error(errorMessage);
-                // If specific backend errors relate to a step, you can navigate there
-                // Example: if (errorMessage.includes('image')) setCurrentStep(2);
-                // if (errorMessage.includes('category')) setCurrentStep(1);
             } else {
                 toast.error('Network error or unexpected error. Please try again.');
             }
@@ -221,7 +235,6 @@ export default function AddPropertyForm() {
         }
     }
 
-    // Helper function for displaying review values
     const formatReviewValue = (value: string | number | null | undefined, placeholder: string = 'N/A') => {
         if (value === 'Not Specified' || value === null || value === undefined || value === '') {
             return placeholder
@@ -229,15 +242,65 @@ export default function AddPropertyForm() {
         return value
     }
 
+    if (isLoadingUserQuota) {
+        return (
+            <div className="flex justify-center items-center min-h-[calc(100vh-80px)] bg-gray-50">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2180d3]"></div>
+                <p className="ml-4 text-lg text-gray-700">Loading user data...</p>
+            </div>
+        );
+    }
+
+    if (fetchError) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] bg-gray-50 text-red-600">
+                <p className="text-xl font-semibold mb-4">Error: {fetchError}</p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="px-6 py-3 bg-[#2180d3] text-white rounded-lg hover:bg-[#1a6fb0] transition-colors shadow-md"
+                >
+                    Retry
+                </button>
+            </div>
+        );
+    }
+
+    if (userListingQuota !== null && userListingQuota <= 0) {
+        return (
+            <div className="max-w-md mx-auto p-8 mt-20 bg-white rounded-3xl shadow-xl border border-gray-100 text-center">
+                <h1 className="text-3xl font-bold text-red-600 mb-6">Listing Quota Exhausted!</h1>
+                <p className="text-lg text-gray-700 mb-8">
+                    You have used all your available property listings. To add more properties, please consider upgrading your plan.
+                </p>
+                <div className="flex flex-col gap-4">
+                    <button
+                        onClick={() =>{ 
+                            router.push('/user/prime')
+                        }
+                        }
+                        className="w-full bg-[#2180d3] hover:bg-[#1a6fb0] text-white font-semibold py-3 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+                    >
+                        View Plans to Upgrade
+                    </button>
+                    <button
+                        onClick={()=>{
+                            router.push('/user/properties')
+                        }}
+                        className="w-full bg-gray-100 text-gray-800 hover:bg-gray-200 font-semibold py-3 px-8 rounded-full shadow-md transition duration-300 ease-in-out"
+                    >
+                        Go to My Properties
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="max-w-4xl mx-auto p-4 sm:p-6 md:p-8 mt-10 bg-white rounded-3xl shadow-xl border border-gray-100">
             <h1 className="text-3xl sm:text-4xl font-bold text-center text-[#2180d3] mb-8">Add New Property</h1>
 
-            {/* Stepper with integrated progress line */}
             <div className="flex flex-row justify-between mb-10 overflow-x-auto whitespace-nowrap relative">
-                {/* Progress Line Track */}
                 <div className="absolute top-4 left-0 w-full h-[2px] bg-gray-300 z-0">
-                    {/* Progress Line Fill */}
                     <div
                         className="h-full bg-[#2180d3] transition-all duration-500 ease-in-out"
                         style={{
@@ -256,7 +319,6 @@ export default function AddPropertyForm() {
                         >
                             {i + 1}
                         </div>
-                        {/* The label is hidden on mobile and shown on larger screens */}
                         <span className={clsx('text-xs mt-2 text-center hidden sm:block', currentStep >= i ? 'text-[#2180d3]' : 'text-gray-400')}>
                             {label}
                         </span>
@@ -264,7 +326,6 @@ export default function AddPropertyForm() {
                 ))}
             </div>
 
-            {/* Form content, wrapped by a real form tag for accessibility but controlled by RHF's handleSubmit */}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 <FormSteps
                     currentStep={currentStep}
@@ -275,8 +336,8 @@ export default function AddPropertyForm() {
                     uploading={uploading}
                     handleImageUpload={handleImageUpload}
                     handleRemoveImage={handleRemoveImage}
-                    location={getValues('location')} // Pass map location
-                    setLocation={(latlng) => setValue('location', latlng, { shouldValidate: true })} // Update map location
+                    location={getValues('location')}
+                    setLocation={(latlng) => setValue('location', latlng, { shouldValidate: true })}
                     getValues={getValues}
                     formatReviewValue={formatReviewValue}
                 />
@@ -292,10 +353,14 @@ export default function AddPropertyForm() {
                             Next
                         </button>
                     ) : (
-                        // This button triggers the Dialog for final confirmation before submission
                         <Dialog open={showModal} onOpenChange={setShowModal}>
                             <DialogTrigger asChild>
-                                <button type="button" className="bg-[#2180d3] text-white px-6 py-2 rounded-lg hover:bg-[#1a6cb2] transition" disabled={isSubmitting}>
+                                <button
+                                    type="button"
+                                    className="bg-[#2180d3] text-white px-6 py-2 rounded-lg hover:bg-[#1a6cb2] transition"
+                                    disabled={isSubmitting || (userListingQuota !== null && userListingQuota <= 0)}
+                                    title={userListingQuota !== null && userListingQuota <= 0 ? "You have no available listings" : ""}
+                                >
                                     {isSubmitting ? 'Submitting...' : 'Submit Property'}
                                 </button>
                             </DialogTrigger>
@@ -307,8 +372,8 @@ export default function AddPropertyForm() {
                                 <div className="flex justify-end gap-4">
                                     <button onClick={() => setShowModal(false)} className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 transition" disabled={isSubmitting}>Cancel</button>
                                     <button
-                                        onClick={handleSubmit(onSubmit)} // This will trigger RHF validation and then call onSubmit
-                                        disabled={isSubmitting}
+                                        onClick={handleSubmit(onSubmit)}
+                                        disabled={isSubmitting || (userListingQuota !== null && userListingQuota <= 0)}
                                         className="px-4 py-2 rounded bg-[#2180d3] text-white hover:bg-[#1a6cb2] transition"
                                     >
                                         {isSubmitting ? 'Submitting...' : 'Confirm'}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDb } from "@/dbConfig/dbConfig";
 import Plan from "@/models/planModel";
+import User from "@/models/userModel";
 import crypto from "crypto";
 import { getDataFromToken } from "@/helpers/getDataFromToken";
 
@@ -113,6 +114,14 @@ export async function POST(request: NextRequest) {
     });
 
     const savedPlan = await newPlan.save();
+
+    // 🔄 Update user with plan info
+    await User.findByIdAndUpdate(userId, {
+      plan: selectedPlan.title,
+      listings: selectedPlan.listings,
+      premiumBadging: selectedPlan.premiumBadging,
+      planId: savedPlan._id
+    });
 
     return NextResponse.json({
       message: "Payment successful and plan saved!",

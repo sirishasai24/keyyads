@@ -45,6 +45,24 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  plan: {
+    type: String,
+    enum: ["Free", "Quarterly Plan", "Half Yearly Plan", "Annual Plan"],
+    default: "Free"
+  },
+  listings: {
+    type: Number,
+    default: 1
+  },
+  premiumBadging: {
+    type: Number,
+    default: 0
+  },
+  planId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Plan',
+    default: null
+  }
 });
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
