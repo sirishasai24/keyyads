@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 import {
     CheckCircleIcon,
     MinusCircleIcon,
@@ -94,10 +95,14 @@ const plans: Plan[] = [
 
 const SubscriptionPage = () => {
     const [showMore, setShowMore] = useState<ShowMoreState>({});
+    const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+    const [activatedPlanTitle, setActivatedPlanTitle] = useState<string | null>(null);
+
 
     useEffect(() => {
         const script = document.createElement("script");
         script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
         document.body.appendChild(script);
     }, []);
 
@@ -111,6 +116,11 @@ const SubscriptionPage = () => {
     const handleBuyNow = async (plan: Plan) => {
         const amount = parseInt(plan.price.replace(/[^\d]/g, ""), 10);
 
+        if (isNaN(amount) || amount <= 0) {
+            toast.error("Invalid plan price. Please try again or contact support.");
+            return;
+        }
+
         try {
             const res = await axios.post("/api/razorpay/create-order", {
                 amount,
@@ -119,29 +129,74 @@ const SubscriptionPage = () => {
 
             const order = res.data;
 
+            if (!order?.id || !order?.amount || !order?.currency) {
+                toast.error("Failed to create order. Please try again.");
+                return;
+            }
+
+            if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
+                toast.error("Payment gateway not configured.");
+                return;
+            }
+
+            if (typeof (window as any).Razorpay === "undefined") {
+                toast.error("Payment system not ready. Please refresh the page.");
+                return;
+            }
+
             const options = {
-                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
                 amount: order.amount,
                 currency: order.currency,
-                name: "RealEstate Pro",
+                name: "Ploteasy Subscription",
                 description: `${plan.title} Subscription`,
                 order_id: order.id,
-                handler: (response: any) => {
-                    console.log("Payment success", response);
+                handler: async (response: any) => {
+                    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
+
+                    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+                        toast.error("Payment successful, but verification failed. Please contact support.");
+                        return;
+                    }
+
+                    try {
+                        const { data } = await axios.post("/api/razorpay/save-plan", {
+                            razorpay_payment_id,
+                            razorpay_order_id,
+                            razorpay_signature,
+                            plan,
+                        });
+
+                        if (data.success) {
+                            toast.success("Payment successful and plan activated!");
+                            setActivatedPlanTitle(plan.title); // Set the activated plan
+                            setShowSuccessAnimation(true); // Trigger animation
+                            setTimeout(() => setShowSuccessAnimation(false), 5000); // Hide after 5 seconds
+                        } else {
+                            toast.error(`Plan activation failed: ${data.message || "Please contact support."}`);
+                        }
+                    } catch (error: any) {
+                        const msg =
+                            error?.response?.data?.message ||
+                            error?.message ||
+                            "An unknown error occurred during plan activation.";
+                        toast.error(`Payment received, but activation failed: ${msg}`);
+                    }
                 },
                 prefill: {
-                    name: "Tarun",
-                    email: "tarun@example.com",
+                    name: "Tarun", // You might want to prefill with actual user data
+                    email: "tarun@example.com", // You might want to prefill with actual user data
                 },
                 theme: {
-                    color: "#2180d3", // Changed to #2180d3
+                    color: "#2180d3",
                 },
             };
 
             const razor = new (window as any).Razorpay(options);
             razor.open();
-        } catch (err) {
-            console.error("Payment failed", err);
+        } catch (err: any) {
+            const msg = err.response?.data?.error || err.message || "Something went wrong.";
+            toast.error(`Failed to initiate payment: ${msg}`);
         }
     };
 
@@ -177,7 +232,9 @@ const SubscriptionPage = () => {
 
     const PlanCard = ({ plan }: { plan: Plan }) => (
         <div
-            className={`relative flex flex-col justify-between bg-white rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1 border-t-8 ${plan.color.replace(/from-\w+-\d+ to-\w+-\d+/, 'from-[#2180d3] to-[#1a6fb0]')} overflow-hidden`} // Adjusted color classes
+            className={`relative flex flex-col justify-between bg-white rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1 border-t-8 ${plan.color.replace(/from-\w+-\d+ to-\w+-\d+/, 'from-[#2180d3] to-[#1a6fb0]')} overflow-hidden
+            ${activatedPlanTitle === plan.title ? 'ring-4 ring-offset-4 ring-[#2180d3] scale-105' : ''}
+            `}
         >
             <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-xl font-bold text-center text-gray-900 mb-1">
@@ -198,20 +255,18 @@ const SubscriptionPage = () => {
                         plan.title === "Quarterly Plan"
                             ? "3 Months Validity"
                             : plan.title === "Half Yearly Plan"
-                                ? "6 Months Validity"
-                                : "12 Months Validity",
+                            ? "6 Months Validity"
+                            : "12 Months Validity",
                         true,
                         CalendarDaysIcon
                     )}
                     {renderFeature(
-                        `${plan.premiumBadging} Premium Listing${plan.premiumBadging > 1 ? "s" : ""
-                        }`,
+                        `${plan.premiumBadging} Premium Listing${plan.premiumBadging > 1 ? "s" : ""}`,
                         true,
                         StarIcon
                     )}
                     {renderFeature(
-                        `${plan.listings} Property Listing${plan.listings > 1 ? "s" : ""
-                        }`,
+                        `${plan.listings} Property Listing${plan.listings > 1 ? "s" : ""}`,
                         true,
                         HomeModernIcon
                     )}
@@ -254,7 +309,7 @@ const SubscriptionPage = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white py-10 px-4 sm:px-6 lg:px-8 font-sans">
+        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white py-10 px-4 sm:px-6 lg:px-8 font-sans relative overflow-hidden">
             <div className="max-w-7xl mx-auto text-center mb-8">
                 <h2 className="text-3xl font-extrabold text-gray-900">Unlock Your Property's Full Potential</h2>
                 <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
@@ -262,14 +317,12 @@ const SubscriptionPage = () => {
                 </p>
             </div>
 
-            {/* Desktop */}
             <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto items-stretch">
                 {plans.map((plan) => (
                     <PlanCard key={plan.title} plan={plan} />
                 ))}
             </div>
 
-            {/* Mobile Swiper */}
             <div className="md:hidden px-4 relative">
                 <Swiper
                     spaceBetween={15}
@@ -297,6 +350,101 @@ const SubscriptionPage = () => {
                     <ChevronRightIcon className="w-8 h-8" />
                 </div>
             </div>
+
+            {/* Success Animation Overlay */}
+            {showSuccessAnimation && (
+                <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 animate-fade-in">
+                    <div className="bg-white p-8 rounded-lg shadow-2xl text-center transform scale-0 animate-pop-in">
+                        <CheckCircleIcon className="w-20 h-20 text-green-500 mx-auto mb-4 animate-bounce-once" />
+                        <h3 className="text-3xl font-bold text-gray-900 mb-2">  
+                            Congratulations!
+                        </h3>
+                        <p className="text-lg text-gray-700">
+                            Your <span className="font-semibold text-[#2180d3]">{activatedPlanTitle}</span> is now active!
+                        </p>
+                        <p className="text-sm text-gray-500 mt-2">
+                            Get ready to unlock your property's full potential.
+                        </p>
+                    </div>
+                    {/* Confetti effect - simple circles for demonstration */}
+                    <div className="confetti-container">
+                        {Array.from({ length: 50 }).map((_, i) => (
+                            <div
+                                key={i}
+                                className="confetti"
+                                style={{
+                                    left: `${Math.random() * 100}%`,
+                                    animationDelay: `${Math.random() * 2}s`,
+                                    backgroundColor: `hsl(${Math.random() * 360}, 70%, 60%)`,
+                                    animationDuration: `${2 + Math.random() * 3}s`,
+                                }}
+                            ></div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Tailwind Keyframes for animations */}
+            <style jsx>{`
+                @keyframes fade-in {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+
+                @keyframes pop-in {
+                    0% { transform: scale(0.5); opacity: 0; }
+                    80% { transform: scale(1.05); opacity: 1; }
+                    100% { transform: scale(1); }
+                }
+
+                @keyframes bounce-once {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-10px); }
+                }
+
+                .animate-fade-in {
+                    animation: fade-in 0.3s ease-out forwards;
+                }
+
+                .animate-pop-in {
+                    animation: pop-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+                }
+
+                .animate-bounce-once {
+                    animation: bounce-once 0.8s ease-in-out;
+                }
+
+                .confetti-container {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: none;
+                    overflow: hidden;
+                }
+
+                .confetti {
+                    position: absolute;
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    opacity: 0;
+                    transform: translateY(0) rotate(0deg);
+                    animation: fall 5s forwards;
+                }
+
+                @keyframes fall {
+                    0% {
+                        transform: translateY(-100px) rotate(0deg);
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateY(100vh) rotate(720deg);
+                        opacity: 0;
+                    }
+                }
+            `}</style>
         </div>
     );
 };

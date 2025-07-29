@@ -93,7 +93,7 @@ export default function Navbar() {
           ) : (
             <Link
               href="/auth"
-              className="border border-white text-white px-4 py-2 rounded-lg hover:bg-white hover:text-[#20b4b1] transition flex items-center gap-2" 
+              className="border border-white text-white px-4 py-2 rounded-lg hover:bg-white hover:text-[#1a6cb2] transition flex items-center gap-2" 
             >
               <UserIcon className="w-5 h-5" />
               Login
