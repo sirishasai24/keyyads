@@ -169,7 +169,7 @@ export const FeaturedListings = () => {
                                             {getListingTags(listing).map((tag, index) => (
                                                 <span
                                                     key={index}
-                                                    className="bg-[#20b4b1]/90 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md"
+                                                    className="bg-[#2180d3]/90 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md"
                                                 >
                                                     {tag}
                                                 </span>
@@ -178,7 +178,7 @@ export const FeaturedListings = () => {
                                     </div>
                                     <div className="p-6">
                                         <h3 className="text-xl font-bold text-gray-800 mb-2 truncate">{listing.title}</h3>
-                                        <p className="text-[#20b4b1] font-extrabold text-lg mb-1">
+                                        <p className="text-[#2180d3] font-extrabold text-lg mb-1">
                                             {formatPrice(listing.price, listing.transactionType)}
                                         </p>
                                         <p className="text-gray-600 text-sm mb-4 flex items-center gap-1">
@@ -187,7 +187,7 @@ export const FeaturedListings = () => {
                                         {/* This button is now redundant if the whole card is a link,
                                             but keeping it if you want specific button styling/behavior.
                                             If the whole card is linked, you might remove this button. */}
-                                        <button className="w-full bg-[#20b4b1] hover:bg-[#1a9a97] text-white py-3 rounded-xl font-medium transition duration-300 ease-in-out shadow-md">
+                                        <button className="w-full bg-[#2180d3] hover:bg-[#1a6cb2] text-white py-3 rounded-xl font-medium transition duration-300 ease-in-out shadow-md">
                                             View Details
                                         </button>
                                     </div>

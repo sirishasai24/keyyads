@@ -252,8 +252,8 @@ export default function EditPropertyPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col justify-center items-center min-h-[calc(100vh-80px)] bg-gray-50 text-[#20b4b1]">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#20b4b1]"></div>
+      <div className="flex flex-col justify-center items-center min-h-[calc(100vh-80px)] bg-gray-50 text-[#2180d3]">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2180d3]"></div>
         <p className="mt-4 text-lg font-medium">Loading property details...</p>
       </div>
     );
@@ -266,7 +266,7 @@ export default function EditPropertyPage() {
         <p className="text-lg text-center mb-6">{error}</p>
         <button
           onClick={() => window.location.reload()} // Simple reload to retry fetching
-          className="px-8 py-3 bg-[#20b4b1] text-white rounded-full hover:bg-[#1a9a97] transition-all duration-300 ease-in-out shadow-lg"
+          className="px-8 py-3 bg-[#2180d3] text-white rounded-full hover:bg-[#1a9a97] transition-all duration-300 ease-in-out shadow-lg"
         >
           <span className="flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -291,7 +291,7 @@ export default function EditPropertyPage() {
       <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl mx-auto">
         {/* Basic Details */}
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#20b4b1] pb-3">Basic Information</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2180d3] pb-3">Basic Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="form-group">
               <label htmlFor="title" className="block text-gray-700 font-medium mb-2">Property Title</label>
@@ -301,7 +301,7 @@ export default function EditPropertyPage() {
                 name="title"
                 value={propertyData.title}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
                 placeholder="e.g., Spacious 3BHK Apartment"
                 required
               />
@@ -314,7 +314,7 @@ export default function EditPropertyPage() {
                 name="username"
                 value={propertyData.username}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
                 placeholder="Your contact name"
                 required
               />
@@ -327,7 +327,7 @@ export default function EditPropertyPage() {
                 name="contact"
                 value={propertyData.contact}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
                 placeholder="+91 9876543210"
                 required
               />
@@ -340,7 +340,7 @@ export default function EditPropertyPage() {
                 name="address"
                 value={propertyData.address}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
                 placeholder="Street, Locality, Landmark"
                 required
               />
@@ -352,7 +352,7 @@ export default function EditPropertyPage() {
                 name="type"
                 value={propertyData.type}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
                 required
               >
                 <option value="building">Building (House, Apartment, Villa)</option>
@@ -366,7 +366,7 @@ export default function EditPropertyPage() {
                 name="transactionType"
                 value={propertyData.transactionType}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
                 required
               >
                 <option value="sale">For Sale</option>
@@ -381,7 +381,7 @@ export default function EditPropertyPage() {
                 name="price"
                 value={propertyData.price}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
                 min="0"
                 required
               />
@@ -394,7 +394,7 @@ export default function EditPropertyPage() {
                 name="discount"
                 value={propertyData.discount}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
                 min="0"
                 max="100"
               />
@@ -404,7 +404,7 @@ export default function EditPropertyPage() {
 
         {/* Location Details */}
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#20b4b1] pb-3">Location Details</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2180d3] pb-3">Location Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="form-group">
               <label htmlFor="state" className="block text-gray-700 font-medium mb-2">State</label>
@@ -414,7 +414,7 @@ export default function EditPropertyPage() {
                 name="location.state"
                 value={propertyData.location.state}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
                 required
               />
             </div>
@@ -426,44 +426,17 @@ export default function EditPropertyPage() {
                 name="location.city"
                 value={propertyData.location.city}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
                 required
               />
             </div>
-            {/* Latitude and Longitude (Optional) */}
-            {/*
-            <div className="form-group">
-              <label htmlFor="lat" className="block text-gray-700 font-medium mb-2">Latitude</label>
-              <input
-                type="number"
-                id="lat"
-                name="location.lat"
-                value={propertyData.location.lat ?? ''}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
-                step="any"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="lng" className="block text-gray-700 font-medium mb-2">Longitude</label>
-              <input
-                type="number"
-                id="lng"
-                name="location.lng"
-                value={propertyData.location.lng ?? ''}
-                onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
-                step="any"
-              />
-            </div>
-            */}
           </div>
         </div>
 
         {/* Specific Details based on Property Type */}
         {propertyData.type === "building" && (
           <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#20b4b1] pb-3">Building Specifics</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2180d3] pb-3">Building Specifics</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="form-group">
                 <label htmlFor="floors" className="block text-gray-700 font-medium mb-2">Floors</label>
@@ -473,7 +446,7 @@ export default function EditPropertyPage() {
                   name="floors"
                   value={propertyData.floors ?? ""}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
                   min="0"
                 />
               </div>
@@ -485,7 +458,7 @@ export default function EditPropertyPage() {
                   name="parking"
                   value={propertyData.parking ?? ""}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
                   min="0"
                 />
               </div>
@@ -497,7 +470,7 @@ export default function EditPropertyPage() {
                   name="bedrooms"
                   value={propertyData.bedrooms ?? ""}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
                   placeholder="e.g., 3, 2BHK"
                 />
               </div>
@@ -509,7 +482,7 @@ export default function EditPropertyPage() {
                   name="bathrooms"
                   value={propertyData.bathrooms ?? ""}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
                   placeholder="e.g., 2, 2 attached"
                 />
               </div>
@@ -520,7 +493,7 @@ export default function EditPropertyPage() {
                   name="propertyAge"
                   value={propertyData.propertyAge ?? ""}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
+                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
                 >
                   <option value="">Select Age</option>
                   <option value="New">New</option>
@@ -536,7 +509,7 @@ export default function EditPropertyPage() {
                   name="furnishing"
                   value={propertyData.furnishing ?? ""}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
+                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
                 >
                   <option value="">Select Furnishing</option>
                   <option value="Unfurnished">Unfurnished</option>
@@ -551,7 +524,7 @@ export default function EditPropertyPage() {
                   name="facing"
                   value={propertyData.facing ?? "Not Specified"}
                   onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
+                  className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
                 >
                   <option value="Not Specified">Not Specified</option>
                   <option value="North">North</option>
@@ -570,7 +543,7 @@ export default function EditPropertyPage() {
 
         {propertyData.type === "land" && (
           <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#20b4b1] pb-3">Land Specifics</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2180d3] pb-3">Land Specifics</h2>
             <div className="form-group">
               <label htmlFor="landCategory" className="block text-gray-700 font-medium mb-2">Land Category</label>
               <select
@@ -578,7 +551,7 @@ export default function EditPropertyPage() {
                 name="landCategory"
                 value={propertyData.landCategory ?? ""}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
                 required={propertyData.type === 'land'}
               >
                 <option value="">Select Category</option>
@@ -592,7 +565,7 @@ export default function EditPropertyPage() {
 
         {/* Area Details */}
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#20b4b1] pb-3">Area Details</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2180d3] pb-3">Area Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="form-group">
               <label htmlFor="area" className="block text-gray-700 font-medium mb-2">Area</label>
@@ -602,7 +575,7 @@ export default function EditPropertyPage() {
                 name="area"
                 value={propertyData.area}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
                 min="0"
                 required
               />
@@ -614,7 +587,7 @@ export default function EditPropertyPage() {
                 name="areaUnit"
                 value={propertyData.areaUnit}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
+                className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent bg-white appearance-none pr-8 transition-all duration-200"
                 required
               >
                 <option value="sqft">Sq. Ft.</option>
@@ -628,7 +601,7 @@ export default function EditPropertyPage() {
 
         {/* Description & Other Details */}
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#20b4b1] pb-3">Additional Information</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2180d3] pb-3">Additional Information</h2>
           <div className="form-group mb-6">
             <label htmlFor="description" className="block text-gray-700 font-medium mb-2">Description</label>
             <textarea
@@ -637,7 +610,7 @@ export default function EditPropertyPage() {
               value={propertyData.description ?? ""}
               onChange={handleChange}
               rows={5}
-              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
               placeholder="Provide a detailed description of the property..."
             ></textarea>
           </div>
@@ -649,7 +622,7 @@ export default function EditPropertyPage() {
               value={propertyData.otherDetails ?? ""}
               onChange={handleChange}
               rows={3}
-              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#20b4b1] focus:border-transparent transition-all duration-200"
+              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-[#2180d3] focus:border-transparent transition-all duration-200"
               placeholder="Any other relevant information..."
             ></textarea>
           </div>
@@ -664,7 +637,7 @@ export default function EditPropertyPage() {
               name="isPremium"
               checked={propertyData.isPremium}
               onChange={handleChange}
-              className="h-5 w-5 text-[#20b4b1] rounded border-gray-300 focus:ring-[#20b4b1] cursor-pointer"
+              className="h-5 w-5 text-[#20b4b1] rounded border-gray-300 focus:ring-[#2180d3] cursor-pointer"
             />
             <label htmlFor="isPremium" className="ml-3 block text-lg font-medium text-gray-800 cursor-pointer">
               Mark as **Premium Listing** (Higher Visibility)
@@ -674,7 +647,7 @@ export default function EditPropertyPage() {
 
         {/* Images */}
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#20b4b1] pb-3">Property Images</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-[#2180d3] pb-3">Property Images</h2>
           <div className="mb-6">
             <label className="block text-gray-700 font-medium mb-2" htmlFor="imageUpload">Upload New Images</label>
             <input
@@ -687,8 +660,8 @@ export default function EditPropertyPage() {
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-full file:border-0
                 file:text-sm file:font-semibold
-                file:bg-[#e0f2f1] file:text-[#20b4b1]
-                hover:file:bg-[#d0e0df] cursor-pointer"
+                file:bg-[#2180d3] file:text-[#fff]
+                hover:file:bg-[#1a6cb2] cursor-pointer"
             />
             <p className="mt-2 text-sm text-gray-500">Add up to 5 images (JPG, PNG) for your listing.</p>
           </div>
@@ -731,7 +704,7 @@ export default function EditPropertyPage() {
             className={`px-10 py-4 rounded-full text-white font-bold text-lg shadow-lg transition-all duration-300 ease-in-out transform
               ${submitting || previewImages.length === 0
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-[#20b4b1] hover:bg-[#1a9a97] hover:scale-105"
+                : "bg-[#2180d3] hover:bg-[#1a6cb2] hover:scale-105"
               }
               flex items-center justify-center
             `}

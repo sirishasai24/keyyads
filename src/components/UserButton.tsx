@@ -22,6 +22,9 @@ export function UserButton() {
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
 
+  const primaryColor = "#2180d3"; // Define the primary color
+  const lightPrimaryColor = "#e6f0fa"; // A lighter shade for hover backgrounds
+
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -82,7 +85,23 @@ export function UserButton() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-10 h-10 rounded-full border border-zinc-300 bg-zinc-200 flex items-center justify-center text-lg font-semibold cursor-pointer hover:border-blue-500 hover:ring-2 hover:ring-blue-300 transition-all duration-200 shadow-sm"
+        className="w-10 h-10 rounded-full border border-zinc-300 bg-zinc-200 flex items-center justify-center text-lg font-semibold cursor-pointer transition-all duration-200 shadow-sm"
+        style={{
+            borderColor: open ? primaryColor : 'rgb(228 228 231)', // Apply primary color when open
+            boxShadow: open ? `0 0 0 2px ${lightPrimaryColor}` : '0 1px 2px 0 rgb(0 0 0 / 0.05)', // Apply ring when open
+        }}
+        onMouseEnter={(e) => {
+            if (!open) {
+                e.currentTarget.style.borderColor = primaryColor;
+                e.currentTarget.style.boxShadow = `0 0 0 2px ${lightPrimaryColor}`;
+            }
+        }}
+        onMouseLeave={(e) => {
+            if (!open) {
+                e.currentTarget.style.borderColor = 'rgb(228 228 231)';
+                e.currentTarget.style.boxShadow = '0 1px 2px 0 rgb(0 0 0 / 0.05)';
+            }
+        }}
         title="User Menu"
       >
         {user.avatar ? (
@@ -108,7 +127,10 @@ export function UserButton() {
               setOpen(false);
               router.push("/user/profile");
             }}
-            className="flex items-center gap-3 w-full text-left px-4 py-2 hover:bg-blue-100 text-zinc-700 cursor-pointer transition-colors duration-200"
+            className="flex items-center gap-3 w-full text-left px-4 py-2 text-zinc-700 cursor-pointer transition-colors duration-200"
+            style={{ '--hover-bg': lightPrimaryColor } as React.CSSProperties} // Use CSS variable for dynamic hover background
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--hover-bg)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
           >
             <User size={18} /> View Profile
           </button>

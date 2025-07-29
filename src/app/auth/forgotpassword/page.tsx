@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { toast } from "react-hot-toast"; // Ensure Toaster is imported or included in a parent component if needed for 'react-hot-toast'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -10,51 +10,58 @@ export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(0);
 
-  // Timer countdown
+  // Timer countdown logic
   useEffect(() => {
     let countdown: NodeJS.Timeout;
     if (timer > 0) {
       countdown = setTimeout(() => setTimer(timer - 1), 1000);
     }
+    // Cleanup the timeout if the component unmounts or timer resets
     return () => clearTimeout(countdown);
   }, [timer]);
 
   const onResetPassword = async () => {
-    // Close any previous empty-email toast
+    // Dismiss any specific toast error for empty email if it exists
     toast.dismiss("empty-email-error");
 
+    // Client-side validation for empty email
     if (!email.trim()) {
       toast.error("Please enter your email.", { id: "empty-email-error" });
       return;
     }
 
+    // Prevent multiple submissions or submission during cooldown
     if (loading || timer > 0) return;
 
+    // Reset messages and activate loading state
     setMessage("");
     setErrorMessage("");
     setLoading(true);
 
     try {
       const response = await axios.post("/api/auth/forgotpassword", { email });
-      console.log(response);
-      setMessage("Email sent to reset password");
-      toast.success("Email sent to reset password");
-      setTimer(30); // Start 30s cooldown
-    } catch (error) {
-      const errorMsg = "An error occurred";
-      console.log(error)
-      setErrorMessage(errorMsg);
-      toast.error(errorMsg);
+      console.log("Forgot password API response:", response.data);
+      setMessage("Email sent to reset password"); // Set internal message state
+      toast.success("Password reset link sent to your email!"); // User-facing toast notification
+      setTimer(30); // Start 30-second cooldown period
+    } catch (error: any) { // Type 'error' as 'any' for flexible error handling
+      // Extract specific error message from response or use a generic one
+      const errorMsg = error.response?.data?.message || "Failed to send reset email. Please try again.";
+      console.error("Forgot password error:", error);
+      setErrorMessage(errorMsg); // Set internal error message state
+      toast.error(errorMsg); // User-facing toast notification
     } finally {
-      setLoading(false);
+      setLoading(false); // Deactivate loading state regardless of success or failure
     }
   };
 
+  // Determine if the button should be disabled
   const isDisabled = !email.trim() || loading || timer > 0;
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#eef2fb] p-4 sm:p-6">
-      <div className="relative w-full max-w-sm sm:max-w-md bg-[#7494ec] rounded-2xl shadow-xl p-6 sm:p-8 transition-all duration-300">
+
+      <div className="relative w-full max-w-sm sm:max-w-md bg-[#2180d3] rounded-2xl shadow-xl p-6 sm:p-8 transition-all duration-300">
         <h1 className="text-lg sm:text-2xl font-bold text-center text-white mb-3 sm:mb-4">
           Forgot Password
         </h1>
@@ -67,17 +74,20 @@ export default function ForgotPasswordPage() {
           placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="block w-full px-4 py-2 rounded-lg bg-white text-gray-800 border border-transparent focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-all duration-300 hover:border-[#5e7fd6]"
+          className="block w-full px-4 py-2 rounded-lg bg-white text-gray-800 border border-transparent focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-all duration-300 hover:border-[#4d97e2]"
+          aria-label="Email for password reset"
+          required
         />
 
         <button
           onClick={onResetPassword}
           disabled={isDisabled}
-          className={`w-full mt-4 py-2 sm:py-3 px-4 font-semibold rounded-lg shadow-md transition-all duration-300 ${
-            isDisabled
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-white text-[#547dec] hover:bg-[#eef2fb] hover:text-black hover:scale-105 cursor-pointer"
-          }`}
+          className={`w-full mt-4 py-2 sm:py-3 px-4 font-semibold rounded-lg shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#51a7e9]
+            ${
+              isDisabled
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-white text-[#2180d3] hover:bg-[#aedffc] hover:text-[#0f3a57] hover:scale-105 cursor-pointer"
+            }`}
         >
           {loading
             ? "Sending..."
@@ -86,11 +96,14 @@ export default function ForgotPasswordPage() {
             : "Reset Password"}
         </button>
 
+        {/* Display messages (toast is usually sufficient for user feedback) */}
         {message && (
-          <p className="mt-3 text-sm text-white text-center">{message}</p>
+          <p className="mt-3 text-sm text-white text-center" role="status">
+            {message}
+          </p>
         )}
         {errorMessage && (
-          <p className="mt-3 text-sm text-red-100 text-center">
+          <p className="mt-3 text-sm text-red-100 text-center" role="alert">
             {errorMessage}
           </p>
         )}

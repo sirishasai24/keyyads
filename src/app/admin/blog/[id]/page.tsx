@@ -20,6 +20,8 @@ export default function Blog() {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const primaryColor = "#2180d3"; // Define the primary color
+
   const fetchBlog = async () => {
     try {
       const response = await axios.get(`/api/admin/blog/${id}`);
@@ -65,8 +67,8 @@ export default function Blog() {
 
   if (!blog || !user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white text-[#20b4b1]">
-        <div className="w-16 h-16 border-4 border-[#20b4b1] border-t-transparent rounded-full animate-spin mb-4" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white" style={{ color: primaryColor }}>
+        <div className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin mb-4" style={{ borderColor: primaryColor, borderTopColor: 'transparent' }} />
         <p className="text-xl font-semibold">Loading blog...</p>
       </div>
     );
@@ -76,7 +78,12 @@ export default function Blog() {
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-100 text-gray-800">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-12">
         <header className="text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-[#20b4b1] to-[#18a7a4] bg-clip-text text-transparent">
+          <h1
+            className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent"
+            style={{
+              backgroundImage: `linear-gradient(to right, ${primaryColor}, #1a66a7)`, // Gradient using primaryColor
+            }}
+          >
             {blog.title}
           </h1>
           <div className="mt-4 flex flex-wrap justify-center gap-4 text-sm text-gray-500">
@@ -87,7 +94,7 @@ export default function Blog() {
             <div className="flex items-center gap-2">
               <FaUserCircle />
               <Link href={`/profile/${blogUser._id}`}>
-                <span className="text-[#20b4b1] font-medium hover:underline">
+                <span className="font-medium hover:underline" style={{ color: primaryColor }}>
                   {blogUser.username}
                 </span>
               </Link>
@@ -122,7 +129,7 @@ export default function Blog() {
 
         {loading && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-            <div className="w-16 h-16 border-4 border-[#20b4b1] border-t-transparent rounded-full animate-spin" />
+            <div className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: primaryColor, borderTopColor: 'transparent' }} />
           </div>
         )}
 
@@ -135,7 +142,7 @@ export default function Blog() {
               {index % 2 === 0 ? (
                 <p className="text-gray-800 text-lg leading-relaxed">{section}</p>
               ) : (
-                <blockquote className="italic border-l-4 pl-4 border-[#20b4b1] text-[#20b4b1] text-base">
+                <blockquote className="italic border-l-4 pl-4 text-base" style={{ borderColor: primaryColor, color: primaryColor }}>
                   <FaQuoteLeft className="inline mr-2" />
                   {section}
                 </blockquote>
@@ -144,17 +151,18 @@ export default function Blog() {
           ))}
         </section>
 
-        <footer className="mt-12 flex items-center gap-4 p-6 bg-white border border-[#20b4b1]/30 rounded-xl shadow">
+        <footer className="mt-12 flex items-center gap-4 p-6 bg-white rounded-xl shadow" style={{ borderColor: `${primaryColor}30`, border: `1px solid ${primaryColor}30` }}>
           {blogUser.profileImageURL && (
             <img
               src={blogUser.profileImageURL}
               alt={blogUser.username}
-              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-[#20b4b1] object-cover"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 object-cover"
+              style={{ borderColor: primaryColor }}
             />
           )}
           <div>
             <Link href={`/profile/${blogUser._id}`}>
-              <h3 className="text-lg font-semibold text-[#20b4b1] hover:underline">
+              <h3 className="text-lg font-semibold hover:underline" style={{ color: primaryColor }}>
                 {blogUser.username}
               </h3>
             </Link>

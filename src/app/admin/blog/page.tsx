@@ -13,6 +13,8 @@ interface Blog {
 }
 
 const Home = () => {
+  const primaryColor = "#2180d3"; // New theme color
+
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +39,7 @@ const Home = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
         <motion.div
-          className="w-16 h-16 border-4 border-[#20b4b1] border-t-transparent rounded-full animate-spin"
+          className="w-16 h-16 border-4 border-[#2180d3] border-t-transparent rounded-full animate-spin" // Updated color
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.5 }}
@@ -55,7 +57,7 @@ const Home = () => {
   return (
     <div className="bg-gray-50 min-h-screen px-4 md:px-12 py-10">
       <motion.h1
-        className="text-4xl font-extrabold text-center text-[#20b4b1] mb-12"
+        className="text-4xl font-extrabold text-center text-[#2180d3] mb-12" // Updated color
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
@@ -79,7 +81,7 @@ const Home = () => {
               />
             </div>
             <div className="p-6 flex flex-col flex-grow">
-              <h2 className="text-xl font-semibold text-[#20b4b1] mb-2">
+              <h2 className="text-xl font-semibold text-[#2180d3] mb-2"> {/* Updated color */}
                 {blog.title}
               </h2>
               <p className="text-gray-600 text-sm mb-4">
@@ -90,7 +92,7 @@ const Home = () => {
               </p>
               <a
                 href={`/admin/blog/${blog._id}`}
-                className="mt-auto inline-block text-center text-white bg-[#20b4b1] px-4 py-2 rounded-lg hover:bg-[#199f9c] transition"
+                className="mt-auto inline-block text-center text-white bg-[#2180d3] px-4 py-2 rounded-lg hover:bg-[#1a66a7] transition" // Updated colors
               >
                 Read More
               </a>

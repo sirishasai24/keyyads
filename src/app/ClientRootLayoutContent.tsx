@@ -12,7 +12,7 @@ export default function ClientRootLayoutContent({
 }) {
   const pathname = usePathname();
 
-  const excludeNavbarPaths = ['/auth', '/resetpassword', '/forgotpassword', '/resetpassword','verifyemail'];
+  const excludeNavbarPaths = ['/auth', '/auth/resetpassword', '/auth/forgotpassword', '/auth/resetpassword','/auth/verifyemail'];
 
   const shouldShowNavbar = !excludeNavbarPaths.includes(pathname);
 

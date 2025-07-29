@@ -3,7 +3,7 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 function NewPasswordPage() {
   const router = useRouter();
@@ -11,7 +11,7 @@ function NewPasswordPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [equal, setEqual] = useState(true);
+  const [passwordsMatchAndLengthValid, setPasswordsMatchAndLengthValid] = useState(false); // Renamed for clarity
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -19,19 +19,29 @@ function NewPasswordPage() {
   useEffect(() => {
     const emailId = searchParams.get("email");
     if (emailId) setEmail(emailId);
-  }, [searchParams]);
+    else {
+      // If no email is found, likely an invalid direct access, redirect or show error
+      toast.error("Email not found in the link. Please retry the password reset process.");
+      router.push("/auth/forgotpassword"); // Redirect to forgot password page
+    }
+  }, [searchParams, router]); // Added router to dependency array
 
   useEffect(() => {
-    if (newPassword === confirmPassword && newPassword.length > 7) {
-      setEqual(false);
+    // Check if passwords match and meet minimum length
+    if (newPassword === confirmPassword && newPassword.length >= 8) { // Minimum 8 characters for password strength
+      setPasswordsMatchAndLengthValid(true);
     } else {
-      setEqual(true);
+      setPasswordsMatchAndLengthValid(false);
     }
   }, [confirmPassword, newPassword]);
 
   const onResetPassword = async () => {
-    if (equal) {
-      toast.error("Passwords do not match or are too short!");
+    if (!passwordsMatchAndLengthValid) {
+      if (newPassword.length < 8) {
+        toast.error("Password must be at least 8 characters long.");
+      } else {
+        toast.error("Passwords do not match!");
+      }
       return;
     }
     setLoading(true);
@@ -40,14 +50,15 @@ function NewPasswordPage() {
         email,
         newPassword,
       });
-      console.log(response);
+      console.log("Password reset response:", response.data);
       toast.success("Password reset successfully!");
       setTimeout(() => {
         router.push("/auth");
       }, 2000);
-    } catch (error) {
+    } catch (error: any) { // Use 'any' for broader error handling
       console.error("Error resetting password:", error);
-      toast.error("Failed to reset password. Please try again.");
+      const errorMessage = error.response?.data?.message || "Failed to reset password. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -55,8 +66,7 @@ function NewPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#eef2fb] p-4">
-      <Toaster position="top-center" reverseOrder={false} />
-      <div className="bg-[#7494ec] shadow-2xl rounded-2xl p-8 w-full max-w-md transition-all duration-300">
+      <div className="bg-[#2180d3] shadow-2xl rounded-2xl p-8 w-full max-w-md transition-all duration-300">
         <h1 className="text-2xl font-bold text-white mb-4 text-center">
           Reset Your Password
         </h1>
@@ -75,8 +85,10 @@ function NewPasswordPage() {
               id="newpassword"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-transparent rounded-lg bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-white focus:border-white transition-all duration-300 hover:border-[#5e7fd6]"
-              placeholder="Enter new password"
+              className="mt-1 block w-full px-4 py-2 border border-transparent rounded-lg bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-white focus:border-white transition-all duration-300 hover:border-[#4d97e2]"
+              placeholder="Enter new password (min 8 characters)"
+              minLength={8} // Add minLength attribute for basic HTML validation
+              required
             />
             <button
               type="button"
@@ -145,8 +157,10 @@ function NewPasswordPage() {
               id="confirmpassword"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 border border-transparent rounded-lg bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-white focus:border-white transition-all duration-300 hover:border-[#5e7fd6]"
+              className="mt-1 block w-full px-4 py-2 border border-transparent rounded-lg bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-white focus:border-white transition-all duration-300 hover:border-[#4d97e2]"
               placeholder="Confirm new password"
+              minLength={8} // Add minLength attribute
+              required
             />
             <button
               type="button"
@@ -206,13 +220,13 @@ function NewPasswordPage() {
 
           {/* Reset Password Button */}
           <button
-            disabled={equal || loading}
+            disabled={!passwordsMatchAndLengthValid || loading} // Use the clearer state variable
             onClick={onResetPassword}
             className={`w-full px-4 py-2 font-semibold rounded-lg shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 
               ${
-                equal || loading
+                !passwordsMatchAndLengthValid || loading
                   ? "bg-gray-400 text-white cursor-not-allowed"
-                  : "bg-white text-[#547dec] hover:bg-[#eef2fb] hover:text-black hover:scale-105 cursor-pointer"
+                  : "bg-white text-[#2180d3] hover:bg-[#aedffc] hover:text-[#0f3a57] hover:scale-105 cursor-pointer focus:ring-[#2180d3]" // Updated hover and focus states
               }`}
           >
             {loading ? "Resetting..." : "Reset Password"}
@@ -225,7 +239,11 @@ function NewPasswordPage() {
 
 function NewPasswordPageWrapper() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#eef2fb] p-4 text-[#2180d3] font-semibold">
+        Loading...
+      </div>
+    }>
       <NewPasswordPage />
     </Suspense>
   );

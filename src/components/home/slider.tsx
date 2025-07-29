@@ -72,7 +72,7 @@ export const Carousel: React.FC<CarouselProps> = ({
                             <button
                                 key={index}
                                 onClick={() => goToSlide(index)}
-                                className={`h-2 w-2 rounded-full ${currentIndex === index ? 'bg-[#20b4b1]' : 'bg-gray-300'} transition-colors duration-200`}
+                                className={`h-2 w-2 rounded-full ${currentIndex === index ? 'bg-[#1f8fff]' : 'bg-gray-300'} transition-colors duration-200`}
                             />
                         ))}
                     </div>

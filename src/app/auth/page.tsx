@@ -18,12 +18,12 @@ import { FaGoogle, FaGithub } from "react-icons/fa";
 
 const Loader = () => (
   <div className="fixed top-0 left-0 w-full h-full bg-white/80 flex items-center justify-center z-[9999]">
-    <div className="w-12 h-12 border-4 border-[#6fcfcc] border-b-transparent rounded-full animate-spin"></div>
+    <div className="w-12 h-12 border-4 border-[#2180d3] border-b-transparent rounded-full animate-spin"></div>
   </div>
 );
 
 const inputBaseClass =
-  "w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6fcfcc] focus:border-transparent placeholder-gray-400 transition duration-200";
+  "w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2180d3] focus:border-transparent placeholder-gray-400 transition duration-200";
 
 const LoginRegister: React.FC = () => {
   const router = useRouter();
@@ -131,11 +131,6 @@ const LoginRegister: React.FC = () => {
           >
             <div className="flex flex-col items-center mb-2">
               <Image src={Logo} alt="Logo" width={100} height={100} />
-              {/* <h2 className="text-3xl font-bold mt-2 text-transparent bg-clip-text bg-gradient-to-r from-[#6fcfcc] to-[#2e3a47] tracking-wide">
-  Plot Easy
-</h2> */}
-
-
             </div>
 
             <form onSubmit={isRegistering ? handleRegister : handleLogin}>
@@ -224,7 +219,7 @@ const LoginRegister: React.FC = () => {
                 <div className="text-right mb-4 text-sm">
                   <a
                     href="/auth/forgotpassword"
-                    className="text-[#20b4b1] hover:underline"
+                    className="text-[#2180d3] hover:underline"
                   >
                     Forgot Password?
                   </a>
@@ -234,7 +229,7 @@ const LoginRegister: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoginLoading || isRegisterLoading}
-                className="w-full bg-[#20b4b1] text-white font-semibold p-3 rounded-lg hover:scale-[1.01] transition-transform cursor-pointer hover:bg-[#1a9a97]"
+                className="w-full bg-[#2180d3] text-white font-semibold p-3 rounded-lg hover:scale-[1.01] transition-transform cursor-pointer hover:bg-[#1a68a7]"
               >
                 {isRegistering ? "Register" : "Login"}
               </button>
@@ -248,17 +243,17 @@ const LoginRegister: React.FC = () => {
                   type="button"
                   onClick={() => signInWithProvider("google")}
                   disabled={socialLoadingType !== null}
-                  className="p-3 rounded-full shadow border border-gray-300 hover:scale-105 transition cursor-pointer bg-white hover:border-[#20b4b1]"
+                  className="p-3 rounded-full shadow border border-gray-300 hover:scale-105 transition cursor-pointer bg-white hover:border-[#2180d3]"
                 >
-                  <FaGoogle className="text-lg text-[#20b4b1] hover:text-black" />
+                  <FaGoogle className="text-lg text-[#2180d3] hover:text-black" />
                 </button>
                 <button
                   type="button"
                   onClick={() => signInWithProvider("github")}
                   disabled={socialLoadingType !== null}
-                  className="p-3 rounded-full bg-white shadow border border-gray-300 hover:scale-105 transition cursor-pointer hover:border-[#20b4b1]"
+                  className="p-3 rounded-full bg-white shadow border border-gray-300 hover:scale-105 transition cursor-pointer hover:border-[#2180d3]"
                 >
-                  <FaGithub className="text-lg text-[#20b4b1] hover:text-black" />
+                  <FaGithub className="text-lg text-[#2180d3] hover:text-black" />
                 </button>
               </div>
 
@@ -267,7 +262,7 @@ const LoginRegister: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsRegistering(!isRegistering)}
-                  className="text-[#20b4b1] font-medium hover:underline cursor-pointer"
+                  className="text-[#2180d3] font-medium hover:underline cursor-pointer"
                 >
                   {isRegistering ? "Sign In" : "Sign Up"}
                 </button>

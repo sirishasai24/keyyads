@@ -44,20 +44,9 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="sticky top-0 z-50 bg-gradient-to-r from-[#20B4B1] to-[#3aafa9] shadow-md border-b border-gray-200"> {/* Updated gradient background */}
+    <nav className="sticky top-0 z-50 bg-gradient-to-r from-[#2180d3] to-[#2180d3] shadow"> {/* Updated gradient background */}
       <div className="absolute top-full left-0 w-full overflow-hidden leading-[0]">
-        <svg
-          className="relative block w-[calc(100%+1.3px)] h-6"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="none"
-          viewBox="0 0 1200 120"
-        >
-          {/* Changed fill color to match the 'to' color of the navbar gradient */}
-          <path
-            d="M1200 0L0 0 0 46.29C150 72.86 350 90 600 90s450-17.14 600-43.71V0z"
-            className="fill-[#3aafa9]" // Curve color matches the end of the gradient
-          ></path>
-        </svg>
+       
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center relative z-10">
@@ -94,7 +83,7 @@ export default function Navbar() {
           )}
           <Link
             href="/property/add"
-            className="bg-white text-[#20b4b1] px-4 py-2 rounded-lg hover:bg-gray-100 transition flex items-center" 
+            className="bg-white text-[#2180d3] px-4 py-2 rounded-lg hover:bg-gray-100 transition flex items-center" 
           >
             <PlusIcon className="w-5 h-5 mr-2" />
             Post Property

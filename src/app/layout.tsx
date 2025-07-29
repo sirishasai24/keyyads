@@ -1,24 +1,22 @@
 // app/layout.tsx
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Alata } from "next/font/google";
 import "./globals.css";
-import 'leaflet/dist/leaflet.css';
+import "leaflet/dist/leaflet.css";
 
-import ClientRootLayoutContent from '@/app/ClientRootLayoutContent';
+import Script from "next/script";
+import ClientRootLayoutContent from "@/app/ClientRootLayoutContent";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const alata = Alata({
+  weight: "400",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-alata",
 });
 
 export const metadata: Metadata = {
   title: "Ploteasy",
-  description: "Find your next home or investment property with Ploteasy. Browse properties for sale and rent, connect with agents, and post your listings.",
+  description:
+    "Find your next home or investment property with Ploteasy. Browse properties for sale and rent, connect with agents, and post your listings.",
 };
 
 export default function RootLayout({
@@ -36,13 +34,17 @@ export default function RootLayout({
           crossOrigin="anonymous"
           referrerPolicy="no-referrer"
         />
+
+        {/* Razorpay Checkout script */}
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="beforeInteractive"
+        />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-800`}
+        className={`${alata.variable} font-sans antialiased bg-gray-50 text-gray-800`}
       >
-        <ClientRootLayoutContent>
-          {children}
-        </ClientRootLayoutContent>
+        <ClientRootLayoutContent>{children}</ClientRootLayoutContent>
       </body>
     </html>
   );
