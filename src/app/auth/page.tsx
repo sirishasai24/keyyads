@@ -12,7 +12,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import Image from "next/image";
-import Logo from "../../../public/images/plotlogo1.jpg";
+import Logo from "../../../public/images/keyyards.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaGoogle, FaGithub } from "react-icons/fa";
 
@@ -129,8 +129,8 @@ const LoginRegister: React.FC = () => {
             transition={{ duration: 0.5 }}
             className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl"
           >
-            <div className="flex flex-col items-center mb-2">
-              <Image src={Logo} alt="Logo" width={100} height={100} />
+            <div className="flex flex-col items-center ">
+              <Image src={Logo} alt="Logo" width={200} height={100} />
             </div>
 
             <form onSubmit={isRegistering ? handleRegister : handleLogin}>

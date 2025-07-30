@@ -2,24 +2,33 @@ import Razorpay from "razorpay";
 import { NextRequest, NextResponse } from "next/server";
 
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { amount, planName } = body;
+    try {
+        const body = await req.json();
+        const { amount, planName } = body;
 
-  const options = {
-    amount: amount * 100,
-    currency: "INR",
-    receipt: `receipt_${planName}_${Date.now()}`,
-  };
+        if (typeof amount !== 'number' || amount <= 0) {
+            console.error("Invalid amount received for order creation:", amount);
+            return NextResponse.json({ error: "Invalid amount provided" }, { status: 400 });
+        }
 
-  try {
-    const order = await razorpay.orders.create(options);
-    return NextResponse.json(order);
-  } catch (error) {
-    return NextResponse.json({ error: "Order creation failed" }, { status: 500 });
-  }
+        const options = {
+            amount: amount,
+            currency: "INR",
+            receipt: `receipt_${planName || 'subscription'}_${Date.now()}`,
+        };
+
+        const order = await razorpay.orders.create(options);
+        return NextResponse.json(order);
+    } catch (error) {
+        console.error("Error creating Razorpay order:", error);
+        return NextResponse.json(
+            { error: "Order creation failed", message: error || "Unknown error" },
+            { status: 500 }
+        );
+    }
 }

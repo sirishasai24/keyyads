@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import {
@@ -25,6 +25,12 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 
+declare global {
+    interface Window {
+        Razorpay: any;
+    }
+}
+
 interface Plan {
     title: string;
     color: string;
@@ -39,6 +45,42 @@ interface Plan {
     price: string;
     originalPrice: string;
     note: string;
+    order: number;
+}
+
+interface User {
+    _id: string;
+    username: string;
+    email: string;
+    plan: "Free" | "Quarterly Plan" | "Half Yearly Plan" | "Annual Plan";
+    listings: number;
+    premiumBadging: number;
+}
+
+interface UserPlanDetails {
+    userId: string;
+    planTitle: "Quarterly Plan" | "Half Yearly Plan" | "Annual Plan";
+    startDate: string;
+    expiryDate: string;
+    transactionId: string;
+    pricePaid: string;
+    listings: number;
+    premiumBadging: number;
+    shows: number;
+    emi: boolean;
+    saleAssurance: boolean;
+    socialMedia: boolean;
+    moneyBack: boolean | string;
+    teleCalling: boolean;
+    originalPrice: string;
+    note: string;
+    planDetailsSnapshot: object;
+    createdAt: string;
+}
+
+interface CurrentUserResponse {
+    user: User;
+    plan?: UserPlanDetails;
 }
 
 interface ShowMoreState {
@@ -57,9 +99,10 @@ const plans: Plan[] = [
         socialMedia: true,
         moneyBack: false,
         teleCalling: false,
-        price: "₹8,999/-",
+        price: "₹8,999",
         originalPrice: "₹12,499",
         note: "Inclusive of GST",
+        order: 1,
     },
     {
         title: "Half Yearly Plan",
@@ -72,9 +115,10 @@ const plans: Plan[] = [
         socialMedia: true,
         moneyBack: false,
         teleCalling: true,
-        price: "₹17,999/-",
+        price: "₹17,999",
         originalPrice: "₹26,999",
         note: "Inclusive of GST",
+        order: 2,
     },
     {
         title: "Annual Plan",
@@ -87,9 +131,10 @@ const plans: Plan[] = [
         socialMedia: true,
         moneyBack: "Yes (After 6th month)",
         teleCalling: true,
-        price: "₹29,988/-",
+        price: "₹29,988",
         originalPrice: "₹44,982",
         note: "Inclusive of GST",
+        order: 3,
     },
 ];
 
@@ -97,13 +142,47 @@ const SubscriptionPage = () => {
     const [showMore, setShowMore] = useState<ShowMoreState>({});
     const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
     const [activatedPlanTitle, setActivatedPlanTitle] = useState<string | null>(null);
-
+    const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const [currentUserPlanDetails, setCurrentUserPlanDetails] = useState<UserPlanDetails | null>(null);
+    const [loadingUser, setLoadingUser] = useState(true);
+    const [razorpayLoading, setRazorpayLoading] = useState(true);
 
     useEffect(() => {
         const script = document.createElement("script");
         script.src = "https://checkout.razorpay.com/v1/checkout.js";
         script.async = true;
+        script.onload = () => {
+            setRazorpayLoading(false);
+        };
+        script.onerror = () => {
+            toast.error("Failed to load payment script. Please refresh.");
+            setRazorpayLoading(false);
+        };
         document.body.appendChild(script);
+
+        return () => {
+            document.body.removeChild(script);
+        };
+    }, []);
+
+    useEffect(() => {
+        fetchUserData();
+    }, [activatedPlanTitle]);
+
+    const fetchUserData = useCallback(async () => {
+        try {
+            setLoadingUser(true);
+            const res = await axios.get<CurrentUserResponse>("/api/user/current-plan");
+            setCurrentUser(res.data.user);
+            setCurrentUserPlanDetails(res.data.plan || null);
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+            if (axios.isAxiosError(error) && error.response?.status !== 401 && error.response?.status !== 403) {
+                toast.error("Error loading user information. Please log in again.");
+            }
+        } finally {
+            setLoadingUser(false);
+        }
     }, []);
 
     const toggleShowMore = (title: string) => {
@@ -113,34 +192,98 @@ const SubscriptionPage = () => {
         }));
     };
 
-    const handleBuyNow = async (plan: Plan) => {
-        const amount = parseInt(plan.price.replace(/[^\d]/g, ""), 10);
+    const parsePrice = (priceString: string): number => {
+        return parseInt(priceString.replace(/[₹,\/-]/g, ""), 10);
+    };
 
-        if (isNaN(amount) || amount <= 0) {
-            toast.error("Invalid plan price. Please try again or contact support.");
+    const calculateUpgradePrice = (
+        newPlan: Plan,
+        currentPlanDetails: UserPlanDetails
+    ): number => {
+        const newPlanPrice = parsePrice(newPlan.price);
+        const currentPlanPricePaid = parsePrice(currentPlanDetails.pricePaid);
+
+        const currentStartDate = new Date(currentPlanDetails.startDate);
+        const currentExpiryDate = new Date(currentPlanDetails.expiryDate);
+        const currentDate = new Date();
+
+        const totalDurationMs = currentExpiryDate.getTime() - currentStartDate.getTime();
+        const totalDurationDays = totalDurationMs / (1000 * 60 * 60 * 24);
+
+        const elapsedDurationMs = currentDate.getTime() - currentStartDate.getTime();
+        const elapsedDurationDays = Math.max(0, elapsedDurationMs / (1000 * 60 * 60 * 24));
+
+        if (totalDurationDays <= 0 || elapsedDurationDays >= totalDurationDays) {
+            return newPlanPrice;
+        }
+
+        const valueUsed = (elapsedDurationDays / totalDurationDays) * currentPlanPricePaid;
+
+        const remainingValue = currentPlanPricePaid - valueUsed;
+
+        const finalUpgradePrice = Math.max(0, newPlanPrice - remainingValue);
+
+        return Math.round(finalUpgradePrice);
+    };
+
+    const processPayment = async (plan: Plan, action: "save" | "renew" | "upgrade") => {
+        if (!currentUser) {
+            toast.error("Please log in to purchase a plan.");
             return;
         }
 
+        if (razorpayLoading || typeof window.Razorpay === "undefined") {
+            toast.error("Payment system is not ready. Please wait a moment or refresh the page.");
+            return;
+        }
+
+        let amountToSendINR = parsePrice(plan.price);
+        let endpoint = "";
+        let successMessage = "";
+        let failureMessage = "";
+
+        if (action === "save") {
+            endpoint = "/api/razorpay/save-plan";
+            successMessage = "Payment successful and plan activated!";
+            failureMessage = "Plan activation failed:";
+        } else if (action === "renew") {
+            endpoint = "/api/razorpay/renew-plan";
+            successMessage = "Plan successfully renewed!";
+            failureMessage = "Plan renewal failed:";
+        } else if (action === "upgrade") {
+            if (!currentUserPlanDetails) {
+                toast.error("Current plan details not found for upgrade. Cannot proceed.");
+                return;
+            }
+            amountToSendINR = calculateUpgradePrice(plan, currentUserPlanDetails);
+            endpoint = "/api/razorpay/upgrade-plan";
+            successMessage = "Plan successfully upgraded!";
+            failureMessage = "Plan upgrade failed:";
+        }
+
+        if (isNaN(amountToSendINR) || amountToSendINR < 0) {
+            toast.error("Invalid amount for payment. Please contact support.");
+            return;
+        }
+
+        const razorpayAmount = Math.max(100, Math.round(amountToSendINR * 100));
+
         try {
             const res = await axios.post("/api/razorpay/create-order", {
-                amount,
+                amount: razorpayAmount,
                 planName: plan.title,
             });
 
             const order = res.data;
 
             if (!order?.id || !order?.amount || !order?.currency) {
-                toast.error("Failed to create order. Please try again.");
+                toast.error("Failed to create payment order. Please try again.");
+                console.error("Backend did not return a valid order object:", order);
                 return;
             }
 
             if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
-                toast.error("Payment gateway not configured.");
-                return;
-            }
-
-            if (typeof (window as any).Razorpay === "undefined") {
-                toast.error("Payment system not ready. Please refresh the page.");
+                toast.error("Payment gateway not configured correctly (missing key ID).");
                 return;
             }
 
@@ -160,20 +303,22 @@ const SubscriptionPage = () => {
                     }
 
                     try {
-                        const { data } = await axios.post("/api/razorpay/save-plan", {
+                        const { data } = await axios.post(endpoint, {
                             razorpay_payment_id,
                             razorpay_order_id,
                             razorpay_signature,
                             plan,
+                            ...(action === "upgrade" && { currentUserPlanDetails: currentUserPlanDetails }),
                         });
 
                         if (data.success) {
-                            toast.success("Payment successful and plan activated!");
-                            setActivatedPlanTitle(plan.title); // Set the activated plan
-                            setShowSuccessAnimation(true); // Trigger animation
-                            setTimeout(() => setShowSuccessAnimation(false), 5000); // Hide after 5 seconds
+                            toast.success(successMessage);
+                            setActivatedPlanTitle(plan.title);
+                            setShowSuccessAnimation(true);
+                            setTimeout(() => setShowSuccessAnimation(false), 5000);
+                            fetchUserData();
                         } else {
-                            toast.error(`Plan activation failed: ${data.message || "Please contact support."}`);
+                            toast.error(`${failureMessage} ${data.message || "Please contact support."}`);
                         }
                     } catch (error: any) {
                         const msg =
@@ -181,22 +326,28 @@ const SubscriptionPage = () => {
                             error?.message ||
                             "An unknown error occurred during plan activation.";
                         toast.error(`Payment received, but activation failed: ${msg}`);
+                        console.error("Plan activation failed after successful payment:", error);
                     }
                 },
                 prefill: {
-                    name: "Tarun", // You might want to prefill with actual user data
-                    email: "tarun@example.com", // You might want to prefill with actual user data
+                    name: currentUser?.username || "Customer",
+                    email: currentUser?.email || "customer@example.com",
                 },
                 theme: {
                     color: "#2180d3",
                 },
             };
 
-            const razor = new (window as any).Razorpay(options);
+            const razor = new window.Razorpay(options);
+            razor.on('payment.failed', function (response: any){
+                toast.error(`Payment Failed: ${response.error.description || "An error occurred."}`);
+                console.error("Razorpay Payment Failed:", response.error);
+            });
             razor.open();
         } catch (err: any) {
             const msg = err.response?.data?.error || err.message || "Something went wrong.";
             toast.error(`Failed to initiate payment: ${msg}`);
+            console.error("Payment initiation error:", err.response?.data || err.message || err);
         }
     };
 
@@ -230,88 +381,156 @@ const SubscriptionPage = () => {
         );
     };
 
-    const PlanCard = ({ plan }: { plan: Plan }) => (
-        <div
-            className={`relative flex flex-col justify-between bg-white rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1 border-t-8 ${plan.color.replace(/from-\w+-\d+ to-\w+-\d+/, 'from-[#2180d3] to-[#1a6fb0]')} overflow-hidden
-            ${activatedPlanTitle === plan.title ? 'ring-4 ring-offset-4 ring-[#2180d3] scale-105' : ''}
-            `}
-        >
-            <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold text-center text-gray-900 mb-1">
-                    {plan.title.toUpperCase()}
-                </h3>
-                <p className="text-center text-gray-500 text-sm mb-2">
-                    The perfect plan for your needs.
-                </p>
-                <div className="text-center mb-4">
-                    <p className="text-3xl font-extrabold text-gray-900">{plan.price}</p>
-                    <p className="text-sm text-gray-400 line-through">
-                        (Original: {plan.originalPrice})
-                    </p>
+    const PlanCard = ({ plan }: { plan: Plan }) => {
+        const userHasActivePlan = currentUser && currentUser.plan !== "Free";
+        const isCurrentPlan = currentUser?.plan === plan.title;
+        const currentUserPlanOrder = plans.find(p => p.title === currentUser?.plan)?.order;
+        const canUpgrade = currentUserPlanOrder && plan.order > currentUserPlanOrder;
+        const isLowerOrEqualPlanOrder = currentUserPlanOrder && plan.order <= currentUserPlanOrder;
+
+
+        let buttonText = "BUY NOW";
+        let buttonAction: "save" | "renew" | "upgrade" = "save";
+        let buttonClasses = "bg-gradient-to-r from-[#2180d3] to-[#1a6fb0]";
+        let displayPrice: string | number = parsePrice(plan.price);
+        let buttonDisabled = false;
+
+        if (loadingUser || razorpayLoading) {
+            buttonText = "LOADING...";
+            buttonClasses = "bg-gray-400 cursor-not-allowed";
+            buttonDisabled = true;
+        } else if (!currentUser) {
+            buttonText = "LOGIN TO BUY";
+            buttonClasses = "bg-gray-400 cursor-not-allowed";
+            buttonDisabled = true;
+        } else if (isCurrentPlan) {
+            buttonText = "RENEW NOW";
+            buttonAction = "renew";
+            buttonClasses = "bg-gradient-to-r from-yellow-500 to-yellow-600";
+            buttonDisabled = false;
+        } else if (userHasActivePlan && canUpgrade && currentUserPlanDetails) {
+            displayPrice = calculateUpgradePrice(plan, currentUserPlanDetails);
+            buttonText = `UPGRADE (Pay ₹${displayPrice.toLocaleString()})`;
+            buttonAction = "upgrade";
+            buttonClasses = "bg-gradient-to-r from-green-500 to-green-600";
+            buttonDisabled = false;
+        } else if (userHasActivePlan && isLowerOrEqualPlanOrder) {
+            buttonText = "YOU HAVE A HIGHER PLAN";
+            buttonClasses = "bg-gray-400 cursor-not-allowed";
+            buttonDisabled = true;
+        }
+
+        const handleButtonClick = () => {
+            if (buttonDisabled) return;
+            processPayment(plan, buttonAction);
+        };
+
+        return (
+            <div
+                className={`relative flex flex-col justify-between bg-white rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1 overflow-hidden
+                ${activatedPlanTitle === plan.title ? 'ring-4 ring-offset-4 ring-[#2180d3] scale-105' : ''}
+                ${isCurrentPlan && !activatedPlanTitle ? 'ring-4 ring-offset-4 ring-yellow-500 scale-105' : ''}
+                `}
+            >
+                <div className={`p-6 bg-gradient-to-r ${plan.color} text-white text-center rounded-t-3xl`}>
+                    <h3 className="text-2xl font-bold">{plan.title.toUpperCase()}</h3>
+                    <p className="mt-1 text-sm opacity-90">The perfect plan for your needs.</p>
                 </div>
 
-                <ul className="text-base">
-                    {renderFeature(
-                        plan.title === "Quarterly Plan"
-                            ? "3 Months Validity"
-                            : plan.title === "Half Yearly Plan"
-                            ? "6 Months Validity"
-                            : "12 Months Validity",
-                        true,
-                        CalendarDaysIcon
-                    )}
-                    {renderFeature(
-                        `${plan.premiumBadging} Premium Listing${plan.premiumBadging > 1 ? "s" : ""}`,
-                        true,
-                        StarIcon
-                    )}
-                    {renderFeature(
-                        `${plan.listings} Property Listing${plan.listings > 1 ? "s" : ""}`,
-                        true,
-                        HomeModernIcon
-                    )}
-                    {renderFeature(
-                        `Property Shows`,
-                        `${plan.shows} Event${plan.shows > 1 ? "s" : ""}`,
-                        CalendarDaysIcon
-                    )}
+                <div className="p-6 flex flex-col flex-grow">
+                    <div className="text-center mb-4">
+                        {buttonAction === "upgrade" ? (
+                            <>
+                                <p className="text-3xl font-extrabold text-gray-900">₹{displayPrice.toLocaleString()}/-</p>
+                                <p className="text-sm text-gray-400 line-through">
+                                    (New Plan Original: ₹{parsePrice(plan.originalPrice).toLocaleString()})
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    (Adjusted price considering your current plan's remaining value)
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <p className="text-3xl font-extrabold text-gray-900">₹{parsePrice(plan.price).toLocaleString()}/-</p>
+                                <p className="text-sm text-gray-400 line-through">
+                                    (Original: ₹{parsePrice(plan.originalPrice).toLocaleString()})
+                                </p>
+                            </>
+                        )}
+                    </div>
 
-                    {showMore[plan.title] && (
-                        <>
-                            {renderFeature("EMI Options", plan.emi, BanknotesIcon)}
-                            {renderFeature("Sale Assurance", plan.saleAssurance, ShieldCheckIcon)}
-                            {renderFeature("Social Media Promotions", plan.socialMedia, ShareIcon)}
-                            {renderFeature("100% Money Back Policy", plan.moneyBack, ArrowUturnLeftIcon)}
-                            {renderFeature("Tele Calling Service", plan.teleCalling, PhoneIcon)}
-                        </>
-                    )}
-                </ul>
+                    <ul className="text-base flex-grow">
+                        {renderFeature(
+                            plan.title === "Quarterly Plan"
+                                ? "3 Months Validity"
+                                : plan.title === "Half Yearly Plan"
+                                    ? "6 Months Validity"
+                                    : "12 Months Validity",
+                            true,
+                            CalendarDaysIcon
+                        )}
+                        {renderFeature(
+                            `${plan.premiumBadging} Premium Listing${plan.premiumBadging > 1 ? "s" : ""}`,
+                            true,
+                            StarIcon
+                        )}
+                        {renderFeature(
+                            `${plan.listings} Property Listing${plan.listings > 1 ? "s" : ""}`,
+                            true,
+                            HomeModernIcon
+                        )}
+                        {renderFeature(
+                            `Property Shows`,
+                            `${plan.shows} Event${plan.shows > 1 ? "s" : ""}`,
+                            CalendarDaysIcon
+                        )}
 
-                <div className="mt-4 text-center">
-                    <button
-                        onClick={() => toggleShowMore(plan.title)}
-                        className="inline-flex items-center justify-center text-[#2180d3] hover:text-[#1a6fb0] text-sm font-semibold mb-3 px-5 py-1.5 rounded-full transition duration-300 border border-[#2180d3]"
-                    >
-                        {showMore[plan.title] ? "View Less Features" : "View More Features"}
-                    </button>
+                        {showMore[plan.title] && (
+                            <>
+                                {renderFeature("EMI Options", plan.emi, BanknotesIcon)}
+                                {renderFeature("Sale Assurance", plan.saleAssurance, ShieldCheckIcon)}
+                                {renderFeature("Social Media Promotions", plan.socialMedia, ShareIcon)}
+                                {renderFeature("100% Money Back Policy", plan.moneyBack, ArrowUturnLeftIcon)}
+                                {renderFeature("Tele Calling Service", plan.teleCalling, PhoneIcon)}
+                            </>
+                        )}
+                    </ul>
 
-                    <button
-                        onClick={() => handleBuyNow(plan)}
-                        className="w-full py-3 rounded-xl text-base font-bold text-white bg-gradient-to-r from-[#2180d3] to-[#1a6fb0] hover:opacity-90 transition duration-300 ease-in-out shadow-lg hover:shadow-xl"
-                    >
-                        BUY NOW
-                    </button>
+                    <div className="mt-4 text-center">
+                        <button
+                            onClick={() => toggleShowMore(plan.title)}
+                            className="inline-flex items-center justify-center text-[#2180d3] hover:text-[#1a6fb0] text-sm font-semibold mb-3 px-5 py-1.5 rounded-full transition duration-300 border border-[#2180d3]"
+                        >
+                            {showMore[plan.title] ? "View Less Features" : "View More Features"}
+                        </button>
 
-                    {plan.note && <p className="mt-2 text-xs text-gray-500">{plan.note}</p>}
+                        <button
+                            onClick={handleButtonClick}
+                            disabled={buttonDisabled}
+                            className={`w-full py-3 rounded-xl text-base font-bold text-white hover:opacity-90 transition duration-300 ease-in-out shadow-lg hover:shadow-xl ${buttonClasses}`}
+                        >
+                            {buttonText}
+                        </button>
+
+                        {plan.note && <p className="mt-2 text-xs text-gray-500">{plan.note}</p>}
+                    </div>
                 </div>
             </div>
-        </div>
-    );
+        );
+    };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white py-10 px-4 sm:px-6 lg:px-8 font-sans relative overflow-hidden">
+        <div
+            className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 font-sans relative overflow-hidden"
+            style={{
+                backgroundImage: `url('/freedom.png')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+            }}
+        >
             <div className="max-w-7xl mx-auto text-center mb-8">
-                <h2 className="text-3xl font-extrabold text-gray-900">Unlock Your Property's Full Potential</h2>
+                <h2 className="text-3xl font-alata font-bold text-gray-900">Freedom sale is live now</h2>
                 <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
                     Choose a plan designed to elevate your listings and connect you with the right buyers.
                 </p>
@@ -351,12 +570,11 @@ const SubscriptionPage = () => {
                 </div>
             </div>
 
-            {/* Success Animation Overlay */}
             {showSuccessAnimation && (
                 <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 animate-fade-in">
                     <div className="bg-white p-8 rounded-lg shadow-2xl text-center transform scale-0 animate-pop-in">
                         <CheckCircleIcon className="w-20 h-20 text-green-500 mx-auto mb-4 animate-bounce-once" />
-                        <h3 className="text-3xl font-bold text-gray-900 mb-2">  
+                        <h3 className="text-3xl font-bold text-gray-900 mb-2">
                             Congratulations!
                         </h3>
                         <p className="text-lg text-gray-700">
@@ -366,7 +584,6 @@ const SubscriptionPage = () => {
                             Get ready to unlock your property's full potential.
                         </p>
                     </div>
-                    {/* Confetti effect - simple circles for demonstration */}
                     <div className="confetti-container">
                         {Array.from({ length: 50 }).map((_, i) => (
                             <div
@@ -384,7 +601,6 @@ const SubscriptionPage = () => {
                 </div>
             )}
 
-            {/* Tailwind Keyframes for animations */}
             <style jsx>{`
                 @keyframes fade-in {
                     from { opacity: 0; }

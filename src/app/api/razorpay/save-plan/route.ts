@@ -120,7 +120,8 @@ export async function POST(request: NextRequest) {
       plan: selectedPlan.title,
       listings: selectedPlan.listings,
       premiumBadging: selectedPlan.premiumBadging,
-      planId: savedPlan._id
+      planId: savedPlan._id,
+      shows: selectedPlan.shows
     });
 
     return NextResponse.json({
