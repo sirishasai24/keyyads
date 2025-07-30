@@ -1,11 +1,11 @@
 // app/api/property/[id]/related/route.ts
-import {  NextResponse,NextRequest } from 'next/server';
-import { connectDb } from '@/dbConfig/dbConfig'; 
-import Property from '@/models/propertyModel'; 
+import { NextResponse, NextRequest } from 'next/server';
+import { connectDb } from '@/dbConfig/dbConfig';
+import Property from '@/models/propertyModel';
 
-connectDb(); 
+connectDb();
 
-interface Query{
+interface Query {
   _id?: { $ne: string };
   type?: string;
   transactionType?: string;
@@ -14,53 +14,55 @@ interface Query{
   landCategory?: string;
 }
 
-export async function GET(request: NextRequest,
-  context: { params: { id: string } } // Use 'context' as the parameter name
-) {
-  // Await the params object before destructuring
-  const { id } = await context.params; // <--- The crucial change here
+export async function GET(request: NextRequest) {
+  const url = new URL(request.url);
+  const id = url.pathname.split('/').pop();
+
+  // Ensure id is a string before proceeding
+  if (!id) {
+    return NextResponse.json({ success: false, message: 'Property ID is missing' }, { status: 400 });
+  }
 
   try {
-    // Find the current property
     const currentProperty = await Property.findById(id);
 
     if (!currentProperty) {
       return NextResponse.json({ success: false, message: 'Property not found' }, { status: 404 });
     }
 
-    // Define criteria for related properties
     const query: Query = {
-      _id: { $ne: id }, // Exclude the current property
+      _id: { $ne: id },
       type: currentProperty.type,
       transactionType: currentProperty.transactionType,
       'location.city': currentProperty.location.city,
     };
 
-    // If it's a building, try to find similar furnishing or property age if available
     if (currentProperty.type === 'building') {
       if (currentProperty.furnishing && currentProperty.furnishing !== 'Unfurnished') {
         query.furnishing = currentProperty.furnishing;
       }
-      // You could also add propertyAge or approximate price range here for more relevant results
     }
 
-    // If it's land, match by landCategory
     if (currentProperty.type === 'land' && currentProperty.landCategory) {
       query.landCategory = currentProperty.landCategory;
     }
 
-    // Fetch related properties
     const relatedProperties = await Property.find(query)
-      .limit(6) // Limit to a few related properties
-      .sort({ createdAt: -1 }); // Sort by newest first
+      .limit(6)
+      .sort({ createdAt: -1 });
 
     return NextResponse.json({ success: true, relatedProperties }, { status: 200 });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching related properties:', error);
-    // Be more specific with error types if possible, e.g., Mongoose CastError
+
+    let errorMessage = 'Internal Server Error';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
     return NextResponse.json(
-      { success: false, message: 'Internal Server Error', error: error },
+      { success: false, message: errorMessage, error: error },
       { status: 500 }
     );
   }

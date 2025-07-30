@@ -61,7 +61,7 @@ export default function PropertyDetailsPage() {
           setMainImage(res.data.property.images[0])
         }
 
-        const relatedRes = await axios.get(`/api/property/${id}/related`)
+        const relatedRes = await axios.get(`/api/property/related/${id}`)
         setRelatedProperties(relatedRes.data.relatedProperties)
 
       } catch (error) {
