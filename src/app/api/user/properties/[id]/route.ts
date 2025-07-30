@@ -32,12 +32,10 @@ async function uploadImageToCloudinary(file: File): Promise<string> {
   });
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest) {
   try {
-    const propertyId = params.id;
+    const url = new URL(request.url);
+    const propertyId = url.pathname.split('/').pop();
 
     const property = await Property.findById(propertyId);
 
@@ -58,17 +56,16 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest) {
+  
+    const url = new URL(request.url);
+    const propertyId = url.pathname.split('/').pop();
   try {
     const userId = await getDataFromToken(request);
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const propertyId = params.id;
     const formData = await request.formData();
 
     const updatedData: { [key: string]: unknown } = {};
@@ -152,17 +149,16 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest) {
+
+    const url = new URL(request.url);
+    const propertyId = url.pathname.split('/').pop();
   try {
     const userId = await getDataFromToken(request);
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const propertyId = params.id;
 
     const property = await Property.findOne({
       _id: propertyId,
