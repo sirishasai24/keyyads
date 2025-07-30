@@ -1,5 +1,5 @@
 // app/api/property/[id]/related/route.ts
-import {  NextResponse } from 'next/server';
+import {  NextResponse,NextRequest } from 'next/server';
 import { connectDb } from '@/dbConfig/dbConfig'; 
 import Property from '@/models/propertyModel'; 
 
@@ -14,7 +14,7 @@ interface Query{
   landCategory?: string;
 }
 
-export async function GET(
+export async function GET(request: NextRequest,
   context: { params: { id: string } } // Use 'context' as the parameter name
 ) {
   // Await the params object before destructuring
