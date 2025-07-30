@@ -4,6 +4,7 @@ import { getDataFromToken } from "@/helpers/getDataFromToken";
 import { connectDb } from "@/dbConfig/dbConfig";
 import Property from "@/models/propertyModel";
 import { v2 as cloudinary } from "cloudinary";
+import { Error as MongooseError } from "mongoose";
 
 connectDb();
 
@@ -127,18 +128,17 @@ export async function PUT(
         { error: "Property not found or not authorized to update" },
         { status: 404 }
       );
-    }
-
+      }
     return NextResponse.json(
       { message: "Property updated successfully", property },
       { status: 200 }
     );
   } catch (error: unknown) {
     console.error("Error updating property:", error);
-    if (error instanceof Error && (error as any).name === 'ValidationError') {
+    if (error instanceof MongooseError.ValidationError) {
       const errors: { [key: string]: string } = {};
-      for (const field in (error as any).errors) {
-        errors[field] = (error as any).errors[field].message;
+      for (const field in error.errors) {
+        errors[field] = error.errors[field].message;
       }
       return NextResponse.json(
         { error: "Validation Error", details: errors },

@@ -47,7 +47,6 @@ export default function ResetPasswordPage() {
       } catch (err) { // Type 'err' as 'any' for broader error handling
         setError(true);
         setVerified(false); // Ensure verified is false on error
-        const errorMessage = err || "Failed to verify link. It might be invalid or expired.";
         console.error("Error during link verification:", err);
         toast.error("Failed to verify link. It might be invalid or expired.");
       } finally {

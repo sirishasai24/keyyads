@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { LocationIcon, KeyIcon, BuildingIcon, FilterIcon } from './emojis'; // Assuming these are correctly imported
+import { LocationIcon, KeyIcon, BuildingIcon, FilterIcon } from './emojis';
 
 const advancedFiltersVariants = {
     hidden: { height: 0, opacity: 0, y: -20 },
@@ -12,12 +12,12 @@ const advancedFiltersVariants = {
         opacity: 1,
         y: 0,
         transition: {
-            const: 'spring' as 'spring',
+            type: 'spring',
             stiffness: 100,
             damping: 20,
         },
     },
-};
+} as const; // Added 'as const' here
 
 export const HeroSection = () => {
     const [showMoreFilters, setShowMoreFilters] = useState(false);
@@ -37,7 +37,7 @@ export const HeroSection = () => {
         const params = new URLSearchParams();
         if (location) params.set('location', location);
         if (transactionType) params.set('transactionType', transactionType);
-        if (propertyType) params.set('type', propertyType); // 'type' is the param name for propertyType
+        if (propertyType) params.set('type', propertyType);
         if (bedrooms) params.set('bedrooms', bedrooms);
         if (bathrooms) params.set('bathrooms', bathrooms);
         if (furnishing) params.set('furnishing', furnishing);
@@ -119,7 +119,6 @@ export const HeroSection = () => {
                                 <option value="">Property Type</option>
                                 <option value="land">Land</option>
                                 <option value="building">Building</option>
-                                {/* Add more property types as needed based on your data */}
                             </select>
                         </div>
 

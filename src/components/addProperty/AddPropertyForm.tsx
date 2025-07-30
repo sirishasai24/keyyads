@@ -157,7 +157,7 @@ export default function AddPropertyForm() {
         if (isStepValid) {
             setCurrentStep((prev) => prev + 1)
         } else {
-            const firstErrorField = fieldsToValidate.find(field => (errors as any)[field]); // Cast to any to access properties dynamically
+            const firstErrorField = fieldsToValidate.find(field => (errors)[field]); // Cast to any to access properties dynamically
             if (firstErrorField) {
                 const element = document.getElementsByName(firstErrorField as string)[0] || document.getElementById(firstErrorField as string);
                 if (element) {

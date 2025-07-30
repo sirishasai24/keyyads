@@ -46,7 +46,6 @@ export default function ForgotPasswordPage() {
       setTimer(30); // Start 30-second cooldown period
     } catch (error) { // Type 'error' as 'any' for flexible error handling
       // Extract specific error message from response or use a generic one
-      const errorMsg = error || "Failed to send reset email. Please try again.";
       console.error("Forgot password error:", error);
        // Set internal error message state
       toast.error("Failed to send reset email. Please try again."); // User-facing toast notification

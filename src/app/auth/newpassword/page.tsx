@@ -57,7 +57,6 @@ function NewPasswordPage() {
       }, 2000);
     } catch (error) { // Use 'any' for broader error handling
       console.error("Error resetting password:", error);
-      const errorMessage = error || "Failed to reset password. Please try again.";
       toast.error("Failed to reset password. Please try again.");
     } finally {
       setLoading(false);
