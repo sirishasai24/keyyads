@@ -12,7 +12,7 @@ const advancedFiltersVariants = {
         opacity: 1,
         y: 0,
         transition: {
-            type: 'spring' as 'spring',
+            const: 'spring' as 'spring',
             stiffness: 100,
             damping: 20,
         },

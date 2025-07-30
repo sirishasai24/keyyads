@@ -24,7 +24,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({ isOpen, onConfirm
           </div>
           <h3 className="mt-4 text-xl font-semibold text-gray-900">Confirm Deletion</h3>
           <p className="mt-2 text-gray-600">
-            Are you sure you want to delete the property titled "<strong className="font-medium">{title}</strong>"? This action cannot be undone.
+            Are you sure you want to delete the property titled &quot;<strong className="font-medium">{title}</strong>&quot;? This action cannot be undone.
           </p>
         </div>
         <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">

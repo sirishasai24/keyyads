@@ -51,9 +51,9 @@ export default function AddTestimonialPage() {
       setMessage(response.data.message || "Testimonial submitted successfully!");
       setMessageType("success");
       setFormData({ username: "", review: "", rating: 0, location: "" });
-    } catch (error: any) {
+    } catch (error) {
       console.error("Submission error:", error);
-      setMessage(error.response?.data?.message || "Failed to submit testimonial.");
+      setMessage("Failed to submit testimonial.");
       setMessageType("error");
     } finally {
       setLoading(false);
@@ -73,7 +73,7 @@ export default function AddTestimonialPage() {
             Share Your Experience
           </h2>
           <p className="text-lg text-gray-600">
-            We'd love to hear your thoughts on our service and help others
+            We&apos;d love to hear your thoughts on our service and help others
             find their dream property!
           </p>
         </div>

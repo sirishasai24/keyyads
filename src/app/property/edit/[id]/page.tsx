@@ -73,14 +73,14 @@ export default function EditPropertyPage() {
           location: data.location || initialPropertyState.location,
         });
         setPreviewImages(data.images || []); // Set existing images as previews
-      } catch (err: any) {
+      } catch (err) {
         console.error("Error fetching property:", err);
         setError(
-          err.response?.data?.error ||
+          
             "Failed to fetch property details. Please try again."
         );
         toast.error(
-          err.response?.data?.error || "Failed to load property."
+           "Failed to load property."
         );
       } finally {
         setLoading(false);
@@ -225,7 +225,7 @@ export default function EditPropertyPage() {
       });
 
       // Send PUT request to update the property
-      const response = await axios.put(
+       await axios.put(
         `/api/user/properties/${propertyId}`, // Your PUT route
         formData,
         {
@@ -237,13 +237,13 @@ export default function EditPropertyPage() {
 
       toast.success("Property updated successfully!");
       router.push("/user/properties"); // Redirect to manage page
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error updating property:", err);
       setError(
-        err.response?.data?.error || "Failed to update property. Please try again."
+         "Failed to update property. Please try again."
       );
       toast.error(
-        err.response?.data?.error || "Failed to update property."
+       "Failed to update property."
       );
     } finally {
       setSubmitting(false);
@@ -628,8 +628,8 @@ export default function EditPropertyPage() {
           </div>
         </div>
 
-        {/* Premium Status */}
-        {/* <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
+        
+         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
           <div className="flex items-center">
             <input
               type="checkbox"
@@ -643,7 +643,7 @@ export default function EditPropertyPage() {
               Mark as **Premium Listing** (Higher Visibility)
             </label>
           </div>
-        </div> */}
+        </div>
 
         {/* Images */}
         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">

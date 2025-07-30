@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       { message: "Blog Published Successfully", success: true, blog },
       { status: 201 }
     );
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message, success: false }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: error, success: false }, { status: 500 });
   }
 }

@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { StarRating } from "@/components/StarRating";
-import { format } from "date-fns";
 import {
-  UserCircleIcon,
   MapPinIcon,
   ChatBubbleLeftIcon,
 } from "@heroicons/react/24/outline";
@@ -131,7 +129,7 @@ export default function TestimonialsPage() {
                 style={{ color: primaryColor }} // Apply primaryColor here
               />
               <p className="text-lg text-gray-700 mb-5 italic font-light">
-                "{testimonial.review}"
+                &quot;{testimonial.review}&quot;
               </p>
               <div className="mb-4">
                 <StarRating

@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
   try {
     await connectDb();
     const { searchParams } = new URL(req.url);
-    const filters: any = {};
+    const filters: Record<string, unknown> = {};
 
     // Location: case-insensitive partial match
     const location = searchParams.get('location');
@@ -65,14 +65,13 @@ export async function GET(req: NextRequest) {
     const properties = await Property.find(filters).sort({ createdAt: -1 });
 
     return NextResponse.json({ success: true, properties });
-  } catch (err: any) {
+  } catch (err) {
     console.error('Error fetching properties:', err);
     return NextResponse.json(
       {
         success: false,
         message: 'Error fetching properties',
-        error: err.message,
-        stack: err.stack,
+        error: err,
       },
       { status: 500 }
     );

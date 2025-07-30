@@ -130,13 +130,7 @@ export async function POST(request: NextRequest) {
       plan: savedPlan,
     });
 
-  } catch (error: any) {
-    if (error.code === 11000 && error.keyPattern?.transactionId) {
-      return NextResponse.json(
-        { message: "This transaction has already been processed.", success: false },
-        { status: 409 }
-      );
-    }
-    return NextResponse.json({ error: error.message || "Failed to save plan." }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: error || "Failed to save plan." }, { status: 500 });
   }
 }

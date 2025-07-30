@@ -1,5 +1,4 @@
 import { FieldErrors, UseFormRegister, UseFormWatch, UseFormGetValues } from 'react-hook-form';
-import clsx from 'clsx';
 import { FormValues } from './AddPropertyForm';
 
 // Import the new components

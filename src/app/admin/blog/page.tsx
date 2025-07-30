@@ -13,7 +13,6 @@ interface Blog {
 }
 
 const Home = () => {
-  const primaryColor = "#2180d3"; // New theme color
 
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +23,7 @@ const Home = () => {
       try {
         const response = await axios.get("/api/admin/blog");
         setBlogs(response.data?.blogs || []);
-      } catch (err: any) {
+      } catch (err) {
         setError("Failed to load blogs");
         console.log(err);
       } finally {

@@ -44,11 +44,11 @@ export default function ManagePropertiesPage() {
             const userResponse = await axios.get("/api/auth/me");
             setUser(userResponse.data.user); // Assuming your /api/auth/me returns { user: userData }
 
-        } catch (err: any) {
+        } catch (err) {
             console.error("Error fetching data:", err);
-            if (err.response && err.response.data && err.response.data.error) {
-                setError(err.response.data.error);
-                toast.error(err.response.data.error);
+            if (err) {
+                setError("Failed to fetch data. Please try again.");
+                toast.error("Failed to fetch data. Please try again.");
             } else {
                 setError("Failed to fetch data. Please try again.");
                 toast.error("Failed to fetch data. Please try again.");
@@ -80,10 +80,10 @@ export default function ManagePropertiesPage() {
             // Optimistically update the UI
             setProperties((prev) => prev.filter((p) => p._id !== propertyToDelete._id));
             setPropertyToDelete(null); // Clear the property to delete
-        } catch (err: any) {
+        } catch (err) {
             console.error("Error deleting property:", err);
-            if (err.response && err.response.data && err.response.data.error) {
-                toast.error(err.response.data.error);
+            if (err) {
+                toast.error("Error deleting property:",);
             } else {
                 toast.error("Failed to delete property. Please try again.");
             }
@@ -180,7 +180,7 @@ export default function ManagePropertiesPage() {
 
             {isFreePlanUser && (
                 <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-lg mb-8 text-center shadow-sm">
-                    <p className="font-semibold text-lg mb-2">You're on the Free Plan!</p>
+                    <p className="font-semibold text-lg mb-2">You&apos;re on the Free Plan!</p>
                     <p className="text-md">
                         Editing properties is a premium feature. Upgrade your plan to unlock full editing capabilities.
                     </p>
@@ -197,7 +197,7 @@ export default function ManagePropertiesPage() {
                         No properties found.
                     </p>
                     <p className="text-lg text-gray-500 mb-6">
-                        It looks like you haven't posted any properties yet, or your search/filters yielded no results.
+                        It looks like you haven&apos;t posted any properties yet, or your search/filters yielded no results.
                     </p>
                     <Link href="/post-property">
                         <button className="mt-6 px-8 py-3 bg-[#2180d3] text-white font-semibold rounded-full hover:bg-[#1a6fb0] transition duration-300 shadow-md">

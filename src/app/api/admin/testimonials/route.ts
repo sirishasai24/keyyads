@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import {  NextResponse } from "next/server";
 import { connectDb } from "@/dbConfig/dbConfig";
 import Review from "@/models/reviewModel";
 
@@ -9,6 +9,6 @@ export async function GET() {
     const testimonials = await Review.find().sort({ createdAt: -1 });
     return NextResponse.json({ testimonials });
   } catch (error) {
-    return NextResponse.json({ message: "Error fetching testimonials" }, { status: 500 });
+    return NextResponse.json({ message: "Error fetching testimonials" ,error}, { status: 500 });
   }
 }

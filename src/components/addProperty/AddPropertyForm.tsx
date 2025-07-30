@@ -61,7 +61,7 @@ export default function AddPropertyForm() {
         setValue,
         trigger,
         getValues,
-        formState: { errors, isValid }
+        formState: { errors }
     } = useForm<FormValues>({
         mode: "onTouched",
         defaultValues: {
@@ -157,7 +157,7 @@ export default function AddPropertyForm() {
         if (isStepValid) {
             setCurrentStep((prev) => prev + 1)
         } else {
-            const firstErrorField = fieldsToValidate.find(field => errors[field]);
+            const firstErrorField = fieldsToValidate.find(field => (errors as any)[field]); // Cast to any to access properties dynamically
             if (firstErrorField) {
                 const element = document.getElementsByName(firstErrorField as string)[0] || document.getElementById(firstErrorField as string);
                 if (element) {
@@ -184,14 +184,14 @@ export default function AddPropertyForm() {
         }
 
         try {
-            const dataToSubmit: any = {
+            const dataToSubmit: Partial<FormValues> = { // Use Partial<FormValues> for type safety
                 ...formData,
             }
 
-            dataToSubmit.isPremium = formData.isPremium === 'yes'
+            dataToSubmit.isPremium = formData.isPremium
 
             if (dataToSubmit.facing === 'Not Specified') {
-                dataToSubmit.facing = null;
+                dataToSubmit.facing = undefined; // Set to undefined to remove from payload if not specified
             }
 
             if (dataToSubmit.type === 'land') {
@@ -221,6 +221,7 @@ export default function AddPropertyForm() {
             console.log('Form data submitted successfully:', response.data.data)
             toast.success('Property submitted successfully!')
             setShowModal(false)
+            router.push('/user/properties'); // Redirect to user properties page after successful submission
 
         } catch (error) {
             console.error('Submission error:', error)
@@ -274,7 +275,7 @@ export default function AddPropertyForm() {
                 </p>
                 <div className="flex flex-col gap-4">
                     <button
-                        onClick={() =>{ 
+                        onClick={() => {
                             router.push('/user/prime')
                         }
                         }
@@ -283,7 +284,7 @@ export default function AddPropertyForm() {
                         View Plans to Upgrade
                     </button>
                     <button
-                        onClick={()=>{
+                        onClick={() => {
                             router.push('/user/properties')
                         }}
                         className="w-full bg-gray-100 text-gray-800 hover:bg-gray-200 font-semibold py-3 px-8 rounded-full shadow-md transition duration-300 ease-in-out"

@@ -5,8 +5,22 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { HeroSection } from '@/components/home/hero-section';
 
+interface Location {
+  city?: string;
+  state?: string;
+}
+
+interface Property {
+  _id: string;
+  title: string;
+  images?: string[];
+  type: string;
+  location?: Location;
+  price: number;
+}
+
 export default function PropertyResultsPage() {
-  const [properties, setProperties] = useState<any[]>([]);
+  const [properties, setProperties] = useState<Property[]>([]);
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -33,7 +47,6 @@ export default function PropertyResultsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-10 text-center">
             Discover <span className="text-[#1f8fff]">Your Dream Property</span>{' '}
-            {/* Theme color applied here */}
           </h1>
 
           {properties.length === 0 ? (
@@ -62,7 +75,6 @@ export default function PropertyResultsPage() {
                     )}
                     <div className="absolute top-2 right-2 bg-[#1f8fff] text-white text-[10px] font-semibold px-2 py-0.5 rounded-full shadow">
                       {' '}
-                      {/* Theme color applied here */}
                       {p.type}
                     </div>
                   </div>
@@ -73,7 +85,6 @@ export default function PropertyResultsPage() {
                     <p className="text-xs text-gray-600 mt-1 flex items-center">
                       <span className="mr-1 text-[#1f8fff]">
                         {' '}
-                        {/* Theme color applied here */}
                         <i className="fas fa-map-marker-alt" />
                       </span>
                       {p.location?.city}, {p.location?.state}
@@ -82,12 +93,11 @@ export default function PropertyResultsPage() {
                     <div className="flex items-center justify-between mt-4">
                       <p className="text-lg font-bold text-[#1f8fff]">
                         {' '}
-                        {/* Theme color applied here */}
                         ₹{p.price.toLocaleString()}
                       </p>
                       <button
                         onClick={() => router.push(`/property/${p._id}`)}
-                        className="bg-[#1f8fff] text-white text-xs font-medium px-3 py-1.5 rounded-md hover:bg-[#1a77cc] cursor-pointer shadow-sm transition duration-200" // Theme color & hover variant applied here
+                        className="bg-[#1f8fff] text-white text-xs font-medium px-3 py-1.5 rounded-md hover:bg-[#1a77cc] cursor-pointer shadow-sm transition duration-200"
                       >
                         View Details
                       </button>

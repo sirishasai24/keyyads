@@ -111,10 +111,10 @@ export async function POST(req: NextRequest) {
             planDetails: existingPlanDetails,
         });
 
-    } catch (error: any) {
+    } catch (error) {
         console.error("Error during plan renewal:", error);
         return NextResponse.json(
-            { success: false, message: "Internal server error during plan renewal", error: error.message },
+            { success: false, message: "Internal server error during plan renewal", error: error },
             { status: 500 }
         );
     }

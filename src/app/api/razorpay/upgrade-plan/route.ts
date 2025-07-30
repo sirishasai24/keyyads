@@ -112,15 +112,6 @@ export async function POST(req: NextRequest) {
         }
 
         const newPlanPrice = parsePrice(newPlanDetails.price);
-        const currentPlanPricePaid = parsePrice(existingPlan.pricePaid);
-        const start = new Date(existingPlan.startDate).getTime();
-        const end = new Date(existingPlan.expiryDate).getTime();
-        const now = Date.now();
-        const used = Math.max(0, now - start);
-        const total = Math.max(1, end - start);
-        const remainingValue = ((total - used) / total) * currentPlanPricePaid;
-        const calculatedUpgradePrice = Math.round(Math.max(0, newPlanPrice - remainingValue));
-
         const newStartDate = new Date();
         const newExpiryDate = new Date(newStartDate);
         newExpiryDate.setMonth(newExpiryDate.getMonth() + PLAN_DURATIONS_MONTHS[newPlanDetails.title]);
@@ -161,9 +152,9 @@ export async function POST(req: NextRequest) {
             planDetails: savedPlan,
         });
 
-    } catch (error: any) {
+    } catch (error) {
         return NextResponse.json(
-            { success: false, message: "Server error during plan upgrade", error: error.message },
+            { success: false, message: "Server error during plan upgrade", error: error },
             { status: 500 }
         );
     }

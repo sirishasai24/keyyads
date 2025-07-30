@@ -1,20 +1,18 @@
 // src/app/api/users/properties/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getDataFromToken } from "@/helpers/getDataFromToken"; // Make sure this path is correct
-import { connectDb } from "@/dbConfig/dbConfig"; // Make sure this path is correct
-import Property from "@/models/propertyModel"; // Make sure this path is correct
+import { getDataFromToken } from "@/helpers/getDataFromToken";
+import { connectDb } from "@/dbConfig/dbConfig";
+import Property from "@/models/propertyModel";
 import { v2 as cloudinary } from "cloudinary";
 
 connectDb();
 
-// Configure Cloudinary (ensure you have CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET in your .env)
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Helper to upload image to Cloudinary
 async function uploadImageToCloudinary(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
@@ -33,13 +31,12 @@ async function uploadImageToCloudinary(file: File): Promise<string> {
   });
 }
 
-// GET method to fetch a single property
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const propertyId = params.id; // No need for userId check here if this is a public view route
+    const propertyId = params.id;
 
     const property = await Property.findById(propertyId);
 
@@ -51,16 +48,15 @@ export async function GET(
     }
 
     return NextResponse.json({ property }, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching property:", error);
     return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
+      { error: "Internal Server Error", details: (error as Error).message },
       { status: 500 }
     );
   }
 }
 
-// PUT method to update a property
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -74,54 +70,45 @@ export async function PUT(
     const propertyId = params.id;
     const formData = await request.formData();
 
-    // Reconstruct property data from FormData
-    const updatedData: { [key: string]: any } = {};
+    const updatedData: { [key: string]: unknown } = {};
     for (const [key, value] of formData.entries()) {
       if (key.startsWith("location[")) {
-        // Handle nested location object
         const locationKey = key.match(/\[(.*?)\]/)?.[1];
         if (locationKey) {
           if (!updatedData.location) updatedData.location = {};
-          updatedData.location[locationKey] = value;
+          (updatedData.location as { [k: string]: unknown })[locationKey] = value;
         }
       } else if (key === "existingImages[]") {
         if (!updatedData.images) updatedData.images = [];
-        updatedData.images.push(value); // Add existing image URLs back
+        (updatedData.images as string[]).push(value as string);
       } else if (key === "newImages") {
-        // Skip newImages for now, handle separately after extracting other data
+        // Handled separately
       } else {
-        // Convert numbers and booleans if necessary
         if (["price", "discount", "floors", "parking", "area"].includes(key)) {
           updatedData[key] = parseFloat(value as string);
         } else if (key === "isPremium") {
-          updatedData[key] = value === "true"; // FormData boolean values come as strings
+          updatedData[key] = value === "true";
         } else if (value === "undefined" || value === "null") {
-          // Handle cases where a field might be sent as undefined/null string
           updatedData[key] = undefined;
-        }
-         else {
+        } else {
           updatedData[key] = value;
         }
       }
     }
 
-    // --- Image Handling ---
     const newImageFiles = formData.getAll("newImages") as File[];
     const uploadedImageUrls: string[] = [];
 
-    // Upload new images
     for (const file of newImageFiles) {
-      if (file.size > 0) { // Check if a file was actually uploaded (not an empty file input)
+      if (file.size > 0) {
         const imageUrl = await uploadImageToCloudinary(file);
         uploadedImageUrls.push(imageUrl);
       }
     }
 
-    // Combine existing images (if any were kept) with newly uploaded images
-    const finalImages = [...(updatedData.images || []), ...uploadedImageUrls];
+    const finalImages = [...((updatedData.images as string[]) || []), ...uploadedImageUrls];
     updatedData.images = finalImages;
 
-    // Check if at least one image is present
     if (finalImages.length === 0) {
       return NextResponse.json(
         { error: "At least one image is required for the property." },
@@ -129,11 +116,10 @@ export async function PUT(
       );
     }
 
-    // Find and update the property, ensuring the user owns it
     const property = await Property.findOneAndUpdate(
       { _id: propertyId, createdBy: userId },
-      { $set: updatedData }, // Use $set to update specific fields
-      { new: true, runValidators: true } // Return the updated document and run Mongoose validators
+      { $set: updatedData },
+      { new: true, runValidators: true }
     );
 
     if (!property) {
@@ -147,13 +133,12 @@ export async function PUT(
       { message: "Property updated successfully", property },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating property:", error);
-    // Handle specific Mongoose validation errors
-    if (error.name === 'ValidationError') {
+    if (error instanceof Error && (error as any).name === 'ValidationError') {
       const errors: { [key: string]: string } = {};
-      for (let field in error.errors) {
-        errors[field] = error.errors[field].message;
+      for (const field in (error as any).errors) {
+        errors[field] = (error as any).errors[field].message;
       }
       return NextResponse.json(
         { error: "Validation Error", details: errors },
@@ -161,13 +146,12 @@ export async function PUT(
       );
     }
     return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
+      { error: "Internal Server Error", details: (error as Error).message },
       { status: 500 }
     );
   }
 }
 
-// DELETE method to delete a property (kept from previous example)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -198,10 +182,10 @@ export async function DELETE(
       { message: "Property deleted successfully" },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting property:", error);
     return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
+      { error: "Internal Server Error", details: (error as Error).message },
       { status: 500 }
     );
   }

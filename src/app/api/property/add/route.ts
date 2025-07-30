@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
 
     if (error instanceof mongoose.Error.ValidationError) {
       const messages = Object.values(error.errors).map(
-        (err: any) => err.message
+        (err) => err.message
       );
       return NextResponse.json(
         { success: false, message: messages.join(", ") },

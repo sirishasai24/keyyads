@@ -121,7 +121,7 @@ export const TestimonialsSection = () => {
                             className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 flex flex-col text-center transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]"
                         >
                             <QuoteIcon />
-                            <p className="text-lg text-gray-700 mb-5 italic font-light">"{testimonial.review}"</p>
+                            <p className="text-lg text-gray-700 mb-5 italic font-light">&quot;{testimonial.review}&quot;</p>
                             <div className="text-yellow-500 mb-2">
                                 {[...Array(5)].map((_, i) => (
                                     <StarIcon key={i} fill={i < testimonial.rating} />

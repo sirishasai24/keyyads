@@ -147,6 +147,22 @@ const SubscriptionPage = () => {
     const [loadingUser, setLoadingUser] = useState(true);
     const [razorpayLoading, setRazorpayLoading] = useState(true);
 
+    const fetchUserData = useCallback(async () => {
+        try {
+            setLoadingUser(true);
+            const res = await axios.get<CurrentUserResponse>("/api/user/current-plan");
+            setCurrentUser(res.data.user);
+            setCurrentUserPlanDetails(res.data.plan || null);
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+            if (axios.isAxiosError(error) && error.response?.status !== 401 && error.response?.status !== 403) {
+                toast.error("Error loading user information. Please log in again.");
+            }
+        } finally {
+            setLoadingUser(false);
+        }
+    }, []);
+
     useEffect(() => {
         const script = document.createElement("script");
         script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -167,23 +183,7 @@ const SubscriptionPage = () => {
 
     useEffect(() => {
         fetchUserData();
-    }, [activatedPlanTitle]);
-
-    const fetchUserData = useCallback(async () => {
-        try {
-            setLoadingUser(true);
-            const res = await axios.get<CurrentUserResponse>("/api/user/current-plan");
-            setCurrentUser(res.data.user);
-            setCurrentUserPlanDetails(res.data.plan || null);
-        } catch (error) {
-            console.error("Error fetching user data:", error);
-            if (axios.isAxiosError(error) && error.response?.status !== 401 && error.response?.status !== 403) {
-                toast.error("Error loading user information. Please log in again.");
-            }
-        } finally {
-            setLoadingUser(false);
-        }
-    }, []);
+    }, [activatedPlanTitle, fetchUserData]);
 
     const toggleShowMore = (title: string) => {
         setShowMore((prev) => ({
@@ -294,7 +294,7 @@ const SubscriptionPage = () => {
                 name: "Ploteasy Subscription",
                 description: `${plan.title} Subscription`,
                 order_id: order.id,
-                handler: async (response: any) => {
+                handler: async (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string; }) => {
                     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
 
                     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
@@ -322,8 +322,8 @@ const SubscriptionPage = () => {
                         }
                     } catch (error: any) {
                         const msg =
-                            error?.response?.data?.message ||
-                            error?.message ||
+                            error.response?.data?.message ||
+                            error.message ||
                             "An unknown error occurred during plan activation.";
                         toast.error(`Payment received, but activation failed: ${msg}`);
                         console.error("Plan activation failed after successful payment:", error);
@@ -339,15 +339,15 @@ const SubscriptionPage = () => {
             };
 
             const razor = new window.Razorpay(options);
-            razor.on('payment.failed', function (response: any){
+            razor.on('payment.failed', function (response: { error: { description: string; }; }){
                 toast.error(`Payment Failed: ${response.error.description || "An error occurred."}`);
                 console.error("Razorpay Payment Failed:", response.error);
             });
             razor.open();
         } catch (err: any) {
-            const msg = err.response?.data?.error || err.message || "Something went wrong.";
+            const msg = err.response?.data?.message || err.message || "Something went wrong.";
             toast.error(`Failed to initiate payment: ${msg}`);
-            console.error("Payment initiation error:", err.response?.data || err.message || err);
+            console.error("Payment initiation error:", err);
         }
     };
 
@@ -385,8 +385,8 @@ const SubscriptionPage = () => {
         const userHasActivePlan = currentUser && currentUser.plan !== "Free";
         const isCurrentPlan = currentUser?.plan === plan.title;
         const currentUserPlanOrder = plans.find(p => p.title === currentUser?.plan)?.order;
-        const canUpgrade = currentUserPlanOrder && plan.order > currentUserPlanOrder;
-        const isLowerOrEqualPlanOrder = currentUserPlanOrder && plan.order <= currentUserPlanOrder;
+        const canUpgrade = currentUserPlanOrder !== undefined && plan.order > currentUserPlanOrder;
+        const isLowerOrEqualPlanOrder = currentUserPlanOrder !== undefined && plan.order <= currentUserPlanOrder;
 
 
         let buttonText = "BUY NOW";
@@ -446,7 +446,7 @@ const SubscriptionPage = () => {
                                     (New Plan Original: ₹{parsePrice(plan.originalPrice).toLocaleString()})
                                 </p>
                                 <p className="text-xs text-gray-500 mt-1">
-                                    (Adjusted price considering your current plan's remaining value)
+                                    (Adjusted price considering your current plan&apos;s remaining value)
                                 </p>
                             </>
                         ) : (
@@ -581,7 +581,7 @@ const SubscriptionPage = () => {
                             Your <span className="font-semibold text-[#2180d3]">{activatedPlanTitle}</span> is now active!
                         </p>
                         <p className="text-sm text-gray-500 mt-2">
-                            Get ready to unlock your property's full potential.
+                            Get ready to unlock your property&apos;s full potential.
                         </p>
                     </div>
                     <div className="confetti-container">

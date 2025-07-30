@@ -44,12 +44,12 @@ export default function ResetPasswordPage() {
         setVerified(true);
         setError(false);
         toast.success("Verification successful! You can now reset your password.");
-      } catch (err: any) { // Type 'err' as 'any' for broader error handling
+      } catch (err) { // Type 'err' as 'any' for broader error handling
         setError(true);
         setVerified(false); // Ensure verified is false on error
-        const errorMessage = err.response?.data?.message || "Failed to verify link. It might be invalid or expired.";
+        const errorMessage = err || "Failed to verify link. It might be invalid or expired.";
         console.error("Error during link verification:", err);
-        toast.error(errorMessage);
+        toast.error("Failed to verify link. It might be invalid or expired.");
       } finally {
         setLoading(false);
       }

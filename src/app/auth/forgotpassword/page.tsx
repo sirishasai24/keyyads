@@ -44,12 +44,12 @@ export default function ForgotPasswordPage() {
       setMessage("Email sent to reset password"); // Set internal message state
       toast.success("Password reset link sent to your email!"); // User-facing toast notification
       setTimer(30); // Start 30-second cooldown period
-    } catch (error: any) { // Type 'error' as 'any' for flexible error handling
+    } catch (error) { // Type 'error' as 'any' for flexible error handling
       // Extract specific error message from response or use a generic one
-      const errorMsg = error.response?.data?.message || "Failed to send reset email. Please try again.";
+      const errorMsg = error || "Failed to send reset email. Please try again.";
       console.error("Forgot password error:", error);
-      setErrorMessage(errorMsg); // Set internal error message state
-      toast.error(errorMsg); // User-facing toast notification
+       // Set internal error message state
+      toast.error("Failed to send reset email. Please try again."); // User-facing toast notification
     } finally {
       setLoading(false); // Deactivate loading state regardless of success or failure
     }

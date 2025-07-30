@@ -9,7 +9,6 @@ import {
   Bars3Icon,
   XMarkIcon,
   PlusIcon,
-  BuildingOffice2Icon,
   HomeIcon,
   CurrencyDollarIcon,
   KeyIcon,

@@ -4,18 +4,56 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import axios from 'axios'
 
+interface Location {
+  city: string;
+  state: string;
+}
+
+interface Property {
+  _id: string;
+  price: number;
+  transactionType: 'sale' | 'rent';
+  discount: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  type: 'building' | 'land';
+  area?: number;
+  areaUnit?: string;
+  address?: string;
+  location: Location;
+  images: string[];
+  furnishing?: string;
+  parking?: number;
+  facing?: string;
+  isPremium?: boolean;
+  propertyAge?: string;
+  floors?: number;
+  landCategory?: string;
+  title: string;
+  description?: string;
+  otherDetails?: string;
+}
+
+interface User {
+  _id: string;
+  username: string;
+  email: string;
+  phone?: string;
+  profileImageURL?: string;
+}
+
 export default function PropertyDetailsPage() {
   const { id } = useParams()
-  const [property, setProperty] = useState<any | null>(null)
-  const [user, setUser] = useState<any | null>(null)
-  const [relatedProperties, setRelatedProperties] = useState<any[]>([]) // New state for related properties
+  const [property, setProperty] = useState<Property | null>(null)
+  const [user, setUser] = useState<User | null>(null)
+  const [relatedProperties, setRelatedProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [mainImage, setMainImage] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
       try {
-        setLoading(true) // Start loading
+        setLoading(true)
         const res = await axios.get(`/api/property/${id}`)
         setProperty(res.data.property)
         setUser(res.data.user)
@@ -23,16 +61,15 @@ export default function PropertyDetailsPage() {
           setMainImage(res.data.property.images[0])
         }
 
-        // Fetch related properties after main property details are loaded
         const relatedRes = await axios.get(`/api/property/${id}/related`)
         setRelatedProperties(relatedRes.data.relatedProperties)
 
       } catch (error) {
         console.error('Failed to fetch property details or related properties:', error)
         setProperty(null)
-        setRelatedProperties([]) // Clear related properties on error
+        setRelatedProperties([])
       } finally {
-        setLoading(false) // End loading
+        setLoading(false)
       }
     }
 
@@ -60,13 +97,12 @@ export default function PropertyDetailsPage() {
     )
   }
 
-  // Helper function to render a detail row if value exists
   const DetailCard = ({ label, value, iconClass, iconColorClass = 'text-gray-500' }: { label: string, value: string | number | null | undefined, iconClass?: string, iconColorClass?: string }) => {
     if (value === undefined || value === null || (typeof value === 'string' && value.trim() === "") || (typeof value === 'number' && isNaN(value))) return null;
 
-    let displayValue = value;
+    let displayValue: string | number = value;
     if (typeof value === 'string') {
-        displayValue = capitalize(value);
+      displayValue = capitalize(value);
     }
 
     return (
@@ -85,7 +121,6 @@ export default function PropertyDetailsPage() {
     <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
 
-        {/* Top Header Section: Price, Title, Location, and Basic Features */}
         <div className="p-6 md:p-8 border-b border-gray-200 bg-gradient-to-r from-white to-[#f0f6fc]">
           <div className="flex justify-between items-start mb-4 flex-wrap gap-y-3">
             <div className="flex flex-col md:flex-row md:items-baseline md:gap-4">
@@ -101,7 +136,6 @@ export default function PropertyDetailsPage() {
                 </span>
               )}
             </div>
-            {/* More options icon */}
             <button className="p-2 text-gray-500 transition-colors rounded-full hover:text-gray-700 hover:bg-gray-100">
               <i className="text-lg fas fa-ellipsis-h"></i>
             </button>
@@ -119,7 +153,6 @@ export default function PropertyDetailsPage() {
             
           </p>
 
-          {/* Basic Property Details - Adjusted for 'building' type */}
           {property.type === 'building' && (
             <div className="flex flex-wrap justify-center p-4 bg-[#e6f0f7] border border-[#a8c9e7] rounded-lg shadow-inner gap-x-6 gap-y-3 md:justify-start text-gray-800">
               {property.bedrooms !== undefined && property.bedrooms !== null && (
@@ -142,12 +175,9 @@ export default function PropertyDetailsPage() {
           )}
         </div>
 
-        {/* Main Content Area: Left (Image Gallery, Description, Features) & Right (Contact/Download) */}
         <div className="grid grid-cols-1 gap-8 p-6 md:p-8 lg:grid-cols-3">
 
-          {/* Left Column: Main Property Details */}
           <div className="lg:col-span-2">
-            {/* Image Gallery */}
             <div className="mb-8">
               <div className="flex items-center justify-center mb-4 overflow-hidden bg-gray-100 border rounded-lg shadow-xl aspect-video border-gray-200">
                 {mainImage ? (
@@ -168,7 +198,7 @@ export default function PropertyDetailsPage() {
                     <div
                       key={idx}
                       className={`aspect-square rounded-lg overflow-hidden cursor-pointer transition-all duration-300 transform hover:scale-105
-                               ${mainImage === img ? 'border-3 border-[#2180d3] shadow-md' : 'border border-gray-300 hover:border-[#2180d3]/50 shadow-sm'}`}
+                                ${mainImage === img ? 'border-3 border-[#2180d3] shadow-md' : 'border border-gray-300 hover:border-[#2180d3]/50 shadow-sm'}`}
                       onClick={() => setMainImage(img)}
                     >
                       <img
@@ -193,11 +223,9 @@ export default function PropertyDetailsPage() {
               </div>
             </div>
 
-            {/* Property Specific Details (Table-like layout from image) */}
             <div className="p-6 mb-8 bg-white border border-gray-200 rounded-xl shadow-md">
                 <h3 className="mb-4 text-xl font-bold text-gray-800 border-l-4 border-[#2180d3] pl-3">Property Highlights</h3>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {/* Common fields */}
                     <DetailCard
                         label="Listing For"
                         value={capitalize(property.transactionType)}
@@ -244,7 +272,6 @@ export default function PropertyDetailsPage() {
                         />
                     )}
 
-                    {/* Building-specific fields */}
                     {property.type === 'building' && (
                         <>
                             <DetailCard
@@ -280,7 +307,6 @@ export default function PropertyDetailsPage() {
                         </>
                     )}
 
-                    {/* Land-specific fields */}
                     {property.type === 'land' && (
                         <DetailCard
                             label="Land Category"
@@ -293,7 +319,6 @@ export default function PropertyDetailsPage() {
             </div>
 
 
-            {/* Property Description Section */}
             <div className="p-6 mb-8 bg-white border border-gray-200 rounded-xl shadow-md">
               <h3 className="mb-4 text-xl font-bold text-gray-800 border-l-4 border-[#2180d3] pl-3">Property Description</h3>
               <p className="text-sm leading-relaxed text-gray-700 mb-5">
@@ -309,7 +334,6 @@ export default function PropertyDetailsPage() {
               )}
             </div>
 
-            {/* Related Properties Section */}
             {relatedProperties.length > 0 && (
                 <div className="p-6 mb-8 bg-white border border-gray-200 rounded-xl shadow-md">
                     <h3 className="mb-6 text-xl font-bold text-gray-800 border-l-4 border-[#2180d3] pl-3">Related Properties</h3>
@@ -358,7 +382,6 @@ export default function PropertyDetailsPage() {
             )}
 
 
-            {/* Bottom Contact Buttons (desktop only) */}
             <div className="hidden mt-8 lg:flex gap-6">
                 <button className="flex-1 px-6 py-3.5 font-bold text-white transition duration-300 ease-in-out transform rounded-lg shadow-lg bg-[#2180d3] hover:bg-[#1a66a7] hover:scale-105">
                     <i className="mr-3 fas fa-paper-plane"></i> Contact Agent
@@ -369,10 +392,8 @@ export default function PropertyDetailsPage() {
             </div>
           </div>
 
-          {/* Right Column: Contact Agent & Download Brochure (Fixed/Sticky behavior for larger screens) */}
           <div className="lg:col-span-1">
             <div className="flex flex-col gap-6 lg:sticky lg:top-8">
-              {/* Contact Agent Card */}
               <div className="p-6 text-center bg-white border border-gray-200 rounded-xl shadow-lg">
                 <h3 className="mb-4 text-xl font-bold text-gray-800">Interested?</h3>
                 <img
@@ -394,7 +415,6 @@ export default function PropertyDetailsPage() {
                 </button>
               </div>
 
-              {/* Download Brochure Card */}
               <div className="p-6 text-center bg-white border border-gray-200 rounded-xl shadow-lg">
                 <i className="mb-4 text-4xl text-red-500 fas fa-file-pdf"></i>
                 <h3 className="mb-2 text-lg font-bold text-gray-800">Download Brochure</h3>
@@ -407,7 +427,6 @@ export default function PropertyDetailsPage() {
           </div>
         </div>
 
-        {/* Floating/Bottom Contact Agent and Get Phone No. for smaller screens */}
         <div className="sticky bottom-0 left-0 right-0 z-10 flex justify-between gap-4 p-4 bg-white border-t border-gray-200 lg:hidden shadow-lg">
             <button className="flex-1 px-4 py-3.5 font-bold text-white transition-colors rounded-lg shadow-md bg-[#2180d3] hover:bg-[#1a66a7]">
                 <i className="mr-2 fas fa-phone-alt"></i> Contact

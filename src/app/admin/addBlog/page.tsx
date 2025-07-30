@@ -15,8 +15,8 @@ export default function AddBlog() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const primaryColor = "#2180d3"; // Define the new primary color
-  const secondaryColor = "#1a66a7"; // A slightly darker shade for gradients/hovers
+  const primaryColor = "#2180d3"; 
+  const secondaryColor = "#1a66a7"; 
 
   const handleImageURL = async (): Promise<string | null> => {
     if (!image) {
@@ -44,8 +44,8 @@ export default function AddBlog() {
             reject(new Error(data.error));
             toast.error("Failed to upload image. Please try again.");
           }
-        } catch (err: any) {
-          console.error("Error uploading image:", err.message);
+        } catch (err) {
+          console.error("Error uploading image:", err);
           reject(err);
           toast.error("An error occurred during image upload.");
         }
@@ -76,7 +76,7 @@ export default function AddBlog() {
       const id = response.data.blog._id;
       toast.success("Blog created successfully!");
       router.push(`/admin/blog/${id}`);
-    } catch (error: any) {
+    } catch (error) {
       console.log("Error", error);
       toast.error("Failed to create blog. Please check your inputs.");
     } finally {

@@ -12,11 +12,32 @@ import {
 } from "react-icons/fa";
 import ConfirmationModal from "@/components/BlogConfirmationModal";
 
+interface Blog {
+  title: string;
+  body: string;
+  coverImageURL: string;
+  createdAt: string;
+}
+
+interface User {
+  _id: string;
+  username: string;
+  email: string;
+  profileImageURL?: string;
+}
+
+interface BlogUser {
+  _id: string;  
+  username: string;
+  email: string;
+  profileImageURL?: string;
+}
+
 export default function Blog() {
   const { id } = useParams();
-  const [blog, setBlog] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
-  const [blogUser, setBlogUser] = useState<any>(null);
+  const [blog, setBlog] = useState<Blog>();
+  const [user, setUser] = useState<User>();
+  const [blogUser, setBlogUser] = useState<BlogUser>();
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -60,12 +81,12 @@ export default function Blog() {
 
   useEffect(() => {
     if (id) {
-      fetchUser();
       fetchBlog();
+      fetchUser();
     }
   }, [id]);
 
-  if (!blog || !user) {
+  if (!blog) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white" style={{ color: primaryColor }}>
         <div className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin mb-4" style={{ borderColor: primaryColor, borderTopColor: 'transparent' }} />
@@ -93,9 +114,9 @@ export default function Blog() {
             </div>
             <div className="flex items-center gap-2">
               <FaUserCircle />
-              <Link href={`/profile/${blogUser._id}`}>
+              <Link href={`/profile/${blogUser?._id}`}>
                 <span className="font-medium hover:underline" style={{ color: primaryColor }}>
-                  {blogUser.username}
+                  {blogUser?.username}
                 </span>
               </Link>
             </div>
@@ -115,7 +136,7 @@ export default function Blog() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent group-hover:from-black/30 transition duration-300" />
         </div>
 
-        {blogUser._id === user._id && (
+        {blogUser && blogUser._id === user?._id && (
           <div className="text-center">
             <button
               onClick={() => setShowModal(true)}
@@ -152,7 +173,7 @@ export default function Blog() {
         </section>
 
         <footer className="mt-12 flex items-center gap-4 p-6 bg-white rounded-xl shadow" style={{ borderColor: `${primaryColor}30`, border: `1px solid ${primaryColor}30` }}>
-          {blogUser.profileImageURL && (
+          {blogUser?.profileImageURL && (
             <img
               src={blogUser.profileImageURL}
               alt={blogUser.username}
@@ -161,12 +182,14 @@ export default function Blog() {
             />
           )}
           <div>
-            <Link href={`/profile/${blogUser._id}`}>
-              <h3 className="text-lg font-semibold hover:underline" style={{ color: primaryColor }}>
-                {blogUser.username}
-              </h3>
-            </Link>
-            <p className="text-sm text-gray-600">{blogUser.email}</p>
+            {blogUser && (
+              <Link href={`/profile/${blogUser._id}`}>
+                <h3 className="text-lg font-semibold hover:underline" style={{ color: primaryColor }}>
+                  {blogUser.username}
+                </h3>
+              </Link>
+            )}
+            <p className="text-sm text-gray-600">{blogUser?.email}</p>
           </div>
         </footer>
       </div>

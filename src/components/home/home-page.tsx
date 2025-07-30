@@ -6,7 +6,6 @@ import { HeroSection } from './hero-section';
 import { QuickFilters } from './quick-filters';
 import { FeaturedListings } from './featured-listings';
 import { TestimonialsSection } from './testimonials-section';
-import Footer from './footer';
 
 export function HomePage() {
     return (

@@ -318,7 +318,7 @@ export default function ProfilePage() {
                             <div className="flex flex-col items-center">
                                 <BiBuilding className="text-4xl mb-2 text-[#2180d3]" />
                                 <p className="italic text-sm">
-                                    You haven't listed any properties yet.
+                                    You haven&apos;t listed any properties yet.
                                 </p>
                                 <button
                                     onClick={() => router.push("/list-property")} // Assuming you have a route to list a new property
