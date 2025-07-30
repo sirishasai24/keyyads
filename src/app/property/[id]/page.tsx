@@ -408,21 +408,21 @@ export default function PropertyDetailsPage() {
                     </p>
                 )}
                 <p className="flex items-center justify-center mb-4 text-sm text-gray-700">
-                  <i className="mr-2 text-gray-500 fas fa-phone-alt"></i> +91-{user?.phone ? user.phone.slice(0, 5) : 'XXXXX'}XXXXX
+                  <i className="mr-2 text-gray-500 fas fa-phone-alt"></i> +91-{user?.phone || 'Not Available'}
                 </p>
                 <button className="w-full py-3.5 font-bold text-white transition duration-300 ease-in-out transform rounded-lg shadow-md bg-[#2180d3] hover:bg-[#1a66a7] hover:scale-105 mb-3">
                   <i className="mr-2 fas fa-phone-alt"></i> Get Phone No.
                 </button>
               </div>
 
-              <div className="p-6 text-center bg-white border border-gray-200 rounded-xl shadow-lg">
+              {/* <div className="p-6 text-center bg-white border border-gray-200 rounded-xl shadow-lg">
                 <i className="mb-4 text-4xl text-red-500 fas fa-file-pdf"></i>
                 <h3 className="mb-2 text-lg font-bold text-gray-800">Download Brochure</h3>
                 <p className="mb-5 text-sm text-gray-600">Access detailed property information and floor plans.</p>
                 <button className="flex items-center justify-center w-full py-3.5 font-bold text-white transition duration-300 ease-in-out transform rounded-lg shadow-md bg-[#2180d3] hover:bg-[#1a66a7] hover:scale-105">
                   <i className="mr-2 fas fa-download "></i> Download Full Brochure
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

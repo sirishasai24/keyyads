@@ -1,3 +1,4 @@
+// components/hero-section.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -53,19 +54,19 @@ export const HeroSection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
-            className="relative bg-cover bg-center h-[70vh] flex items-center justify-center text-white p-4 overflow-hidden rounded-b-[4rem] shadow-2xl"
+            className="relative bg-cover bg-center h-[60vh] md:h-[70vh] flex items-center justify-center text-white px-4 py-8 md:p-4 overflow-hidden rounded-b-[2rem] md:rounded-b-[4rem] shadow-2xl"
             style={{
                 backgroundImage:
                     "url('https://images.unsplash.com/photo-1580587771525-78b9dba3825f?q=80&w=1974&auto=format&fit=crop')",
             }}
         >
-            <div className="absolute inset-0 bg-gradient-to-t from-[#2180d3] to-[#2180d3]"></div>
-            <div className="relative z-10 text-center max-w-5xl mx-auto px-4">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#2180d3]/90 to-[#2180d3]/70"></div> {/* Adjusted opacity for background */}
+            <div className="relative z-10 text-center max-w-5xl mx-auto px-4 sm:px-6"> {/* Removed lg:px-4 to let main container handle */}
                 <motion.h1
                     initial={{ y: -50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, delay: 0.5 }}
-                    className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4 drop-shadow-md leading-tight"
+                    className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-3 md:mb-4 drop-shadow-md leading-tight"
                 >
                     Find Your Future Home.
                 </motion.h1>
@@ -73,7 +74,7 @@ export const HeroSection = () => {
                     initial={{ y: -50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, delay: 0.7 }}
-                    className="text-lg sm:text-xl md:text-2xl mb-8 font-light drop-shadow-sm"
+                    className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 font-light drop-shadow-sm"
                 >
                     Explore verified properties for sale and rent from trusted sellers across India.
                 </motion.p>
@@ -82,26 +83,26 @@ export const HeroSection = () => {
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.9 }}
-                    className="bg-white p-6 sm:p-10 rounded-3xl shadow-2xl max-w-5xl mx-auto"
+                    className="bg-white p-4 sm:p-6 md:p-10 rounded-2xl sm:rounded-3xl shadow-2xl max-w-5xl mx-auto" 
                 >
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-center">
-                        <div className="relative flex items-center bg-gray-100 rounded-xl px-5 py-4 text-gray-800 col-span-full md:col-span-1 focus-within:ring-2 focus-within:ring-[#2180d3]">
-                            <LocationIcon className="w-5 h-5 text-gray-400 mr-2" />
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 items-center"> {/* Adjusted gap */}
+                        <div className="relative flex items-center bg-gray-100 rounded-lg sm:rounded-xl px-4 py-3 sm:px-5 sm:py-4 text-gray-800 col-span-full md:col-span-1 focus-within:ring-2 focus-within:ring-[#2180d3]"> {/* Adjusted padding, rounded */}
+                            <LocationIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 mr-2" /> {/* Adjusted icon size */}
                             <input
                                 type="text"
                                 placeholder="Location"
                                 value={location}
                                 onChange={(e) => setLocation(e.target.value)}
-                                className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder-gray-700"
+                                className="w-full bg-transparent outline-none text-sm sm:text-base text-gray-700 placeholder-gray-700"
                             />
                         </div>
 
-                        <div className="relative bg-gray-100 rounded-xl px-5 py-4 text-gray-800 flex items-center focus-within:ring-2 focus-within:ring-[#2180d3]">
-                            <KeyIcon className="w-5 h-5 text-gray-400 mr-2" />
+                        <div className="relative bg-gray-100 rounded-lg sm:rounded-xl px-4 py-3 sm:px-5 sm:py-4 text-gray-800 flex items-center focus-within:ring-2 focus-within:ring-[#2180d3]"> {/* Adjusted padding, rounded */}
+                            <KeyIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 mr-2" /> {/* Adjusted icon size */}
                             <select
                                 value={transactionType}
                                 onChange={(e) => setTransactionType(e.target.value)}
-                                className="w-full bg-transparent outline-none text-sm text-gray-700 appearance-none"
+                                className="w-full bg-transparent outline-none text-sm sm:text-base text-gray-700 appearance-none"
                             >
                                 <option value="">Transaction Type</option>
                                 <option value="sale">For Sale</option>
@@ -109,12 +110,12 @@ export const HeroSection = () => {
                             </select>
                         </div>
 
-                        <div className="relative bg-gray-100 rounded-xl px-5 py-4 text-gray-800 flex items-center focus-within:ring-2 focus-within:ring-[#2180d3]">
-                            <BuildingIcon className="w-5 h-5 text-gray-400 mr-2" />
+                        <div className="relative bg-gray-100 rounded-lg sm:rounded-xl px-4 py-3 sm:px-5 sm:py-4 text-gray-800 flex items-center focus-within:ring-2 focus-within:ring-[#2180d3]"> {/* Adjusted padding, rounded */}
+                            <BuildingIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 mr-2" /> {/* Adjusted icon size */}
                             <select
                                 value={propertyType}
                                 onChange={(e) => setPropertyType(e.target.value)}
-                                className="w-full bg-transparent outline-none text-sm text-gray-700 appearance-none"
+                                className="w-full bg-transparent outline-none text-sm sm:text-base text-gray-700 appearance-none"
                             >
                                 <option value="">Property Type</option>
                                 <option value="land">Land</option>
@@ -124,18 +125,18 @@ export const HeroSection = () => {
 
                         <button
                             onClick={handleSearch}
-                            className="w-full md:w-auto bg-[#2180d3] hover:bg-[#1a6cb2] text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-md col-span-full lg:col-span-1"
+                            className="w-full bg-[#2180d3] hover:bg-[#1a6cb2] text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-lg sm:rounded-xl transition-all duration-200 transform hover:scale-105 shadow-md col-span-full lg:col-span-1" 
                         >
                             Search
                         </button>
                     </div>
 
-                    <div className="flex justify-end mt-5">
+                    <div className="flex justify-end mt-4 sm:mt-5"> {/* Adjusted margin-top */}
                         <button
                             onClick={() => setShowMoreFilters(!showMoreFilters)}
-                            className="text-sm text-[#2180d3] bg-gray-100 hover:bg-gray-200 px-6 py-3 rounded-xl font-semibold flex items-center gap-2"
+                            className="text-xs sm:text-sm text-[#2180d3] bg-gray-100 hover:bg-gray-200 px-4 py-2 sm:px-6 sm:py-3 rounded-lg sm:rounded-xl font-semibold flex items-center gap-1 sm:gap-2" 
                         >
-                            <FilterIcon className="w-4 h-4" />
+                            <FilterIcon className="w-3 h-3 sm:w-4 sm:h-4" /> {/* Adjusted icon size */}
                             {showMoreFilters ? 'Less Filters' : 'More Filters'}
                         </button>
                     </div>
@@ -147,13 +148,13 @@ export const HeroSection = () => {
                                 animate="visible"
                                 exit="hidden"
                                 variants={advancedFiltersVariants}
-                                className="mt-6"
+                                className="mt-4" 
                             >
-                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4"> {/* Adjusted gap */}
                                     <select
                                         value={bedrooms}
                                         onChange={(e) => setBedrooms(e.target.value)}
-                                        className="w-full px-5 py-4 rounded-xl bg-gray-100 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2180d3]"
+                                        className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-lg sm:rounded-xl bg-gray-100 text-sm sm:text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2180d3]"
                                     >
                                         <option value="">Bedrooms</option>
                                         <option>1 BHK</option>
@@ -165,7 +166,7 @@ export const HeroSection = () => {
                                     <select
                                         value={bathrooms}
                                         onChange={(e) => setBathrooms(e.target.value)}
-                                        className="w-full px-5 py-4 rounded-xl bg-gray-100 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2180d3]"
+                                        className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-lg sm:rounded-xl bg-gray-100 text-sm sm:text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2180d3]"
                                     >
                                         <option value="">Bathrooms</option>
                                         <option>1</option>
@@ -177,7 +178,7 @@ export const HeroSection = () => {
                                     <select
                                         value={furnishing}
                                         onChange={(e) => setFurnishing(e.target.value)}
-                                        className="w-full px-5 py-4 rounded-xl bg-gray-100 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2180d3]"
+                                        className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-lg sm:rounded-xl bg-gray-100 text-sm sm:text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2180d3]"
                                     >
                                         <option value="">Furnishing</option>
                                         <option value="unfurnished">Unfurnished</option>
@@ -188,7 +189,7 @@ export const HeroSection = () => {
                                     <select
                                         value={propertyAge}
                                         onChange={(e) => setPropertyAge(e.target.value)}
-                                        className="w-full px-5 py-4 rounded-xl bg-gray-100 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2180d3]"
+                                        className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-lg sm:rounded-xl bg-gray-100 text-sm sm:text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2180d3]"
                                     >
                                         <option value="">Property Age</option>
                                         <option value="new">New</option>
@@ -200,7 +201,7 @@ export const HeroSection = () => {
                                     <select
                                         value={facing}
                                         onChange={(e) => setFacing(e.target.value)}
-                                        className="w-full px-5 py-4 rounded-xl bg-gray-100 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2180d3]"
+                                        className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-lg sm:rounded-xl bg-gray-100 text-sm sm:text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2180d3]"
                                     >
                                         <option value="">Facing</option>
                                         <option value="north">North</option>
@@ -218,7 +219,7 @@ export const HeroSection = () => {
                                         value={maxPrice}
                                         onChange={(e) => setMaxPrice(e.target.value)}
                                         placeholder="Max Price (₹)"
-                                        className="w-full px-5 py-4 rounded-xl bg-gray-100 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2180d3]"
+                                        className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-lg sm:rounded-xl bg-gray-100 text-sm sm:text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#2180d3]"
                                     />
                                 </div>
                             </motion.div>

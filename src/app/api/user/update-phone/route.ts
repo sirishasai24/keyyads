@@ -63,8 +63,8 @@ export async function POST(request: NextRequest) {
             user: updatedUser,
         }, { status: 200 });
 
-    } catch (error: any) {
+    } catch (error) {
         console.error("Error updating phone number:", error);
-        return NextResponse.json({ error: error.message || "Internal server error." }, { status: 500 });
+        return NextResponse.json({ error: error || "Internal server error." }, { status: 500 });
     }
 }

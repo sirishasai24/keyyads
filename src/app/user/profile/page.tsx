@@ -14,7 +14,6 @@ import {
 import { BiLogOut, BiBuilding } from "react-icons/bi";
 import { MdVerified } from "react-icons/md";
 import { FiCamera } from "react-icons/fi";
-import { FaBoxes, FaCalendarAlt } from "react-icons/fa"; // For listings and shows
 import toast from "react-hot-toast"; // Import toast for notifications
 
 // Updated UserProfile interface to include plan details and expiry date
