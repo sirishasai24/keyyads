@@ -52,6 +52,7 @@ export default function AddPropertyForm() {
     const [userListingQuota, setUserListingQuota] = useState<number | null>(null);
     const [isLoadingUserQuota, setIsLoadingUserQuota] = useState(true);
     const [fetchError, setFetchError] = useState<string | null>(null);
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // New state for login status
 
 
     const {
@@ -84,16 +85,26 @@ export default function AddPropertyForm() {
             try {
                 const response = await axios.get('/api/auth/me');
                 if (response.data && response.data.user) {
+                    setIsLoggedIn(true); // User is logged in
                     setUserListingQuota(response.data.user.listings);
                 } else {
+                    // This case handles when the API returns success but no user object,
+                    // which might happen if the session is somehow invalid but not an error.
+                    setIsLoggedIn(false); // User is not logged in
                     console.warn("User data or 'listings' field not found in /api/auth/me response.");
-                    setUserListingQuota(0);
-                    setFetchError("Could not retrieve user listing quota. Please try again.");
+                    setUserListingQuota(0); // Set quota to 0 as a safeguard
                 }
             } catch (error) {
-                console.error('Failed to fetch user listing quota:', error);
-                setFetchError('Failed to load user data. Please try again.');
-                setUserListingQuota(0);
+                if (axios.isAxiosError(error) && error.response?.status === 401) {
+                    // Explicitly handle 401 Unauthorized for not logged in
+                    setIsLoggedIn(false);
+                } else {
+                    // Other errors (network, server issues)
+                    console.error('Failed to fetch user listing quota:', error);
+                    setFetchError('Failed to load user data. Please try again.');
+                    setIsLoggedIn(false); // Assume not logged in if unable to fetch
+                }
+                setUserListingQuota(0); // Set quota to 0 or appropriate default
             } finally {
                 setIsLoadingUserQuota(false);
             }
@@ -243,11 +254,30 @@ export default function AddPropertyForm() {
         return value
     }
 
-    if (isLoadingUserQuota) {
+    // New: Check if login status is still loading
+    if (isLoggedIn === null || isLoadingUserQuota) {
         return (
             <div className="flex justify-center items-center min-h-[calc(100vh-80px)] bg-gray-50">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2180d3]"></div>
-                <p className="ml-4 text-lg text-gray-700">Loading user data...</p>
+                <p className="ml-4 text-lg text-gray-700">Checking authentication...</p>
+            </div>
+        );
+    }
+
+    // New: If not logged in, show a login prompt
+    if (isLoggedIn === false) {
+        return (
+            <div className="max-w-md mx-auto p-8 mt-20 bg-white rounded-3xl shadow-xl border border-gray-100 text-center">
+                <h1 className="text-3xl font-bold text-[#2180d3] mb-6">Login Required</h1>
+                <p className="text-lg text-gray-700 mb-8">
+                    Please log in to your account to add a new property listing.
+                </p>
+                <button
+                    onClick={() => router.push('/login')} // Assuming a login page at /login
+                    className="w-full bg-[#2180d3] hover:bg-[#1a6fb0] text-white font-semibold py-3 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+                >
+                    Go to Login
+                </button>
             </div>
         );
     }

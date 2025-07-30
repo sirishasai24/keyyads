@@ -169,7 +169,7 @@ export const FeaturedListings = () => {
                                             {getListingTags(listing).map((tag, index) => (
                                                 <span
                                                     key={index}
-                                                    className="bg-[#2180d3]/90 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md"
+                                                    className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-gray-800 text-xs font-semibold px-3 py-1 rounded-full shadow-md"
                                                 >
                                                     {tag}
                                                 </span>

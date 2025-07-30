@@ -3,16 +3,21 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Link from "next/link"; // Import Link for navigation
 import {
     AiOutlineMail,
     AiOutlinePhone,
     AiOutlineCalendar,
     AiOutlineEdit,
+    AiOutlineStar, // For Premium Badging
 } from "react-icons/ai";
 import { BiLogOut, BiBuilding } from "react-icons/bi";
 import { MdVerified } from "react-icons/md";
 import { FiCamera } from "react-icons/fi";
+import { FaBoxes, FaCalendarAlt } from "react-icons/fa"; // For listings and shows
+import toast from "react-hot-toast"; // Import toast for notifications
 
+// Updated UserProfile interface to include plan details and expiry date
 interface UserProfile {
     username: string;
     email: string;
@@ -21,6 +26,20 @@ interface UserProfile {
     profileImageURL?: string;
     role?: string;
     createdAt?: string;
+    plan?: "Free" | "Quarterly Plan" | "Half Yearly Plan" | "Annual Plan";
+    listings?: number; // Remaining listings
+    premiumBadging?: number; // Remaining premium listings
+    shows?: number; // Remaining shows
+}
+
+interface UserPlan {
+    planTitle: "Quarterly Plan" | "Half Yearly Plan" | "Annual Plan";
+    startDate: string;
+    expiryDate: string;
+    listings: number;
+    premiumBadging: number;
+    shows: number;
+    // ... other plan details if you want to display them
 }
 
 interface Property {
@@ -36,6 +55,7 @@ interface Property {
 
 export default function ProfilePage() {
     const [user, setUser] = useState<UserProfile | null>(null);
+    const [userPlan, setUserPlan] = useState<UserPlan | null>(null); // State for plan details
     const [phoneInput, setPhoneInput] = useState("");
     const [editPhone, setEditPhone] = useState(false);
     const [properties, setProperties] = useState<Property[]>([]);
@@ -48,80 +68,118 @@ export default function ProfilePage() {
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                setImagePreview(reader.result);
-                try {
-                    setUploading(true);
-                    const res = await axios.post("/api/user/upload", {
-                        image: reader.result,
-                    });
-                    setUser((prev) =>
-                        prev ? { ...prev, profileImageURL: res.data.secure_url } : prev
-                    );
-                } catch (err) {
-                    console.error("Upload failed", err);
-                } finally {
-                    setUploading(false);
-                }
-            };
-            reader.readAsDataURL(file);
-        }
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            setImagePreview(reader.result);
+            try {
+                setUploading(true);
+                toast.loading("Uploading profile image...");
+                const res = await axios.post("/api/user/upload", {
+                    image: reader.result,
+                });
+                setUser((prev) =>
+                    prev ? { ...prev, profileImageURL: res.data.secure_url } : prev
+                );
+                toast.success("Profile image updated successfully!");
+            } catch (err) {
+                console.error("Upload failed", err);
+                toast.error("Failed to upload image.");
+            } finally {
+                setUploading(false);
+                toast.dismiss(); // Dismiss the loading toast
+            }
+        };
+        reader.readAsDataURL(file);
     };
 
     useEffect(() => {
-        // Fetch user profile
-        axios
-            .get("/api/auth/me")
-            .then((res) => {
+        const fetchUserData = async () => {
+            try {
+                // Fetch user and plan data from the new endpoint
+                const res = await axios.get("/api/user/current-plan");
+                
+                // Set user data
                 setUser(res.data.user);
                 setPhoneInput(res.data.user.phone || "");
-            })
-            .catch((err) => {
-                console.error("Profile fetch error:", err);
-                router.push("/auth");
-            });
 
-        // Fetch user properties
-        axios
-            .get("/api/user/properties")
-            .then((res) => {
-                setProperties(res.data.properties);
-            })
-            .catch((err) => {
-                console.error("Properties fetch error:", err);
-                // Handle error, e.g., show a message to the user
-            });
+                // Set plan data if available
+                if (res.data.plan) {
+                    setUserPlan(res.data.plan);
+                } else {
+                    setUserPlan(null); // Explicitly set to null if no plan
+                }
+
+                const propertiesRes = await axios.get("/api/user/properties");
+                setProperties(propertiesRes.data.properties);
+            } catch (err) {
+                console.error("Data fetch error:", err);
+                toast.error("Failed to load profile or properties. Please login again.");
+                router.push("/auth");
+            }
+        };
+
+        fetchUserData();
     }, [router]);
 
     const handleLogout = async () => {
         try {
             await axios.post("/api/logout");
+            toast.success("Logged out successfully!");
             router.push("/auth");
         } catch (err) {
             console.error("Logout failed:", err);
+            toast.error("Logout failed. Please try again.");
         }
     };
 
     const handlePhoneSubmit = async () => {
         try {
-            const res = await axios.post("/api/update-phone", { phone: phoneInput });
+            // Basic validation for phone number
+            if (!phoneInput || phoneInput.length < 10) {
+                toast.error("Please enter a valid phone number.");
+                return;
+            }
+
+            toast.loading("Updating phone number...");
+            const res = await axios.post("/api/user/update-phone", { phone: phoneInput });
             setUser((prev) => (prev ? { ...prev, ...res.data.user } : null));
             setEditPhone(false);
+            toast.success("Phone number updated successfully!");
         } catch (err) {
             console.error("Phone update error:", err);
+            if (axios.isAxiosError(err) && err.response?.data?.error) {
+                toast.error(err.response.data.error);
+            } else {
+                toast.error("Failed to update phone number.");
+            }
+        } finally {
+            toast.dismiss(); // Dismiss the loading toast
         }
     };
 
-    const handleVerifyClick = async () => {
-        try {
-            await axios.post("/api/request-verification", { phone: user?.phone });
-            alert(
-                "A verification code has been sent to your phone. Please check it to verify your number."
-            );
-        } catch (err) {
-            console.error("Verification request failed", err);
+    // Function to format date as dd/mm/yyyy
+    const formatDate = (dateString: string | undefined): string => {
+        if (!dateString) return "N/A";
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
+    // Function to determine the border color based on the plan
+    const getPlanBorderColorClass = (plan: UserProfile['plan']) => {
+        switch (plan) {
+            case "Quarterly Plan":
+                return "border-green-400"; // Emerald green
+            case "Half Yearly Plan":
+                return "border-purple-400"; // Violet/Purple
+            case "Annual Plan":
+                return "border-yellow-400"; // Amber/Orange-Yellow
+            default:
+                return "border-white"; // Default for Free or no plan
         }
     };
 
@@ -132,6 +190,8 @@ export default function ProfilePage() {
             </div>
         );
     }
+
+    const planBorderClass = getPlanBorderColorClass(user.plan);
 
     return (
         <div className="min-h-screen bg-gray-100 py-16 px-4">
@@ -152,7 +212,7 @@ export default function ProfilePage() {
                                     : user.profileImageURL || "/profile.webp"
                             }
                             alt="Profile"
-                            className="w-28 h-28 rounded-full border-4 border-white object-cover shadow-md"
+                            className={`w-28 h-28 rounded-full border-4 object-cover shadow-md ${planBorderClass}`} // Apply dynamic border here
                         />
                         <label
                             htmlFor="imageUpload"
@@ -183,6 +243,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="p-8 space-y-8">
+                    {/* User Contact and Creation Details */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="flex items-center space-x-4">
                             <AiOutlineMail className="text-2xl text-[#2180d3]" />
@@ -203,14 +264,13 @@ export default function ProfilePage() {
                                     Account Created
                                 </p>
                                 <p className="text-lg font-semibold text-gray-800">
-                                    {user.createdAt
-                                        ? new Date(user.createdAt).toLocaleDateString()
-                                        : "N/A"}
+                                    {formatDate(user.createdAt)}
                                 </p>
                             </div>
                         </div>
                     </div>
 
+                    {/* Phone Number Section */}
                     <div className="flex flex-col gap-4">
                         <div className="flex items-center space-x-4">
                             <AiOutlinePhone className="text-2xl text-[#2180d3]" />
@@ -228,12 +288,10 @@ export default function ProfilePage() {
                                                 <MdVerified className="mr-1" /> Verified
                                             </span>
                                         ) : (
-                                            <button
-                                                onClick={handleVerifyClick}
-                                                className="text-sm font-medium text-[#2180d3] hover:text-blue-700 transition"
-                                            >
-                                                Verify
-                                            </button>
+                                            // Verification button is present but will not function without backend OTP setup
+                                            <span className="text-sm font-medium text-gray-500">
+                                                (Unverified)
+                                            </span>
                                         )}
                                         <button
                                             onClick={() => setEditPhone(true)}
@@ -271,6 +329,49 @@ export default function ProfilePage() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Plan Details Section */}
+                    <div className="border-t border-gray-200 pt-8 mt-8">
+                        <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <AiOutlineStar className="text-2xl text-yellow-500" />
+                            My Plan
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="bg-blue-50 p-4 rounded-lg shadow-sm">
+                                <p className="text-sm text-gray-600 font-medium">Current Plan</p>
+                                <p className="text-lg font-semibold text-[#2180d3]">{user.plan || "Free"}</p>
+                            </div>
+                            {userPlan && user.plan !== "Free" && ( // Only show expiry if a paid plan exists
+                                <div className="bg-red-50 p-4 rounded-lg shadow-sm">
+                                    <p className="text-sm text-gray-600 font-medium">Plan Expires</p>
+                                    <p className="text-lg font-semibold text-red-700">
+                                        {formatDate(userPlan.expiryDate)}
+                                    </p>
+                                </div>
+                            )}
+                            <div className="bg-green-50 p-4 rounded-lg shadow-sm">
+                                <p className="text-sm text-gray-600 font-medium">Listings Left</p>
+                                <p className="text-lg font-semibold text-green-700">{user.listings !== undefined ? user.listings : "N/A"}</p>
+                            </div>
+                            <div className="bg-yellow-50 p-4 rounded-lg shadow-sm">
+                                <p className="text-sm text-gray-600 font-medium">Premium Badging Left</p>
+                                <p className="text-lg font-semibold text-yellow-700">{user.premiumBadging !== undefined ? user.premiumBadging : "N/A"}</p>
+                            </div>
+                            <div className="bg-purple-50 p-4 rounded-lg shadow-sm">
+                                <p className="text-sm text-gray-600 font-medium">Shows Left</p>
+                                <p className="text-lg font-semibold text-purple-700">{user.shows !== undefined ? user.shows : "N/A"}</p>
+                            </div>
+                        </div>
+                        {user.plan === "Free" && (
+                            <div className="mt-6 text-center">
+                                <Link href="/user/prime">
+                                    <button className="px-6 py-3 bg-yellow-500 text-white font-semibold rounded-full hover:bg-yellow-600 transition shadow-md">
+                                        Upgrade Your Plan
+                                    </button>
+                                </Link>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="p-8 bg-gray-50 border-t border-gray-200">
@@ -286,31 +387,31 @@ export default function ProfilePage() {
                     {properties.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {properties.map((property) => (
-                                <div
-                                    key={property._id}
-                                    className="bg-white rounded-lg shadow-md overflow-hidden"
-                                >
-                                    <img
-                                        src={property.images[0] || "/placeholder.jpg"} // Use a placeholder if no image
-                                        alt={property.title}
-                                        className="w-full h-48 object-cover"
-                                    />
-                                    <div className="p-4">
-                                        <h4 className="text-lg font-semibold text-gray-900 truncate">
-                                            {property.title}
-                                        </h4>
-                                        <p className="text-sm text-gray-600">
-                                            {property.address}
-                                        </p>
-                                        <p className="text-md font-bold text-[#2180d3] mt-2">
-                                            ₹{property.price.toLocaleString()}
-                                        </p>
-                                        <p className="text-xs text-gray-500 mt-1">
-                                            {property.area} {property.areaUnit}
-                                        </p>
-                                        {/* Add more property details here as needed */}
+                                <Link href={`/property/${property._id}`} key={property._id}>
+                                    <div
+                                        className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+                                    >
+                                        <img
+                                            src={property.images[0] || "/placeholder.jpg"}
+                                            alt={property.title}
+                                            className="w-full h-48 object-cover"
+                                        />
+                                        <div className="p-4">
+                                            <h4 className="text-lg font-semibold text-gray-900 truncate">
+                                                {property.title}
+                                            </h4>
+                                            <p className="text-sm text-gray-600">
+                                                {property.address}
+                                            </p>
+                                            <p className="text-md font-bold text-[#2180d3] mt-2">
+                                                ₹{property.price.toLocaleString()}
+                                            </p>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                {property.area} {property.areaUnit}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     ) : (
@@ -321,7 +422,7 @@ export default function ProfilePage() {
                                     You haven&apos;t listed any properties yet.
                                 </p>
                                 <button
-                                    onClick={() => router.push("/list-property")} // Assuming you have a route to list a new property
+                                    onClick={() => router.push("/property/add")}
                                     className="mt-4 px-6 py-2 rounded-lg bg-[#2180d3] text-white font-semibold hover:bg-blue-500 transition shadow"
                                 >
                                     List a New Property

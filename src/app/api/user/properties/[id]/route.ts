@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDataFromToken } from "@/helpers/getDataFromToken";
 import { connectDb } from "@/dbConfig/dbConfig";
 import Property from "@/models/propertyModel";
+import User from "@/models/userModel"; // Import your User model
 import { v2 as cloudinary } from "cloudinary";
 import { Error as MongooseError } from "mongoose";
 
@@ -57,9 +58,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  
-    const url = new URL(request.url);
-    const propertyId = url.pathname.split('/').pop();
+  const url = new URL(request.url);
+  const propertyId = url.pathname.split('/').pop();
+
   try {
     const userId = await getDataFromToken(request);
     if (!userId) {
@@ -85,7 +86,7 @@ export async function PUT(request: NextRequest) {
         if (["price", "discount", "floors", "parking", "area"].includes(key)) {
           updatedData[key] = parseFloat(value as string);
         } else if (key === "isPremium") {
-          updatedData[key] = value === "true";
+          updatedData[key] = value === "true"; // Parse as boolean
         } else if (value === "undefined" || value === "null") {
           updatedData[key] = undefined;
         } else {
@@ -114,6 +115,52 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // --- Premium Listing Logic Start ---
+    const existingProperty = await Property.findById(propertyId);
+    if (!existingProperty || existingProperty.createdBy.toString() !== userId) {
+      return NextResponse.json(
+        { error: "Property not found or not authorized to update" },
+        { status: 404 }
+      );
+    }
+
+    const isPremiumOld = existingProperty.isPremium;
+    const isPremiumNew = updatedData.isPremium as boolean;
+
+    // Fetch the user document to check and update premiumBadging
+    const user = await User.findById(userId);
+    if (!user) {
+      return NextResponse.json({ error: "User not found." }, { status: 404 });
+    }
+
+    if (isPremiumOld && !isPremiumNew) {
+      // Scenario 1: Trying to downgrade from premium to non-premium
+      return NextResponse.json(
+        { error: "Premium listings cannot be reverted to non-premium." },
+        { status: 400 }
+      );
+    }
+
+    if (!isPremiumOld && isPremiumNew) {
+      // Scenario 2: Trying to upgrade from non-premium to premium
+      if (user.premiumBadging <= 0) {
+        // User does not have available premium listings
+        return NextResponse.json(
+          { error: "You have exhausted your premium listing quota. Upgrade your plan to get more premium listings." },
+          { status: 403 }
+        );
+      }
+
+      // If user has quota, decrement it and proceed
+      user.premiumBadging -= 1;
+      await user.save(); // Save the updated user document
+    }
+    // Scenario 3: isPremiumOld and isPremiumNew are both true (no change, or property was already premium and remains so)
+    // Scenario 4: isPremiumOld and isPremiumNew are both false (no change, property remains non-premium)
+    // No special action needed for scenarios 3 & 4 regarding quota.
+    // --- Premium Listing Logic End ---
+
+
     const property = await Property.findOneAndUpdate(
       { _id: propertyId, createdBy: userId },
       { $set: updatedData },
@@ -121,11 +168,13 @@ export async function PUT(request: NextRequest) {
     );
 
     if (!property) {
+      // This should ideally not be reached if existingProperty check passes,
+      // but kept as a safeguard.
       return NextResponse.json(
         { error: "Property not found or not authorized to update" },
         { status: 404 }
       );
-      }
+    }
     return NextResponse.json(
       { message: "Property updated successfully", property },
       { status: 200 }
@@ -150,15 +199,13 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-
-    const url = new URL(request.url);
-    const propertyId = url.pathname.split('/').pop();
+  const url = new URL(request.url);
+  const propertyId = url.pathname.split('/').pop();
   try {
     const userId = await getDataFromToken(request);
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
 
     const property = await Property.findOne({
       _id: propertyId,
@@ -171,6 +218,8 @@ export async function DELETE(request: NextRequest) {
         { status: 404 }
       );
     }
+
+  
 
     await Property.deleteOne({ _id: propertyId });
 

@@ -43,6 +43,12 @@ const initialPropertyState: Property = {
   createdBy: "", // Not editable
 };
 
+interface UserPlanDetails {
+  premiumBadging: number;
+  planTitle: string; // e.g., "Quarterly Plan", "Half Yearly Plan", "Annual Plan", "Free"
+  expiryDate: string; // for checking active status
+}
+
 export default function EditPropertyPage() {
   const router = useRouter();
   const params = useParams();
@@ -56,15 +62,38 @@ export default function EditPropertyPage() {
   const [imageFiles, setImageFiles] = useState<File[]>([]); // For new image uploads
   const [previewImages, setPreviewImages] = useState<string[]>([]); // For existing and new images
 
-  // Fetch property data on component mount
+  // New states for premium listing logic
+  const [userPremiumQuota, setUserPremiumQuota] = useState<number | null>(null);
+  const [hasActivePlan, setHasActivePlan] = useState(false);
+  const [initialIsPremium, setInitialIsPremium] = useState(false); // To track if property was initially premium
+
+  // Fetch property data and user plan on component mount
   useEffect(() => {
     if (!propertyId) return;
 
-    const fetchProperty = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`/api/property/${propertyId}`); // Public API to get single property
-        const data = response.data.property;
+        // Fetch property details
+        const propertyRes = await axios.get(`/api/property/${propertyId}`);
+        const data = propertyRes.data.property;
+
+        // Fetch user's current plan and premium badging
+        const userPlanRes = await axios.get<{ user: { listings: number; premiumBadging: number; plan: string }; plan?: UserPlanDetails }>("/api/user/current-plan");
+        const userPlanData = userPlanRes.data.plan;
+        const userData = userPlanRes.data.user;
+
+        if (userPlanData && new Date(userPlanData.expiryDate) > new Date()) {
+          setHasActivePlan(true);
+          setUserPremiumQuota(userPlanData.premiumBadging);
+        } else if (userData?.plan === "Free") {
+          setHasActivePlan(true); // Free plan is active but 0 premium badging
+          setUserPremiumQuota(0);
+        } else {
+            setHasActivePlan(false);
+            setUserPremiumQuota(0);
+        }
+
 
         // Set initial form data
         setPropertyData({
@@ -73,21 +102,22 @@ export default function EditPropertyPage() {
           location: data.location || initialPropertyState.location,
         });
         setPreviewImages(data.images || []); // Set existing images as previews
+        setInitialIsPremium(data.isPremium || false); // Store initial premium status
+
       } catch (err) {
-        console.error("Error fetching property:", err);
+        console.error("Error fetching data:", err);
         setError(
-          
-            "Failed to fetch property details. Please try again."
+          "Failed to fetch property details or user plan. Please try again."
         );
         toast.error(
-           "Failed to load property."
+          "Failed to load property details or user plan."
         );
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProperty();
+    fetchData();
   }, [propertyId]);
 
   // Handle form field changes
@@ -98,7 +128,24 @@ export default function EditPropertyPage() {
   ) => {
     const { name, value, type, checked } = e.target as HTMLInputElement;
 
-    if (name.startsWith("location.")) {
+    if (name === "isPremium") {
+      // Logic for isPremium checkbox
+      if (initialIsPremium && !checked) {
+        // Prevent unchecking if already premium
+        toast.error("A premium listing cannot be reverted to non-premium.");
+        return; // Do not update state
+      }
+      if (!initialIsPremium && checked && (!hasActivePlan || (userPremiumQuota !== null && userPremiumQuota <= 0))) {
+        // Prevent marking as premium if no active plan or no quota
+        toast.error("You need an active plan with available premium listings to mark this property as premium. Please upgrade your plan.");
+        return; // Do not update state
+      }
+      setPropertyData((prev) => ({
+        ...prev,
+        [name]: checked,
+      }));
+    }
+    else if (name.startsWith("location.")) {
       const locationField = name.split(".")[1];
       setPropertyData((prev) => ({
         ...prev,
@@ -107,11 +154,6 @@ export default function EditPropertyPage() {
           [locationField]:
             type === "number" ? parseFloat(value) || 0 : value,
         },
-      }));
-    } else if (type === "checkbox") {
-      setPropertyData((prev) => ({
-        ...prev,
-        [name]: checked,
       }));
     } else if (type === "number") {
       setPropertyData((prev) => ({
@@ -189,9 +231,9 @@ export default function EditPropertyPage() {
       return;
     }
     if (propertyData.type === 'land' && !propertyData.landCategory) {
-        toast.error("Land category is required for land properties.");
-        setSubmitting(false);
-        return;
+      toast.error("Land category is required for land properties.");
+      setSubmitting(false);
+      return;
     }
     if (previewImages.length === 0) {
       toast.error("At least one image is required for the property.");
@@ -215,7 +257,12 @@ export default function EditPropertyPage() {
           // Append existing image URLs
           propertyData.images.forEach((url) => formData.append("existingImages[]", url));
         } else if (propertyData[key as keyof Property] !== undefined && propertyData[key as keyof Property] !== null) {
-          formData.append(key, String(propertyData[key as keyof Property]));
+            // For isPremium, ensure we send the boolean value
+            if (key === "isPremium") {
+                formData.append(key, String(propertyData[key] as boolean));
+            } else {
+                formData.append(key, String(propertyData[key as keyof Property]));
+            }
         }
       }
 
@@ -225,7 +272,7 @@ export default function EditPropertyPage() {
       });
 
       // Send PUT request to update the property
-       await axios.put(
+      await axios.put(
         `/api/user/properties/${propertyId}`, // Your PUT route
         formData,
         {
@@ -239,12 +286,13 @@ export default function EditPropertyPage() {
       router.push("/user/properties"); // Redirect to manage page
     } catch (err) {
       console.error("Error updating property:", err);
-      setError(
-         "Failed to update property. Please try again."
-      );
-      toast.error(
-       "Failed to update property."
-      );
+      if (axios.isAxiosError(err) && err.response?.data?.error) {
+          setError(err.response.data.error);
+          toast.error(err.response.data.error);
+      } else {
+          setError("Failed to update property. Please try again.");
+          toast.error("Failed to update property.");
+      }
     } finally {
       setSubmitting(false);
     }
@@ -628,8 +676,8 @@ export default function EditPropertyPage() {
           </div>
         </div>
 
-        
-         <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
+
+        <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md border border-gray-100 transition-all duration-300 hover:shadow-lg">
           <div className="flex items-center">
             <input
               type="checkbox"
@@ -637,10 +685,20 @@ export default function EditPropertyPage() {
               name="isPremium"
               checked={propertyData.isPremium}
               onChange={handleChange}
-              className="h-5 w-5 text-[#20b4b1] rounded border-gray-300 focus:ring-[#2180d3] cursor-pointer"
+              disabled={initialIsPremium || (!hasActivePlan || (userPremiumQuota !== null && userPremiumQuota <= 0))} // Disable if already premium or no quota/plan
+              className={`h-5 w-5 rounded border-gray-300 focus:ring-[#2180d3] cursor-pointer ${
+                (initialIsPremium || (!hasActivePlan || (userPremiumQuota !== null && userPremiumQuota <= 0))) ? 'opacity-50 cursor-not-allowed' : 'text-[#20b4b1]'
+              }`}
             />
             <label htmlFor="isPremium" className="ml-3 block text-lg font-medium text-gray-800 cursor-pointer">
               Mark as **Premium Listing** (Higher Visibility)
+              {initialIsPremium && <span className="text-sm text-gray-500 ml-2">(Already Premium)</span>}
+              {!initialIsPremium && hasActivePlan && userPremiumQuota !== null && userPremiumQuota > 0 && (
+                  <span className="text-sm text-green-600 ml-2">(Available: {userPremiumQuota})</span>
+              )}
+              {!initialIsPremium && (!hasActivePlan || (userPremiumQuota !== null && userPremiumQuota <= 0)) && (
+                  <span className="text-sm text-red-500 ml-2">(Upgrade plan for premium listings)</span>
+              )}
             </label>
           </div>
         </div>

@@ -15,6 +15,8 @@ import {
   ClipboardDocumentListIcon,
   UserIcon,
   SparklesIcon,
+  DocumentTextIcon, // Icon for Blog
+  ChatBubbleBottomCenterTextIcon, // Icon for Testimonials
 } from "@heroicons/react/24/solid";
 
 export default function Navbar() {
@@ -49,22 +51,17 @@ export default function Navbar() {
       {/* Updated gradient background */}
       <div className="absolute top-full left-0 w-full overflow-hidden leading-[0]"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center relative z-10">
-        <Link
-  href="/"
-  className="flex items-center  text-2xl font-bold text-white"
->
-  <Image
-    src="/images/navlogo.png" // Make sure this image exists in /public/images/
-    alt="Ploteasy Logo"
-    width={40}
-    height={40}
-    className="rounded-md"
-    priority
-  />
-  <span className="inline-block">Keyyards</span>
-
-</Link>
-
+        <Link href="/" className="flex items-center text-2xl font-bold text-white">
+          <Image
+            src="/images/navlogo.png" // Make sure this image exists in /public/images/
+            alt="Ploteasy Logo"
+            width={40}
+            height={40}
+            className="rounded-md"
+            priority
+          />
+          <span className="inline-block">Keyyards</span>
+        </Link>
 
         <div className="hidden md:flex items-center space-x-6 ml-auto">
           <Link
@@ -93,6 +90,22 @@ export default function Navbar() {
             {/* Changed text to white */}
             <KeyIcon className="w-5 h-5" />
             Rent
+          </Link>
+          {/* New Blog Link */}
+          <Link
+            href="/admin/blog"
+            className="text-white hover:text-gray-200 flex items-center gap-1"
+          >
+            <DocumentTextIcon className="w-5 h-5" />
+            Blog
+          </Link>
+          {/* New Testimonials Link */}
+          <Link
+            href="/admin/testimonials"
+            className="text-white hover:text-gray-200 flex items-center gap-1"
+          >
+            <ChatBubbleBottomCenterTextIcon className="w-5 h-5" />
+            Testimonials
           </Link>
           <Link
             href="/user/prime"
@@ -180,6 +193,24 @@ export default function Navbar() {
           >
             <KeyIcon className="w-5 h-5" />
             Rent
+          </Link>
+          {/* New Blog Link (Mobile) */}
+          <Link
+            href="/admin/blog"
+            onClick={() => setIsOpen(false)}
+            className="hover:text-gray-200 flex items-center gap-2"
+          >
+            <DocumentTextIcon className="w-5 h-5" />
+            Blog
+          </Link>
+          {/* New Testimonials Link (Mobile) */}
+          <Link
+            href="/admin/testimonials"
+            onClick={() => setIsOpen(false)}
+            className="hover:text-gray-200 flex items-center gap-2"
+          >
+            <ChatBubbleBottomCenterTextIcon className="w-5 h-5" />
+            Testimonials
           </Link>
           <Link
             href="/user/prime"

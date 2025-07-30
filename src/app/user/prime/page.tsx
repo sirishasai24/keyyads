@@ -8,6 +8,7 @@ import {
   MinusCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  XMarkIcon, // Import the XMarkIcon for the close button
 } from "@heroicons/react/24/solid";
 import {
   CalendarDaysIcon,
@@ -28,8 +29,11 @@ import "swiper/css/navigation";
 declare global {
   interface Window {
     Razorpay: {
-      new(options: RazorpayOptions): RazorpayInstance;
-      on(eventName: string, handler: (response: PaymentFailedResponse) => void): void;
+      new (options: RazorpayOptions): RazorpayInstance;
+      on(
+        eventName: string,
+        handler: (response: PaymentFailedResponse) => void
+      ): void;
     };
   }
 }
@@ -70,9 +74,11 @@ interface PaymentFailedResponse {
 
 interface RazorpayInstance {
   open(): void;
-  on(eventName: string, handler: (response: PaymentFailedResponse) => void): void;
+  on(
+    eventName: string,
+    handler: (response: PaymentFailedResponse) => void
+  ): void;
 }
-
 
 interface Plan {
   title: string;
@@ -184,11 +190,15 @@ const plans: Plan[] = [
 const SubscriptionPage = () => {
   const [showMore, setShowMore] = useState<ShowMoreState>({});
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
-  const [activatedPlanTitle, setActivatedPlanTitle] = useState<string | null>(null);
+  const [activatedPlanTitle, setActivatedPlanTitle] = useState<string | null>(
+    null
+  );
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [currentUserPlanDetails, setCurrentUserPlanDetails] = useState<UserPlanDetails | null>(null);
+  const [currentUserPlanDetails, setCurrentUserPlanDetails] =
+    useState<UserPlanDetails | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [razorpayLoading, setRazorpayLoading] = useState(true);
+  const [showHelpContact, setShowHelpContact] = useState(false); // State for help contact
 
   const fetchUserData = useCallback(async () => {
     try {
@@ -197,10 +207,9 @@ const SubscriptionPage = () => {
       setCurrentUser(res.data.user);
       setCurrentUserPlanDetails(res.data.plan || null);
     } catch (error) {
+      // Log the error for debugging but don't show a toast.
+      // The UI will adapt based on whether `currentUser` is available (i.e., logged in).
       console.error("Error fetching user data:", error);
-      if (axios.isAxiosError(error) && error.response?.status !== 401 && error.response?.status !== 403) {
-        toast.error("Error loading user information. Please log in again.");
-      }
     } finally {
       setLoadingUser(false);
     }
@@ -250,11 +259,15 @@ const SubscriptionPage = () => {
     const currentExpiryDate = new Date(currentPlanDetails.expiryDate);
     const currentDate = new Date();
 
-    const totalDurationMs = currentExpiryDate.getTime() - currentStartDate.getTime();
+    const totalDurationMs =
+      currentExpiryDate.getTime() - currentStartDate.getTime();
     const totalDurationDays = totalDurationMs / (1000 * 60 * 60 * 24);
 
     const elapsedDurationMs = currentDate.getTime() - currentStartDate.getTime();
-    const elapsedDurationDays = Math.max(0, elapsedDurationMs / (1000 * 60 * 60 * 24));
+    const elapsedDurationDays = Math.max(
+      0,
+      elapsedDurationMs / (1000 * 60 * 60 * 24)
+    );
 
     if (totalDurationDays <= 0 || elapsedDurationDays >= totalDurationDays) {
       return newPlanPrice;
@@ -271,7 +284,9 @@ const SubscriptionPage = () => {
 
   const processPayment = async (plan: Plan, action: "save" | "renew" | "upgrade") => {
     if (!currentUser) {
-      toast.error("Please log in to purchase a plan.");
+      // The "LOGIN TO BUY" button should be disabled, but as a safeguard,
+      // we exit silently without showing an error toast.
+      console.error("Attempted to process payment without a user session.");
       return;
     }
 
@@ -334,14 +349,17 @@ const SubscriptionPage = () => {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: order.currency,
-        name: "Ploteasy Subscription",
+        name: "keyyards Subscription",
         description: `${plan.title} Subscription`,
         order_id: order.id,
         handler: async (response: PaymentSuccessResponse) => {
-          const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
+          const { razorpay_payment_id, razorpay_order_id, razorpay_signature } =
+            response;
 
           if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
-            toast.error("Payment successful, but verification failed. Please contact support.");
+            toast.error(
+              "Payment successful, but verification failed. Please contact support."
+            );
             return;
           }
 
@@ -351,23 +369,28 @@ const SubscriptionPage = () => {
               razorpay_order_id,
               razorpay_signature,
               plan,
-              ...(action === "upgrade" && { currentUserPlanDetails: currentUserPlanDetails }),
+              ...(action === "upgrade" && {
+                currentUserPlanDetails: currentUserPlanDetails,
+              }),
             });
 
             if (data.success) {
               toast.success(successMessage);
               setActivatedPlanTitle(plan.title);
               setShowSuccessAnimation(true);
-              setTimeout(() => setShowSuccessAnimation(false), 5000);
               fetchUserData();
             } else {
-              toast.error(`${failureMessage} ${data.message || "Please contact support."}`);
+              toast.error(
+                `${failureMessage} ${data.message || "Please contact support."}`
+              );
             }
           } catch (error) {
             const msg =
               axios.isAxiosError(error) && error.response?.data?.message
                 ? error.response.data.message
-                : (error instanceof Error ? error.message : "An unknown error occurred during plan activation.");
+                : error instanceof Error
+                ? error.message
+                : "An unknown error occurred during plan activation.";
             toast.error(`Payment received, but activation failed: ${msg}`);
             console.error("Plan activation failed after successful payment:", error);
           }
@@ -382,8 +405,10 @@ const SubscriptionPage = () => {
       };
 
       const razor = new window.Razorpay(options);
-      razor.on('payment.failed', function (response: PaymentFailedResponse){
-        toast.error(`Payment Failed: ${response.error.description || "An error occurred."}`);
+      razor.on("payment.failed", function (response: PaymentFailedResponse) {
+        toast.error(
+          `Payment Failed: ${response.error.description || "An error occurred."}`
+        );
         console.error("Razorpay Payment Failed:", response.error);
       });
       razor.open();
@@ -391,7 +416,9 @@ const SubscriptionPage = () => {
       const msg =
         axios.isAxiosError(err) && err.response?.data?.message
           ? err.response.data.message
-          : (err instanceof Error ? err.message : "Something went wrong.");
+          : err instanceof Error
+          ? err.message
+          : "Something went wrong.";
       toast.error(`Failed to initiate payment: ${msg}`);
       console.error("Payment initiation error:", err);
     }
@@ -427,13 +454,24 @@ const SubscriptionPage = () => {
     );
   };
 
-  const PlanCard = ({ plan }: { plan: Plan }) => {
+  const PlanCard = ({ plan, isElevated = false }: { plan: Plan; isElevated?: boolean }) => {
     const userHasActivePlan = currentUser && currentUser.plan !== "Free";
     const isCurrentPlan = currentUser?.plan === plan.title;
     const currentUserPlanOrder = plans.find(p => p.title === currentUser?.plan)?.order;
     const canUpgrade = currentUserPlanOrder !== undefined && plan.order > currentUserPlanOrder;
     const isLowerOrEqualPlanOrder = currentUserPlanOrder !== undefined && plan.order <= currentUserPlanOrder;
 
+    // Check if the current plan is within 3 days of expiry
+    const isRenewable = () => {
+      if (currentUserPlanDetails && isCurrentPlan) {
+        const expiryDate = new Date(currentUserPlanDetails.expiryDate);
+        const today = new Date();
+        const diffTime = expiryDate.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays <= 3 && diffDays >= 0; // Within 3 days and not expired
+      }
+      return false;
+    };
 
     let buttonText = "BUY NOW";
     let buttonAction: "save" | "renew" | "upgrade" = "save";
@@ -450,10 +488,16 @@ const SubscriptionPage = () => {
       buttonClasses = "bg-gray-400 cursor-not-allowed";
       buttonDisabled = true;
     } else if (isCurrentPlan) {
-      buttonText = "RENEW NOW";
-      buttonAction = "renew";
-      buttonClasses = "bg-gradient-to-r from-yellow-500 to-yellow-600";
-      buttonDisabled = false;
+      if (isRenewable()) {
+        buttonText = "RENEW NOW";
+        buttonAction = "renew";
+        buttonClasses = "bg-gradient-to-r from-yellow-500 to-yellow-600";
+        buttonDisabled = false;
+      } else {
+        buttonText = "CURRENT PLAN ACTIVE";
+        buttonClasses = "bg-gray-400 cursor-not-allowed";
+        buttonDisabled = true;
+      }
     } else if (userHasActivePlan && canUpgrade && currentUserPlanDetails) {
       displayPrice = calculateUpgradePrice(plan, currentUserPlanDetails);
       buttonText = `UPGRADE (Pay ₹${displayPrice.toLocaleString()})`;
@@ -471,38 +515,73 @@ const SubscriptionPage = () => {
       processPayment(plan, buttonAction);
     };
 
+    // Format expiry date
+    const formattedExpiryDate =
+      isCurrentPlan && currentUserPlanDetails?.expiryDate
+        ? new Date(currentUserPlanDetails.expiryDate).toLocaleDateString("en-IN", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })
+        : null;
+
     return (
       <div
-        className={`relative flex flex-col justify-between bg-white rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1 overflow-hidden
-                ${activatedPlanTitle === plan.title ? 'ring-4 ring-offset-4 ring-[#2180d3] scale-105' : ''}
-                ${isCurrentPlan && !activatedPlanTitle ? 'ring-4 ring-offset-4 ring-yellow-500 scale-105' : ''}
-                `}
+        className={`relative flex flex-col justify-between bg-white rounded-3xl shadow-2xl transition-all duration-500 transform
+          ${isElevated
+            ? "md:scale-105 md:shadow-3xl md:z-10 md:ring-4 md:ring-offset-4 md:ring-[#2180d3]"
+            : "hover:shadow-3xl hover:-translate-y-1"
+          }
+          ${activatedPlanTitle === plan.title ? "ring-4 ring-offset-4 ring-[#2180d3] scale-105" : ""}
+          ${isCurrentPlan && !activatedPlanTitle && !isRenewable() ? "ring-4 ring-offset-4 ring-yellow-500 scale-105" : ""}
+          `}
       >
-        <div className={`p-6 bg-gradient-to-r ${plan.color} text-white text-center rounded-t-3xl`}>
+        {isElevated && (
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md z-20 whitespace-nowrap uppercase">
+            Most Popular
+          </div>
+        )}
+        <div
+          className={`p-6 bg-gradient-to-r ${plan.color} text-white text-center rounded-t-3xl ${isElevated ? "pt-8" : ""
+            }`}
+        >
           <h3 className="text-2xl font-bold">{plan.title.toUpperCase()}</h3>
-          <p className="mt-1 text-sm opacity-90">The perfect plan for your needs.</p>
+          <p className="mt-1 text-sm opacity-90">
+            The perfect plan for your needs.
+          </p>
         </div>
 
         <div className="p-6 flex flex-col flex-grow">
           <div className="text-center mb-4">
             {buttonAction === "upgrade" ? (
               <>
-                <p className="text-3xl font-extrabold text-gray-900">₹{displayPrice.toLocaleString()}/-</p>
+                <p className="text-3xl font-extrabold text-gray-900">
+                  ₹{displayPrice.toLocaleString()}/-
+                </p>
                 <p className="text-sm text-gray-400 line-through">
-                  (New Plan Original: ₹{parsePrice(plan.originalPrice).toLocaleString()})
+                  (New Plan Original: ₹
+                  {parsePrice(plan.originalPrice).toLocaleString()})
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  (Adjusted price considering your current plan&apos;s remaining value)
+                  (Adjusted price considering your current plan&apos;s remaining
+                  value)
                 </p>
               </>
             ) : (
               <>
-                <p className="text-3xl font-extrabold text-gray-900">₹{parsePrice(plan.price).toLocaleString()}/-</p>
+                <p className="text-3xl font-extrabold text-gray-900">
+                  ₹{parsePrice(plan.price).toLocaleString()}/-
+                </p>
                 <p className="text-sm text-gray-400 line-through">
                   (Original: ₹{parsePrice(plan.originalPrice).toLocaleString()})
                 </p>
               </>
             )}
+            {formattedExpiryDate && isCurrentPlan && (
+                <p className="mt-2 text-sm text-gray-600 font-medium">
+                  Expires: <span className="text-blue-700">{formattedExpiryDate}</span>
+                </p>
+              )}
           </div>
 
           <ul className="text-base flex-grow">
@@ -510,18 +589,20 @@ const SubscriptionPage = () => {
               plan.title === "Quarterly Plan"
                 ? "3 Months Validity"
                 : plan.title === "Half Yearly Plan"
-                    ? "6 Months Validity"
-                    : "12 Months Validity",
+                ? "6 Months Validity"
+                : "12 Months Validity",
               true,
               CalendarDaysIcon
             )}
             {renderFeature(
-              `${plan.premiumBadging} Premium Listing${plan.premiumBadging > 1 ? "s" : ""}`,
+              `${plan.premiumBadging} Premium Listing${plan.premiumBadging > 1 ? "s" : ""
+              }`,
               true,
               StarIcon
             )}
             {renderFeature(
-              `${plan.listings} Property Listing${plan.listings > 1 ? "s" : ""}`,
+              `${plan.listings} Property Listing${plan.listings > 1 ? "s" : ""
+              }`,
               true,
               HomeModernIcon
             )}
@@ -565,103 +646,177 @@ const SubscriptionPage = () => {
     );
   };
 
+  // Reorder plans for display: Quarterly, Annual, Half Yearly
+  const displayedPlans = [
+    plans.find((p) => p.title === "Quarterly Plan"),
+    plans.find((p) => p.title === "Annual Plan"),
+    plans.find((p) => p.title === "Half Yearly Plan"),
+  ].filter(Boolean) as Plan[]; // Filter out any undefined in case a plan is not found
+
   return (
     <div
-      className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 font-sans relative overflow-hidden"
+      className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 font-sans relative overflow-hidden flex flex-col"
       style={{
         backgroundImage: `url('/freedom.png')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="max-w-7xl mx-auto text-center mb-8">
-        <h2 className="text-3xl font-alata font-bold text-gray-900">Freedom sale is live now</h2>
-        <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-          Choose a plan designed to elevate your listings and connect you with the right buyers.
-        </p>
-      </div>
+      <div className="flex-grow">
+        <div className="max-w-7xl mx-auto text-center mb-8">
+          <h2 className="text-3xl font-alata font-bold text-gray-900">
+            Freedom sale is live now
+          </h2>
+          <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+            Choose a plan designed to elevate your listings and connect you with the
+            right buyers.
+          </p>
+        </div>
 
-      <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto items-stretch">
-        {plans.map((plan) => (
-          <PlanCard key={plan.title} plan={plan} />
-        ))}
-      </div>
-
-      <div className="md:hidden px-4 relative">
-        <Swiper
-          spaceBetween={15}
-          slidesPerView={1}
-          pagination={{ clickable: true }}
-          navigation={{
-            nextEl: ".swiper-button-next",
-            prevEl: ".swiper-button-prev",
-          }}
-          autoplay={{ delay: 2000, disableOnInteraction: false }}
-          modules={[Pagination, Navigation, Autoplay]}
-          className="w-full"
-        >
-          {plans.map((plan) => (
-            <SwiperSlide key={plan.title}>
-              <PlanCard plan={plan} />
-            </SwiperSlide>
+        <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto items-center">
+          {displayedPlans.map((plan) => (
+            <PlanCard key={plan.title} plan={plan} isElevated={plan.title === "Annual Plan"} />
           ))}
-        </Swiper>
+        </div>
 
-        <div className="swiper-button-prev absolute top-1/2 left-0 z-10 -translate-y-1/2 text-[#2180d3]">
-          <ChevronLeftIcon className="w-8 h-8" />
+        {/* Need Help Button */}
+        <div className="absolute top-140 left-4 z-20 sm:left-6 lg:left-2"> {/* Adjusted positioning for smaller screens */}
+          <button
+            onClick={() => setShowHelpContact(!showHelpContact)}
+            className="flex items-center gap-2 px-3 py-1.5 bg-[#2180d3] text-white rounded-full shadow-lg hover:bg-[#1a6fb0] transition duration-300 ease-in-out text-sm sm:px-4 sm:py-2 sm:text-base" // Adjusted padding/text size for mobile
+          >
+            <PhoneIcon className="w-4 h-4 sm:w-5 sm:h-5" /> {/* Adjusted icon size for mobile */}
+            Help?
+          </button>
+          {showHelpContact && (
+            <div className="mt-2 p-3 bg-white rounded-lg shadow-md text-gray-800 text-sm font-semibold animate-fade-in-up w-auto max-w-[200px] sm:max-w-none"> {/* Added max-w for small screens */}
+              Call us: <a href="tel:+919876543210" className="text-[#2180d3] hover:underline whitespace-nowrap">+91 98765 43210</a>
+            </div>
+          )}
         </div>
-        <div className="swiper-button-next absolute top-1/2 right-0 z-10 -translate-y-1/2 text-[#2180d3]">
-          <ChevronRightIcon className="w-8 h-8" />
+
+        <div className="md:hidden px-4 relative">
+          <Swiper
+            spaceBetween={15}
+            slidesPerView={1}
+            pagination={{ clickable: true }}
+            navigation={{
+              nextEl: ".swiper-button-next",
+              prevEl: ".swiper-button-prev",
+            }}
+            autoplay={{ delay: 2000, disableOnInteraction: false }}
+            modules={[Pagination, Navigation, Autoplay]}
+            className="w-full"
+          >
+            {plans.map((plan) => (
+              <SwiperSlide key={plan.title}>
+                <PlanCard plan={plan} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+
+          <div className="swiper-button-prev absolute top-1/2 left-0 z-10 -translate-y-1/2 text-[#2180d3]">
+            <ChevronLeftIcon className="w-8 h-8" />
+          </div>
+          <div className="swiper-button-next absolute top-1/2 right-0 z-10 -translate-y-1/2 text-[#2180d3]">
+            <ChevronRightIcon className="w-8 h-8" />
+          </div>
         </div>
+
+        {showSuccessAnimation && (
+          <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 animate-fade-in">
+            <div className="bg-white p-6 rounded-lg shadow-2xl text-center transform scale-0 animate-pop-in relative mx-4 max-w-sm w-full"> {/* Added mx-4 and max-w-sm for mobile */}
+              {/* Close button for the popup */}
+              <button
+                onClick={() => setShowSuccessAnimation(false)}
+                className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                aria-label="Close"
+              >
+                <XMarkIcon className="w-6 h-6" />
+              </button>
+
+              <CheckCircleIcon className="w-16 h-16 sm:w-20 sm:h-20 text-green-500 mx-auto mb-3 sm:mb-4 animate-bounce-once" /> {/* Adjusted icon size for mobile */}
+              <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2"> {/* Adjusted text size for mobile */}
+                Congratulations!
+              </h3>
+              <p className="text-base sm:text-lg text-gray-700"> {/* Adjusted text size for mobile */}
+                Your{" "}
+                <span className="font-semibold text-[#2180d3]">
+                  {activatedPlanTitle}
+                </span>{" "}
+                is now active!
+              </p>
+              <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2"> {/* Adjusted text size for mobile */}
+                Get ready to unlock your property&apos;s full potential.
+              </p>
+            </div>
+            <div className="confetti-container">
+              {Array.from({ length: 50 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="confetti"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    animationDelay: `${Math.random() * 2}s`,
+                    backgroundColor: `hsl(${Math.random() * 360}, 70%, 60%)`,
+                    animationDuration: `${2 + Math.random() * 3}s`,
+                  }}
+                ></div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {showSuccessAnimation && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 animate-fade-in">
-          <div className="bg-white p-8 rounded-lg shadow-2xl text-center transform scale-0 animate-pop-in">
-            <CheckCircleIcon className="w-20 h-20 text-green-500 mx-auto mb-4 animate-bounce-once" />
-            <h3 className="text-3xl font-bold text-gray-900 mb-2">
-              Congratulations!
-            </h3>
-            <p className="text-lg text-gray-700">
-              Your <span className="font-semibold text-[#2180d3]">{activatedPlanTitle}</span> is now active!
-            </p>
-            <p className="text-sm text-gray-500 mt-2">
-              Get ready to unlock your property&apos;s full potential.
-            </p>
-          </div>
-          <div className="confetti-container">
-            {Array.from({ length: 50 }).map((_, i) => (
-              <div
-                key={i}
-                className="confetti"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 2}s`,
-                  backgroundColor: `hsl(${Math.random() * 360}, 70%, 60%)`,
-                  animationDuration: `${2 + Math.random() * 3}s`,
-                }}
-              ></div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* "T&C Apply" text moved to the bottom */}
+      <div className="text-center w-full mt-8 pb-4">
+        <p className="text-gray-600 text-sm">*T&C apply</p>
+      </div>
 
       <style jsx>{`
         @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
 
         @keyframes pop-in {
-          0% { transform: scale(0.5); opacity: 0; }
-          80% { transform: scale(1.05); opacity: 1; }
-          100% { transform: scale(1); }
+          0% {
+            transform: scale(0.5);
+            opacity: 0;
+          }
+          80% {
+            transform: scale(1.05);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1);
+          }
         }
 
         @keyframes bounce-once {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
 
         .animate-fade-in {
@@ -674,6 +829,10 @@ const SubscriptionPage = () => {
 
         .animate-bounce-once {
           animation: bounce-once 0.8s ease-in-out;
+        }
+
+        .animate-fade-in-up {
+          animation: fade-in-up 0.3s ease-out forwards;
         }
 
         .confetti-container {
