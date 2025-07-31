@@ -76,19 +76,19 @@ export default function Footer() {
             <li className="flex items-start gap-2.5">
               <EnvelopeIcon className="w-4 h-4 md:w-5 md:h-5 text-[#bcdfff]" />
               <a
-                href="mailto:support@ploteasy.com"
+                href="mailto: info@keyyards.in"
                 className="hover:text-[#bcdfff]"
               >
-                support@ploteasy.com
+                info@keyyards.in
               </a>
             </li>
             <li className="flex items-start gap-2.5">
               <PhoneIcon className="w-4 h-4 md:w-5 md:h-5 text-[#bcdfff]" />
               <a
-                href="tel:+919876543210"
+                href="tel:+912268147080"
                 className="hover:text-[#bcdfff]"
               >
-                +91 40 4031 6406
+                +91 22 6814 7080
               </a>
             </li>
             <li className="flex items-start gap-2.5">

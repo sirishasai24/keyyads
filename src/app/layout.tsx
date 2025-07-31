@@ -1,4 +1,4 @@
-// app/layout.tsx
+// app/layout.tsx (No changes needed here)
 import type { Metadata } from "next";
 import { Alata } from "next/font/google";
 import "./globals.css";
@@ -10,13 +10,14 @@ import ClientRootLayoutContent from "@/app/ClientRootLayoutContent";
 const alata = Alata({
   weight: "400",
   subsets: ["latin"],
-  variable: "--font-alata",
+  variable: "--font-alata", // This line defines the CSS variable
 });
 
 export const metadata: Metadata = {
-  title: "Ploteasy",
+  title: "Keyyards",
   description:
     "Find your next home or investment property with Ploteasy. Browse properties for sale and rent, connect with agents, and post your listings.",
+    icons: '/images/keyyards w.png'
 };
 
 export default function RootLayout({
@@ -42,6 +43,8 @@ export default function RootLayout({
         />
       </head>
       <body
+        // This className correctly applies the CSS variable to the body
+        // and tells Tailwind to use its 'sans' font family
         className={`${alata.variable} font-sans antialiased bg-gray-50 text-gray-800`}
       >
         <ClientRootLayoutContent>{children}</ClientRootLayoutContent>

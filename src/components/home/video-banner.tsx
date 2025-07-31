@@ -1,13 +1,12 @@
-// components/VideoBanner.tsx
-"use client"; // Important for Next.js App Router
+'use client';
 
 import React from 'react';
 
 interface VideoBannerProps {
-  src: string; // The URL path to your video file (e.g., /videos/homepage-bg.mp4)
-  alt?: string; // Optional alt text for accessibility
-  className?: string; // Optional additional Tailwind CSS classes for the video element
-  containerClassName?: string; // Optional additional Tailwind CSS classes for the outer container
+  src: string;
+  alt?: string;
+  className?: string;
+  containerClassName?: string;
 }
 
 const VideoBanner: React.FC<VideoBannerProps> = ({
@@ -17,16 +16,16 @@ const VideoBanner: React.FC<VideoBannerProps> = ({
   containerClassName = "",
 }) => {
   return (
-    <div className={`relative w-full overflow-hidden ${containerClassName}`}>
+    <div className={`relative overflow-hidden ${containerClassName}`}>
       <video
-        className={`w-full h-auto object-cover ${className}`}
+        className={`object-cover ${className}`}
         src={src}
         title={alt}
-        muted 
-        autoPlay 
-        loop 
-        playsInline 
-        preload="auto" 
+        muted
+        autoPlay
+        loop
+        playsInline
+        preload="auto"
       >
         Your browser does not support the video tag.
       </video>

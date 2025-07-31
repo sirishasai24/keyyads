@@ -60,7 +60,7 @@ export const HeroSection = () => {
                     "url('https://images.unsplash.com/photo-1580587771525-78b9dba3825f?q=80&w=1974&auto=format&fit=crop')",
             }}
         >
-            <div className="absolute inset-0 bg-gradient-to-t from-[#2180d3]/90 to-[#2180d3]/70"></div> {/* Adjusted opacity for background */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#2180d3] to-[#2180d3]"></div> {/* Adjusted opacity for background */}
             <div className="relative z-10 text-center max-w-5xl mx-auto px-4 sm:px-6"> {/* Removed lg:px-4 to let main container handle */}
                 <motion.h1
                     initial={{ y: -50, opacity: 0 }}
