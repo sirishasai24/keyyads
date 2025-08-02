@@ -677,7 +677,7 @@ const SubscriptionPage = () => {
           </div>
           <p className="mt-4 text-lg text-gray-800 max-w-3xl mx-auto">
             Choose a plan designed to elevate your listings and connect you with the
-            right buyers. Don't miss out on these limited-time offers!
+            right buyers. Don&apos;t miss out on these limited-time offers!
           </p>
         </div>
 
