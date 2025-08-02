@@ -6,7 +6,6 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Carousel } from './slider'; // Assuming your Carousel component path
 import { QuoteIcon, StarIcon } from './emojis'; // Assuming your emojis path
-import Image from 'next/image'; // Import Next.js Image component for optimization
 
 // Define the updated structure of a testimonial as received from your API
 interface Testimonial {
