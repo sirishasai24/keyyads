@@ -4,16 +4,18 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { Carousel } from './slider';
-import { QuoteIcon, StarIcon } from './emojis';
+import { Carousel } from './slider'; // Assuming your Carousel component path
+import { QuoteIcon, StarIcon } from './emojis'; // Assuming your emojis path
+import Image from 'next/image'; // Import Next.js Image component for optimization
 
-// Define the structure of a testimonial as received from your API
+// Define the updated structure of a testimonial as received from your API
 interface Testimonial {
     _id: string; // MongoDB's default ID
     username: string;
     review: string;
     rating: number;
     location: string;
+    profileImageURL: string; // Add the profile image URL here
 }
 
 // Define the structure of the full API response
@@ -77,7 +79,7 @@ export const TestimonialsSection = () => {
     if (loading) {
         return (
             <section className="py-8 bg-[#1f8fff]/10 rounded-3xl shadow-inner mt-12 text-center text-gray-700">
-                Loading testimonials...
+                <p>Loading testimonials...</p>
             </section>
         );
     }
@@ -85,7 +87,7 @@ export const TestimonialsSection = () => {
     if (error) {
         return (
             <section className="py-8 bg-[#1f8fff]/10 rounded-3xl shadow-inner mt-12 text-center text-red-600">
-                {error}
+                <p>{error}</p>
             </section>
         );
     }
@@ -93,7 +95,7 @@ export const TestimonialsSection = () => {
     if (testimonials.length === 0) {
         return (
             <section className="py-8 bg-[#1f8fff]/10 rounded-3xl shadow-inner mt-12 text-center text-gray-700">
-                No testimonials available at the moment.
+                <p>No testimonials available at the moment.</p>
             </section>
         );
     }
@@ -101,42 +103,52 @@ export const TestimonialsSection = () => {
     // --- Main Render Logic ---
     return (
         <motion.section
-    initial="hidden"
-    whileInView="visible"
-    viewport={{ once: true, amount: 0.2 }}
-    className="py-6 px-4 bg-[#1f8fff]/10 rounded-3xl shadow-inner mt-12 max-w-4xl mx-auto"
->
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            className="py-6 px-4 bg-[#1f8fff]/10 rounded-3xl shadow-inner mt-12 max-w-4xl mx-auto"
+        >
+            <motion.h2
+                variants={itemVariants}
+                className="text-2xl font-bold text-center text-gray-800 mb-6"
+            >
+                What Our Clients Say
+            </motion.h2>
+            <div className="relative max-w-full lg:max-w-6xl mx-auto">
+                <Carousel cardWidthClass="w-full md:w-1/2 lg:w-1/3 p-4" snapAlign="snap-center" interval={7000}>
+                    {testimonials.map((testimonial) => (
+                        <motion.div
+                            key={testimonial._id}
+                            variants={itemVariants}
+                            className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex flex-col items-center text-center transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] min-h-[280px] sm:min-h-[260px] lg:min-h-[250px]"
+                        >
+                            {/* Profile Image */}
+                            <div className="mb-4">
+                                <Image
+                                    src={testimonial.profileImageURL || '/profile.png'} // Fallback image
+                                    alt={testimonial.username}
+                                    width={80} // Set a fixed width
+                                    height={80} // Set a fixed height
+                                    className="rounded-full object-cover border-2 border-[#1f8fff] shadow-md"
+                                />
+                            </div>
 
-    <motion.h2
-        variants={itemVariants}
-        className="text-2xl font-bold text-center text-gray-800 mb-6"
-    >
-        What Our Clients Say
-    </motion.h2>
-    <div className="relative max-w-full lg:max-w-6xl mx-auto">
-        <Carousel cardWidthClass="w-full md:w-1/2 lg:w-1/3 p-4" snapAlign="snap-center" interval={5000}>
-            {testimonials.map((testimonial) => (
-                <motion.div
-                    key={testimonial._id}
-                    variants={itemVariants}
-                    className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex flex-col text-center transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] min-h-[220px]"
-                >
-                    <QuoteIcon />
-                    <p className="text-base text-gray-700 mb-4 italic font-light flex-grow h-[100px] overflow-hidden">
-                        &quot;{testimonial.review}&quot;
-                    </p>
-                    <div className="text-yellow-500 mb-2">
-                        {[...Array(5)].map((_, i) => (
-                            <StarIcon key={i} fill={i < testimonial.rating} />
-                        ))}
-                    </div>
-                    <p className="font-bold text-gray-800">{testimonial.username}</p>
-                    <p className="text-sm text-gray-500">{testimonial.location}</p>
-                </motion.div>
-            ))}
-        </Carousel>
-    </div>
-</motion.section>
-
+                            <QuoteIcon /> {/* Moved QuoteIcon below the image */}
+                            <p className="text-base text-gray-700 mb-4 italic font-light flex-grow h-[100px] overflow-hidden">
+                                &quot;{testimonial.review}&quot;
+                            </p>
+                            <div className="text-yellow-500 mb-2">
+                                {/* Using a simple loop for stars; consider a dedicated StarRating component for more control */}
+                                {[...Array(5)].map((_, i) => (
+                                    <StarIcon key={i} fill={i < testimonial.rating} />
+                                ))}
+                            </div>
+                            <p className="font-bold text-gray-800">{testimonial.username}</p>
+                            <p className="text-sm text-gray-500">{testimonial.location}</p>
+                        </motion.div>
+                    ))}
+                </Carousel>
+            </div>
+        </motion.section>
     );
 };

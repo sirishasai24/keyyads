@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { StarRating } from "@/components/StarRating";
+import { StarRating } from "@/components/StarRating"; // Ensure this path is correct
 import {
   MapPinIcon,
   ChatBubbleLeftIcon,
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
+import Image from 'next/image'; // Import Next.js Image component
 
 interface Testimonial {
   _id: string;
@@ -16,6 +17,7 @@ interface Testimonial {
   rating: number;
   location: string;
   createdAt: string;
+  profileImageURL: string; // Add the profile image URL here
 }
 
 export default function TestimonialsPage() {
@@ -119,22 +121,33 @@ export default function TestimonialsPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4 }}
-              className="p-8 rounded-2xl shadow-lg border border-gray-100 text-center transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]"
+              className="p-8 rounded-2xl shadow-lg border border-gray-100 text-center flex flex-col items-center transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]"
               style={{
                 background: "linear-gradient(135deg, #e6f3ff, #f8fbff)", // Kept as lighter blue, consider adjusting if a darker gradient is preferred
               }}
             >
+              {/* Profile Image */}
+              <div className="mb-4">
+                <Image
+                  src={testimonial.profileImageURL || '/profile.png'} // Use the URL, with a fallback
+                  alt={testimonial.username}
+                  width={96} // Adjust size as needed, 96px for h-24 w-24
+                  height={96}
+                  className="rounded-full object-cover border-2 border-blue-400 shadow-md"
+                />
+              </div>
+
               <ChatBubbleLeftIcon
                 className="h-8 w-8 mx-auto mb-4"
                 style={{ color: primaryColor }} // Apply primaryColor here
               />
-              <p className="text-lg text-gray-700 mb-5 italic font-light">
+              <p className="text-lg text-gray-700 mb-5 italic font-light flex-grow">
                 &quot;{testimonial.review}&quot;
               </p>
               <div className="mb-4">
                 <StarRating
                   rating={testimonial.rating}
-                  readOnly={true}
+                  disabled={true} // Changed from readOnly to disabled
                   starColor={primaryColor} // Apply primaryColor here
                 />
               </div>

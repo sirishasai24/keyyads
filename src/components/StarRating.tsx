@@ -10,7 +10,7 @@ interface StarRatingProps {
   onRatingChange?: (rating: number) => void; // Made optional for display-only
   maxStars?: number;
   starColor?: string;
-  readOnly?: boolean; // <--- THIS IS THE MISSING PROP IN YOUR PROVIDED STAR RATING
+  disabled?: boolean; // Changed from 'readOnly' to 'disabled'
 }
 
 export const StarRating = ({
@@ -18,7 +18,7 @@ export const StarRating = ({
   onRatingChange,
   maxStars = 5,
   starColor = "#0080FF", // Default to the theme color
-  readOnly = false, // Default to false (editable) if not provided
+  disabled = false, // Changed from 'readOnly' to 'disabled'
 }: StarRatingProps) => {
   const [hoverRating, setHoverRating] = useState(0);
 
@@ -29,10 +29,10 @@ export const StarRating = ({
         return (
           <span
             key={currentRating}
-            onMouseEnter={() => !readOnly && setHoverRating(currentRating)} // Only allow hover if not readOnly
-            onMouseLeave={() => !readOnly && setHoverRating(0)} // Only allow hover if not readOnly
-            onClick={() => !readOnly && onRatingChange?.(currentRating)} // Only allow click if not readOnly
-            className={readOnly ? "cursor-default" : "cursor-pointer"} // Change cursor based on readOnly
+            onMouseEnter={() => !disabled && setHoverRating(currentRating)} // Use 'disabled'
+            onMouseLeave={() => !disabled && setHoverRating(0)} // Use 'disabled'
+            onClick={() => !disabled && onRatingChange?.(currentRating)} // Use 'disabled'
+            className={disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"} // Use 'disabled' for styling
           >
             {currentRating <= (hoverRating || rating) ? (
               <StarIcon className="h-5 w-5 transition-colors duration-100" style={{ color: starColor }} />

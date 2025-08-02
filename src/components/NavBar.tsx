@@ -16,7 +16,8 @@ import {
   SparklesIcon,
   DocumentTextIcon, // Icon for Blog
   ChatBubbleBottomCenterTextIcon, // Icon for Testimonials
-} from "@heroicons/react/24/solid";
+  PhoneIcon, // Import PhoneIcon for Contact Us
+} from "@heroicons/react/24/solid"; // Ensuring solid icons for consistency
 import { FaRupeeSign } from "react-icons/fa"; // Import the Rupee icon
 
 export default function Navbar() {
@@ -47,29 +48,31 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-gradient-to-r from-[#2180d3] to-[#2180d3] shadow">
-      {" "}
-      {/* Updated gradient background */}
+      {/* Absolute div for potential background effects, currently empty leading-[0] */}
       <div className="absolute top-full left-0 w-full overflow-hidden leading-[0]"></div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center relative z-10">
-        <Link href="/" className="flex items-center text-2xl font-bold text-white">
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative z-10">
+        {/* Brand Logo and Name - Adjusted for alignment */}
+        {/* Added mr-auto to push the right-aligned content further right */}
+        <Link href="/" className="flex items-center text-2xl font-bold text-white mr-auto md:mr-0">
           <Image
-            src="/images/navlogo.png" // Make sure this image exists in /public/images/
-            alt="Ploteasy Logo"
-            width={45}
-            height={45}
+            src="/images/navlogo.png"
+            alt="Keyyards Logo"
+            width={40}
+            height={40}
             className="rounded-md"
             priority
           />
-          <span className="inline-block">Keyyards</span>
+          <span className="inline-block ml-2">Keyyards</span>
         </Link>
 
-        <div className="hidden md:flex items-center space-x-6 ml-auto">
+        {/* Desktop Navigation Links */}
+        {/* Increased space-x to space-x-5 for slightly tighter packing to fit "Contact Us" */}
+        <div className="hidden md:flex items-center space-x-5">
           <Link
             href="/"
             className="text-white hover:text-gray-200 flex items-center gap-1"
           >
-            {" "}
-            {/* Changed text to white */}
             <HomeIcon className="w-5 h-5" />
             Home
           </Link>
@@ -77,21 +80,16 @@ export default function Navbar() {
             href="/property?transactionType=sale"
             className="text-white hover:text-gray-200 flex items-center gap-1"
           >
-            {" "}
-            {/* Changed text to white */}
-            <FaRupeeSign className="w-4 h-4" /> {/* Replaced with FaRupeeSign */}
+            <FaRupeeSign className="w-4 h-4" />
             Buy
           </Link>
-          <Link
+          {/* <Link
             href="/property?transactionType=rent"
             className="text-white hover:text-gray-200 flex items-center gap-1"
           >
-            {" "}
-            {/* Changed text to white */}
             <KeyIcon className="w-5 h-5" />
             Rent
-          </Link>
-          {/* New Blog Link */}
+          </Link> */}
           <Link
             href="/admin/blog"
             className="text-white hover:text-gray-200 flex items-center gap-1"
@@ -99,7 +97,6 @@ export default function Navbar() {
             <DocumentTextIcon className="w-5 h-5" />
             Blog
           </Link>
-          {/* New Testimonials Link */}
           <Link
             href="/admin/testimonials"
             className="text-white hover:text-gray-200 flex items-center gap-1"
@@ -107,12 +104,11 @@ export default function Navbar() {
             <ChatBubbleBottomCenterTextIcon className="w-5 h-5" />
             Testimonials
           </Link>
+          {/* Contact Us Link for Desktop */}
           <Link
             href="/user/prime"
             className="text-white hover:text-gray-200 flex items-center gap-1"
           >
-            {" "}
-            {/* Changed text to white */}
             <SparklesIcon className="w-5 h-5" />
             Prime Plan
           </Link>
@@ -121,12 +117,16 @@ export default function Navbar() {
               href="/user/properties"
               className="text-white hover:text-gray-200 flex items-center gap-1"
             >
-              {" "}
-              {/* Changed text to white */}
               <ClipboardDocumentListIcon className="w-5 h-5" />
               Manage Properties
             </Link>
-          )}
+          )}<Link
+            href="/contact"
+            className="text-white hover:text-gray-200 flex items-center gap-1"
+          >
+            <PhoneIcon className="w-5 h-5" />
+            Contact Us
+          </Link>
           <Link
             href="/property/add"
             className="bg-white text-[#2180d3] px-4 py-2 rounded-lg hover:bg-gray-100 transition flex items-center"
@@ -147,7 +147,8 @@ export default function Navbar() {
           )}
         </div>
 
-        <div className="md:hidden ml-auto">
+        {/* Mobile Toggle Button */}
+        <div className="md:hidden">
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white"
@@ -160,6 +161,8 @@ export default function Navbar() {
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
       <div
         className={`md:hidden transition-all duration-300 ease-in-out ${
           isOpen
@@ -168,8 +171,6 @@ export default function Navbar() {
         } bg-gradient-to-br from-[#2180d3] to-[#2180d3] shadow-inner`}
       >
         <div className="flex flex-col space-y-4 text-base text-white font-medium">
-          {" "}
-          {/* Changed text to white */}
           <Link
             href="/"
             onClick={() => setIsOpen(false)}
@@ -183,7 +184,7 @@ export default function Navbar() {
             onClick={() => setIsOpen(false)}
             className="hover:text-gray-200 flex items-center gap-2"
           >
-            <FaRupeeSign className="w-5 h-5" /> {/* Replaced with FaRupeeSign */}
+            <FaRupeeSign className="w-5 h-5" />
             Buy
           </Link>
           <Link
@@ -194,7 +195,6 @@ export default function Navbar() {
             <KeyIcon className="w-5 h-5" />
             Rent
           </Link>
-          {/* New Blog Link (Mobile) */}
           <Link
             href="/admin/blog"
             onClick={() => setIsOpen(false)}
@@ -203,7 +203,6 @@ export default function Navbar() {
             <DocumentTextIcon className="w-5 h-5" />
             Blog
           </Link>
-          {/* New Testimonials Link (Mobile) */}
           <Link
             href="/admin/testimonials"
             onClick={() => setIsOpen(false)}
@@ -212,6 +211,7 @@ export default function Navbar() {
             <ChatBubbleBottomCenterTextIcon className="w-5 h-5" />
             Testimonials
           </Link>
+          {/* Contact Us Link for Mobile */}
           <Link
             href="/user/prime"
             onClick={() => setIsOpen(false)}
@@ -230,7 +230,15 @@ export default function Navbar() {
               Manage Properties
             </Link>
           )}
-          <hr className="border-gray-300" />
+          <Link
+            href="/contact"
+            onClick={() => setIsOpen(false)}
+            className="hover:text-gray-200 flex items-center gap-2"
+          >
+            <PhoneIcon className="w-5 h-5" />
+            Contact Us
+          </Link>
+          <hr className="border-gray-300 my-4" />
           <Link
             href="/property/add"
             onClick={() => setIsOpen(false)}

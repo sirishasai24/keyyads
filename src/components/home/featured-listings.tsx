@@ -127,28 +127,29 @@ export const FeaturedListings = () => {
             </motion.h2>
 
             {/* Floating Ad Banner */}
-            {showAd && (
-                <div className="fixed right-6 bottom-24 z-40 max-w-xs w-[270px] rounded-xl shadow-xl bg-white border border-gray-200">
-                    <div className="relative">
-                        <button
-                            className="absolute top-1 right-1 text-white bg-black bg-opacity-50 rounded-full w-6 h-6 flex items-center justify-center hover:bg-opacity-80"
-                            onClick={() => setShowAd(false)}
-                        >
-                            ✕
-                        </button>
-                        <a target="_blank" rel="noopener noreferrer">
-                            <img
-                                src="/banners/ad.jpg"
-                                alt="Advertisement"
-                                className="rounded-xl w-full h-auto"
-                            />
-                        </a>
-                    </div>
-                </div>
-            )}
+           {showAd && (
+    <div className="fixed right-6 bottom-24 z-40 max-w-[150px] w-[150px] rounded-xl shadow-xl bg-white border border-gray-200">
+        <div className="relative">
+            <button
+                className="absolute top-1 right-1 text-white bg-black bg-opacity-50 rounded-full w-6 h-6 flex items-center justify-center hover:bg-opacity-80"
+                onClick={() => setShowAd(false)}
+            >
+                ✕
+            </button>
+            <a href="https://www.youtube.com/watch?v=U9DnQ8kfwGI" target="_blank" rel="noopener noreferrer">
+                <img
+                    src="/banners/ad.jpg"
+                    alt="Advertisement"
+                    className="rounded-xl w-full h-auto" // Keep h-auto for aspect ratio
+                />
+            </a>
+        </div>
+    </div>
+)}
+
 
             <div className="relative max-w-full lg:max-w-4xl mx-auto">
-                <Carousel cardWidthClass="w-full sm:w-1/2 lg:w-1/3 p-2" snapAlign="snap-start" interval={4000}>
+                <Carousel cardWidthClass="w-full sm:w-1/2 lg:w-1/3 p-2" snapAlign="snap-start" interval={6000}>
                     {featuredListings.map((listing) => (
                         <motion.div
                             key={listing._id}

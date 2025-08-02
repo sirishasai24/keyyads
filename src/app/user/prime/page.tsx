@@ -665,7 +665,7 @@ const SubscriptionPage = () => {
           <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight">
            
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700">
-              Freedom Sale
+              Freedom Day Sales
             </span>
           </h2>
           <div className="mt-4 flex items-center justify-center space-x-2">
@@ -703,25 +703,29 @@ const SubscriptionPage = () => {
           )}
         </div>
 
-        <div className="md:hidden px-4 relative">
-          <Swiper
-            spaceBetween={15}
-            slidesPerView={1}
-            pagination={{ clickable: true }}
-            navigation={{
-              nextEl: ".swiper-button-next",
-              prevEl: ".swiper-button-prev",
-            }}
-            autoplay={{ delay: 2000, disableOnInteraction: false }}
-            modules={[Pagination, Navigation, Autoplay]}
-            className="w-full"
-          >
-            {plans.map((plan) => (
-              <SwiperSlide key={plan.title}>
-                <PlanCard plan={plan} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
+       
+
+        <div className="md:hidden px-4 relative">
+          <Swiper
+            spaceBetween={15}
+            slidesPerView={1}
+            pagination={{ clickable: true }}
+            navigation={{
+              nextEl: ".swiper-button-next",
+              prevEl: ".swiper-button-prev",
+            }}
+            autoplay={{ delay: 3000, disableOnInteraction: true }}
+            modules={[Pagination, Navigation, Autoplay]}
+            className="w-full"
+          >
+            {plans.map((plan) => (
+              <SwiperSlide key={plan.title}>
+                <PlanCard plan={plan} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+
+
 
           <div className="swiper-button-prev absolute top-1/2 left-0 z-10 -translate-y-1/2 text-[#2180d3]">
             <ChevronLeftIcon className="w-8 h-8" />
