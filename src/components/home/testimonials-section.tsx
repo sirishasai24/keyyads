@@ -124,7 +124,7 @@ export const TestimonialsSection = () => {
                         >
                             {/* Profile Image */}
                             <div className="mb-4">
-                                <Image
+                                <img
                                     src={testimonial.profileImageURL || '/profile.png'} // Fallback image
                                     alt={testimonial.username}
                                     width={80} // Set a fixed width

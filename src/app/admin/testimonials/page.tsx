@@ -8,7 +8,6 @@ import {
   ChatBubbleLeftIcon,
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
-import Image from 'next/image'; // Import Next.js Image component
 
 interface Testimonial {
   _id: string;
@@ -128,8 +127,8 @@ export default function TestimonialsPage() {
             >
               {/* Profile Image */}
               <div className="mb-4">
-                <Image
-                  src={testimonial.profileImageURL || '/profile.png'} // Use the URL, with a fallback
+                <img
+                  src={testimonial.profileImageURL} // Use the URL, with a fallback
                   alt={testimonial.username}
                   width={96} // Adjust size as needed, 96px for h-24 w-24
                   height={96}

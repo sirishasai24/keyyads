@@ -2,7 +2,7 @@
 'use client'; // This is a client component
 
 import React, { useState, FormEvent } from 'react';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 import {
   UserIcon,
   EnvelopeIcon,
@@ -11,20 +11,17 @@ import {
   PaperAirplaneIcon,
   BuildingOfficeIcon,
   ClockIcon,
-   // Note: CalendarDaysIcon is not used in the final version of info cards
-   // Added for Live Chat card
 } from '@heroicons/react/24/outline';
-import toast from 'react-hot-toast'; // Assuming you have react-hot-toast for notifications
+import toast from 'react-hot-toast';
 
-// If you don't have react-hot-toast, install it: npm install react-hot-toast
-// And add <Toaster /> to your root layout.tsx or a higher-level component.
+// Removed the metadata export from this file
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phoneNumber: '',
-    propertyInterest: '', // Can be a string or array if multiple selection
+    propertyInterest: '',
     message: '',
   });
   const [loading, setLoading] = useState(false);
@@ -43,18 +40,14 @@ export default function ContactPage() {
     setMessageType('');
 
     try {
-      // Use axios for the API endpoint for sending messages
-      // This is a placeholder API call. You will need to create a /api/contact endpoint
-      // that handles sending emails or saving contact form submissions.
       const response = await axios.post('/api/contact', formData);
 
-      if (response.status === 200) { // Assuming your API returns 200 for success
+      if (response.status === 200) {
         toast.success('Message sent successfully! We will get back to you soon.');
         setFormMessage('Your message has been sent successfully!');
         setMessageType('success');
-        setFormData({ fullName: '', email: '', phoneNumber: '', propertyInterest: '', message: '' }); // Clear form
+        setFormData({ fullName: '', email: '', phoneNumber: '', propertyInterest: '', message: '' });
       } else {
-        // Handle non-200 responses from your API
         const errorMsg = response.data?.message || 'Failed to send message. Please try again.';
         toast.error(errorMsg);
         setFormMessage(errorMsg);
@@ -77,24 +70,18 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
         <div className="text-center mb-12">
-          {/* Reduced h1 from text-4xl sm:text-5xl md:text-6xl to text-3xl sm:text-4xl md:text-5xl */}
           <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl md:text-5xl">
             Ready to Find Your Keyyard Property?
           </h1>
-          {/* Reduced p from text-lg to text-base */}
           <p className="mt-4 text-base text-gray-600 max-w-2xl mx-auto">
             Get in touch with our keyyard property specialists. We&apos;re here to help you find the
             perfect secure property that matches your lifestyle and needs.
           </p>
         </div>
 
-        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* Contact Form */}
           <div className="bg-white p-8 md:p-10 rounded-2xl shadow-lg border border-gray-100 h-fit">
-            {/* Reduced h2 from text-2xl to text-xl */}
             <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
               Send us a Message
             </h2>
@@ -225,9 +212,7 @@ export default function ContactPage() {
             </form>
           </div>
 
-          {/* Contact Info Cards */}
           <div className="space-y-6">
-            {/* Call Us Card */}
             <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex items-start space-x-4">
               <div className="flex-shrink-0 bg-blue-100 p-3 rounded-full">
                 <PhoneIcon className="h-6 w-6 text-blue-600" />
@@ -241,7 +226,6 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Email Us Card */}
             <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex items-start space-x-4">
               <div className="flex-shrink-0 bg-green-100 p-3 rounded-full">
                 <EnvelopeIcon className="h-6 w-6 text-green-600" />
@@ -255,23 +239,6 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Live Chat Card - Commented out as in your provided code */}
-            {/*
-            <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex items-start space-x-4">
-              <div className="flex-shrink-0 bg-orange-100 p-3 rounded-full">
-                <ChatBubbleOvalLeftEllipsisIcon className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800">Live Chat</h3>
-                <p className="mt-1 text-gray-600">Instant support available</p>
-                <Link href="#" className="text-orange-600 hover:underline font-medium mt-1 inline-block">
-                  Start a conversation
-                </Link>
-              </div>
-            </div>
-            */}
-
-            {/* Visit Our Office Card - Themed */}
             <div className="bg-gradient-to-br from-[#155a96] to-[#2180d3] text-white p-6 rounded-2xl shadow-lg flex flex-col">
               <h3 className="text-2xl font-bold mb-4">Visit Our Office</h3>
               <div className="space-y-3 text-lg">
@@ -293,12 +260,6 @@ export default function ContactPage() {
                   <li>Sunday: 12:00 PM - 5:00 PM</li>
                 </ul>
               </div>
-              {/* Schedule a Visit Button - Commented out as in your provided code */}
-              {/*
-              <Link href="#" className="mt-6 inline-block self-start px-6 py-3 bg-white text-[#2180d3] font-semibold rounded-md shadow-md hover:bg-gray-100 transition-colors">
-                Schedule a Visit
-              </Link>
-              */}
             </div>
           </div>
         </div>
