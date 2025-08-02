@@ -16,8 +16,8 @@ const alata = Alata({
 export const metadata: Metadata = {
   title: "Keyyards",
   description:
-    "Find your next home or investment property with Ploteasy. Browse properties for sale and rent, connect with agents, and post your listings.",
-    icons: '/images/keyyards w.png'
+    "Find your next home or investment property with Keyyards. Browse properties for sale and rent, connect with agents, and post your listings.",
+    icons: '/images/tab.png'
 };
 
 export default function RootLayout({

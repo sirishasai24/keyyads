@@ -19,7 +19,7 @@ const plans = [
     moneyBack: false,
     teleCalling: false,
     price: "₹8,999/-",
-    originalPrice: "₹12,499",
+    originalPrice: "₹17,998",
     note: "Inclusive of GST",
   },
   {
@@ -33,7 +33,7 @@ const plans = [
     moneyBack: false,
     teleCalling: true,
     price: "₹17,999/-",
-    originalPrice: "₹26,999",
+    originalPrice: "₹35,998",
     note: "Inclusive of GST",
   },
   {
@@ -47,7 +47,7 @@ const plans = [
     moneyBack: "Yes (After 6th month)",
     teleCalling: true,
     price: "₹29,988/-",
-    originalPrice: "₹44,982",
+    originalPrice: "₹59,976",
     note: "Inclusive of GST",
   },
 ];

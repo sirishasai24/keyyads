@@ -5,24 +5,22 @@ import { motion } from 'framer-motion';
 import { Carousel } from './slider';
 import { LocationIcon } from './emojis';
 import axios from 'axios';
-import Link from 'next/link'; // Import Link for navigation
+import Link from 'next/link';
 
-// Define the interface based on your Mongoose Property model
 interface PropertyListing {
-    _id: string; // Mongoose _id
+    _id: string;
     title: string;
-    price: number; // Price is a number in your model
+    price: number;
     location: {
         state: string;
         city: string;
     };
-    images: string[]; // Array of image URLs
-    type: string; // 'land' or 'building'
-    transactionType: string; // 'sale' or 'rent'
+    images: string[];
+    type: string;
+    transactionType: string;
     isPremium: boolean;
-
-    propertyAge?: string; // Optional, as it's an enum in your model
-    furnishing?: string; // Optional
+    propertyAge?: string;
+    furnishing?: string;
     landCategory?: string;
     bedrooms?: string;
     bathrooms?: string;
@@ -45,17 +43,14 @@ export const FeaturedListings = () => {
     const [featuredListings, setFeaturedListings] = useState<PropertyListing[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showAd, setShowAd] = useState(true); // For ad visibility
 
     useEffect(() => {
         const fetchProperties = async () => {
             try {
                 setLoading(true);
                 setError(null);
-
-                // Assuming your API endpoint for featured listings is /api/property/featured
                 const response = await axios.get<{ listings: PropertyListing[] }>('/api/property/featured');
-
-
                 setFeaturedListings(response.data.listings);
             } catch (err) {
                 console.error("Failed to fetch featured listings:", err);
@@ -68,45 +63,28 @@ export const FeaturedListings = () => {
                 setLoading(false);
             }
         };
-
         fetchProperties();
     }, []);
 
     const formatPrice = (price: number, transactionType: string): string => {
         if (transactionType === 'rent') {
-            if (price >= 10000000) { // Check for Crores (1 Crore = 10 million)
-                return `₹ ${(price / 10000000).toFixed(1)} Cr/month`;
-            } else if (price >= 100000) { // Check for Lacs (1 Lac = 100,000)
-                return `₹ ${(price / 100000).toFixed(1)} Lacs/month`;
-            } else if (price >= 1000) {
-                return `₹ ${(price / 1000).toFixed(1)}K/month`;
-            }
+            if (price >= 10000000) return `₹ ${(price / 10000000).toFixed(1)} Cr/month`;
+            if (price >= 100000) return `₹ ${(price / 100000).toFixed(1)} Lacs/month`;
+            if (price >= 1000) return `₹ ${(price / 1000).toFixed(1)}K/month`;
             return `₹ ${price}/month`;
-        } else { // For 'sale'
-            if (price >= 10000000) {
-                return `₹ ${(price / 10000000).toFixed(1)} Cr`;
-            } else if (price >= 100000) {
-                return `₹ ${(price / 100000).toFixed(1)} Lacs`;
-            }
+        } else {
+            if (price >= 10000000) return `₹ ${(price / 10000000).toFixed(1)} Cr`;
+            if (price >= 100000) return `₹ ${(price / 100000).toFixed(1)} Lacs`;
             return `₹ ${price}`;
         }
     };
 
     const getListingTags = (listing: PropertyListing): string[] => {
         const tags: string[] = [];
-        if (listing.isPremium) {
-            tags.push('Premium');
-        }
-        // Calculate 'New' tag based on creation date within the last 30 days
+        if (listing.isPremium) tags.push('Premium');
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        if (new Date(listing.createdAt) > thirtyDaysAgo) {
-            tags.push('New');
-        }
-
-        // Add 'Verified' if you have a verification status in your model
-        // For example: if (listing.isVerified) { tags.push('Verified'); }
-
+        if (new Date(listing.createdAt) > thirtyDaysAgo) tags.push('New');
         return tags;
     };
 
@@ -139,7 +117,7 @@ export const FeaturedListings = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
-            className="py-12"
+            className="py-12 relative"
         >
             <motion.h2
                 variants={itemVariants}
@@ -147,6 +125,28 @@ export const FeaturedListings = () => {
             >
                 Featured Listings
             </motion.h2>
+
+            {/* Floating Ad Banner */}
+            {showAd && (
+                <div className="fixed right-6 bottom-24 z-40 max-w-xs w-[270px] rounded-xl shadow-xl bg-white border border-gray-200">
+                    <div className="relative">
+                        <button
+                            className="absolute top-1 right-1 text-white bg-black bg-opacity-50 rounded-full w-6 h-6 flex items-center justify-center hover:bg-opacity-80"
+                            onClick={() => setShowAd(false)}
+                        >
+                            ✕
+                        </button>
+                        <a target="_blank" rel="noopener noreferrer">
+                            <img
+                                src="/banners/ad.jpg"
+                                alt="Advertisement"
+                                className="rounded-xl w-full h-auto"
+                            />
+                        </a>
+                    </div>
+                </div>
+            )}
+
             <div className="relative max-w-full lg:max-w-4xl mx-auto">
                 <Carousel cardWidthClass="w-full sm:w-1/2 lg:w-1/3 p-2" snapAlign="snap-start" interval={4000}>
                     {featuredListings.map((listing) => (
@@ -155,10 +155,8 @@ export const FeaturedListings = () => {
                             variants={itemVariants}
                             className="flex-shrink-0 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 transform hover:scale-[1.02] cursor-pointer"
                         >
-                            {/* Link to individual property page */}
                             <Link href={`/property/${listing._id}`} passHref>
-                                {/* This div acts as the clickable area for the card content */}
-                                <div className="block"> {/* Use block to make the link cover the card */}
+                                <div className="block">
                                     <div className="relative">
                                         <img
                                             src={listing.images[0] || '/placeholder-image.jpg'}
@@ -184,9 +182,6 @@ export const FeaturedListings = () => {
                                         <p className="text-gray-600 text-sm mb-4 flex items-center gap-1">
                                             <LocationIcon /> {listing.location.city}, {listing.location.state}
                                         </p>
-                                        {/* This button is now redundant if the whole card is a link,
-                                            but keeping it if you want specific button styling/behavior.
-                                            If the whole card is linked, you might remove this button. */}
                                         <button className="w-full bg-[#2180d3] hover:bg-[#1a6cb2] text-white py-3 rounded-xl font-medium transition duration-300 ease-in-out shadow-md">
                                             View Details
                                         </button>
@@ -197,11 +192,11 @@ export const FeaturedListings = () => {
                     ))}
                 </Carousel>
             </div>
+
             <motion.div
                 variants={itemVariants}
                 className="text-center mt-12"
             >
-                {/* Link to all listings page */}
                 <Link href="/property" passHref>
                     <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-8 py-4 rounded-full font-semibold shadow-md transition-transform duration-200 transform hover:scale-105">
                         Browse All Listings

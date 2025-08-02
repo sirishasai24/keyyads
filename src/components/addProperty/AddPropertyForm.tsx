@@ -273,7 +273,7 @@ export default function AddPropertyForm() {
                     Please log in to your account to add a new property listing.
                 </p>
                 <button
-                    onClick={() => router.push('/login')} // Assuming a login page at /login
+                    onClick={() => router.push('/auth')} // Assuming a login page at /login
                     className="w-full bg-[#2180d3] hover:bg-[#1a6fb0] text-white font-semibold py-3 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
                 >
                     Go to Login

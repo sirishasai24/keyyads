@@ -4,6 +4,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { HouseIcon, BuildingIcon, KeyIcon } from './emojis'; // Import icons
+import { useRouter } from 'next/navigation';
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -28,6 +29,7 @@ const itemVariants = {
 };
 
 export const QuickFilters = () => {
+    const router=useRouter();
     return (
         <motion.div
             variants={containerVariants}
@@ -36,13 +38,13 @@ export const QuickFilters = () => {
             viewport={{ once: true, amount: 0.2 }}
             className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-12 -mt-20 relative z-20"
         >
-            <motion.button variants={itemVariants} className="bg-white text-gray-800 px-6 py-3 rounded-full font-semibold shadow-xl transition-transform duration-200 hover:scale-105 hover:shadow-2xl flex items-center gap-2">
+            <motion.button variants={itemVariants} onClick={()=>router.push('/property?type=building')} className="bg-white text-gray-800 px-6 py-3 rounded-full font-semibold shadow-xl transition-transform duration-200 hover:scale-105 hover:shadow-2xl flex items-center gap-2">
                 <HouseIcon /> Plots
             </motion.button>
-            <motion.button variants={itemVariants} className="bg-white text-gray-800 px-6 py-3 rounded-full font-semibold shadow-xl transition-transform duration-200 hover:scale-105 hover:shadow-2xl flex items-center gap-2">
+            <motion.button variants={itemVariants} onClick={()=>router.push('/property?type=land')} className="bg-white text-gray-800 px-6 py-3 rounded-full font-semibold shadow-xl transition-transform duration-200 hover:scale-105 hover:shadow-2xl flex items-center gap-2">
                 <BuildingIcon /> Apartments
             </motion.button>
-            <motion.button variants={itemVariants} className="bg-white text-gray-800 px-6 py-3 rounded-full font-semibold shadow-xl transition-transform duration-200 hover:scale-105 hover:shadow-2xl flex items-center gap-2">
+            <motion.button variants={itemVariants} onClick={()=>router.push('/property?transactionType=rent')} className="bg-white text-gray-800 px-6 py-3 rounded-full font-semibold shadow-xl transition-transform duration-200 hover:scale-105 hover:shadow-2xl flex items-center gap-2">
                 <KeyIcon /> Rentals
             </motion.button>
         </motion.div>

@@ -10,7 +10,6 @@ import {
   XMarkIcon,
   PlusIcon,
   HomeIcon,
-  CurrencyDollarIcon,
   KeyIcon,
   ClipboardDocumentListIcon,
   UserIcon,
@@ -18,6 +17,7 @@ import {
   DocumentTextIcon, // Icon for Blog
   ChatBubbleBottomCenterTextIcon, // Icon for Testimonials
 } from "@heroicons/react/24/solid";
+import { FaRupeeSign } from "react-icons/fa"; // Import the Rupee icon
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -55,8 +55,8 @@ export default function Navbar() {
           <Image
             src="/images/navlogo.png" // Make sure this image exists in /public/images/
             alt="Ploteasy Logo"
-            width={40}
-            height={40}
+            width={45}
+            height={45}
             className="rounded-md"
             priority
           />
@@ -79,7 +79,7 @@ export default function Navbar() {
           >
             {" "}
             {/* Changed text to white */}
-            <CurrencyDollarIcon className="w-5 h-5" />
+            <FaRupeeSign className="w-4 h-4" /> {/* Replaced with FaRupeeSign */}
             Buy
           </Link>
           <Link
@@ -183,7 +183,7 @@ export default function Navbar() {
             onClick={() => setIsOpen(false)}
             className="hover:text-gray-200 flex items-center gap-2"
           >
-            <CurrencyDollarIcon className="w-5 h-5" />
+            <FaRupeeSign className="w-5 h-5" /> {/* Replaced with FaRupeeSign */}
             Buy
           </Link>
           <Link

@@ -16,7 +16,7 @@ import {
 
 export default function Footer() {
   return (
-    <footer className="bg-[#155a96] text-white py-8 md:py-12 mt-12 relative overflow-hidden">
+    <footer className="bg-[#155a96] text-white py-5 md:py-6 mt-12 relative overflow-hidden"> {/* Further reduced py */}
       {/* Subtle background pattern/gradient for visual interest */}
       <div className="absolute inset-0 opacity-10">
         <svg
@@ -24,7 +24,8 @@ export default function Footer() {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <pattern
+          {/* Background pattern commented out as it was in the original code, but left for context if you wish to re-enable or change it */}
+          {/* <pattern
             id="stripes"
             patternUnits="userSpaceOnUse"
             width="40"
@@ -39,16 +40,16 @@ export default function Footer() {
               stroke="#ffffff"
               strokeWidth="1"
             />
-          </pattern>
-          <rect width="100%" height="100%" fill="url(#stripes)" />
+          </pattern> */}
+          {/* <rect width="100%" height="100%" fill="url(#stripes)" /> */}
         </svg>
       </div>
 
       {/* Main content grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-8 md:gap-y-10 lg:gap-x-16"> {/* Changed to lg:grid-cols-3 and increased lg:gap-x */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5 md:gap-y-6 lg:gap-x-16"> {/* Further reduced gap-y */}
         {/* Brand & Description */}
         <div className="flex flex-col items-start">
-          <div className="flex items-center gap-2 mb-3 md:mb-4">
+          <div className="flex items-center gap-2 mb-2"> {/* Reduced mb */}
             <Image
               src="/images/navlogo.png"
               alt="Ploteasy Logo"
@@ -67,19 +68,19 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* Contact Info - This will now occupy its own column on larger screens */}
-        <div className="flex flex-col"> {/* Removed sm:flex-row and md:col-span-2 from this div and its parent, as it's now a direct grid item */}
-          <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4 border-b-2 border-[#2e7bbd] pb-2 inline-block">
+        {/* Contact Info */}
+        <div className="flex flex-col">
+          <h3 className="text-lg md:text-xl font-bold mb-2 border-b-2 border-[#2e7bbd] pb-2 inline-block"> {/* Reduced mb */}
             Contact Us
           </h3>
-          <ul className="space-y-2.5 md:space-y-3 text-gray-100 text-sm md:text-base">
+          <ul className="space-y-2 text-gray-100 text-sm md:text-base">
             <li className="flex items-start gap-2.5">
               <EnvelopeIcon className="w-4 h-4 md:w-5 md:h-5 text-[#bcdfff]" />
               <a
                 href="mailto: info@keyyards.in"
                 className="hover:text-[#bcdfff]"
               >
-                info@keyyards.in
+                support@keyyyards.in
               </a>
             </li>
             <li className="flex items-start gap-2.5">
@@ -88,7 +89,7 @@ export default function Footer() {
                 href="tel:+912268147080"
                 className="hover:text-[#bcdfff]"
               >
-                +91 22 6814 7080
+               +91 40403 16406
               </a>
             </li>
             <li className="flex items-start gap-2.5">
@@ -98,12 +99,12 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Social Links - This will also occupy its own column on larger screens */}
+        {/* Social Links */}
         <div>
-          <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4 border-b-2 border-[#2e7bbd] pb-2 inline-block">
+          <h3 className="text-lg md:text-xl font-bold mb-2 border-b-2 border-[#2e7bbd] pb-2 inline-block"> {/* Reduced mb */}
             Connect With Us
           </h3>
-          <div className="flex gap-2.5 sm:gap-3 mt-3">
+          <div className="flex gap-2.5 sm:gap-3 mt-2">
             <a
               href="#"
               aria-label="Facebook"
@@ -137,8 +138,8 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-[#2e7bbd] mt-8 md:mt-12 pt-5 pb-2 text-xs md:text-sm text-gray-200 text-center relative z-10 px-4">
-        <p className="mb-1.5">
+      <div className="border-t border-[#2e7bbd] mt-5 md:mt-6 pt-3 pb-2 text-xs md:text-sm text-gray-200 text-center relative z-10 px-4"> {/* Further reduced mt and pt */}
+        <p className="mb-0.5">
           &copy; {new Date().getFullYear()} Keyyards. All rights reserved.
         </p>
         <div className="flex justify-center gap-3 md:gap-4 flex-wrap">

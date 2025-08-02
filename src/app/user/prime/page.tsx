@@ -13,7 +13,7 @@ import {
 import {
   CalendarDaysIcon,
   HomeModernIcon,
-  StarIcon,
+  StarIcon as StarOutlineIcon, // Renamed to avoid conflict
   BanknotesIcon,
   ShieldCheckIcon,
   ShareIcon,
@@ -26,6 +26,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 
+// Keeping existing Razorpay and data interfaces as they are
 declare global {
   interface Window {
     Razorpay: {
@@ -149,7 +150,7 @@ const plans: Plan[] = [
     moneyBack: false,
     teleCalling: false,
     price: "₹8,999",
-    originalPrice: "₹12,499",
+    originalPrice: "₹17,998",
     note: "Inclusive of GST",
     order: 1,
   },
@@ -165,7 +166,7 @@ const plans: Plan[] = [
     moneyBack: false,
     teleCalling: true,
     price: "₹17,999",
-    originalPrice: "₹26,999",
+    originalPrice: "₹35,998",
     note: "Inclusive of GST",
     order: 2,
   },
@@ -181,7 +182,7 @@ const plans: Plan[] = [
     moneyBack: "Yes (After 6th month)",
     teleCalling: true,
     price: "₹29,988",
-    originalPrice: "₹44,982",
+    originalPrice: "₹59,976",
     note: "Inclusive of GST",
     order: 3,
   },
@@ -207,8 +208,6 @@ const SubscriptionPage = () => {
       setCurrentUser(res.data.user);
       setCurrentUserPlanDetails(res.data.plan || null);
     } catch (error) {
-      // Log the error for debugging but don't show a toast.
-      // The UI will adapt based on whether `currentUser` is available (i.e., logged in).
       console.error("Error fetching user data:", error);
     } finally {
       setLoadingUser(false);
@@ -284,8 +283,6 @@ const SubscriptionPage = () => {
 
   const processPayment = async (plan: Plan, action: "save" | "renew" | "upgrade") => {
     if (!currentUser) {
-      // The "LOGIN TO BUY" button should be disabled, but as a safeguard,
-      // we exit silently without showing an error toast.
       console.error("Attempted to process payment without a user session.");
       return;
     }
@@ -598,7 +595,7 @@ const SubscriptionPage = () => {
               `${plan.premiumBadging} Premium Listing${plan.premiumBadging > 1 ? "s" : ""
               }`,
               true,
-              StarIcon
+              StarOutlineIcon
             )}
             {renderFeature(
               `${plan.listings} Property Listing${plan.listings > 1 ? "s" : ""
@@ -665,12 +662,22 @@ const SubscriptionPage = () => {
     >
       <div className="flex-grow">
         <div className="max-w-7xl mx-auto text-center mb-8">
-          <h2 className="text-3xl font-alata font-bold text-gray-900">
-            Freedom sale is live now
+          <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 leading-tight">
+           
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-700">
+              Freedom Sale
+            </span>
           </h2>
-          <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+          <div className="mt-4 flex items-center justify-center space-x-2">
+            <StarOutlineIcon className="w-6 h-6 text-yellow-500 animate-pulse" />
+            <span className="text-3xl sm:text-4xl font-black text-white bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-1.5 rounded-lg shadow-xl tracking-wide transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+              50% OFF!
+            </span>
+            <StarOutlineIcon className="w-6 h-6 text-yellow-500 animate-pulse" />
+          </div>
+          <p className="mt-4 text-lg text-gray-800 max-w-3xl mx-auto">
             Choose a plan designed to elevate your listings and connect you with the
-            right buyers.
+            right buyers. Don't miss out on these limited-time offers!
           </p>
         </div>
 
@@ -681,17 +688,17 @@ const SubscriptionPage = () => {
         </div>
 
         {/* Need Help Button */}
-        <div className="absolute top-140 left-4 z-20 sm:left-6 lg:left-2"> {/* Adjusted positioning for smaller screens */}
+        <div className="absolute top-165 left-4 z-20 sm:left-6 lg:left-2">
           <button
             onClick={() => setShowHelpContact(!showHelpContact)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-[#2180d3] text-white rounded-full shadow-lg hover:bg-[#1a6fb0] transition duration-300 ease-in-out text-sm sm:px-4 sm:py-2 sm:text-base" // Adjusted padding/text size for mobile
+            className="flex items-center gap-2 px-3 py-1.5 bg-[#2180d3] text-white rounded-full shadow-lg hover:bg-[#1a6fb0] transition duration-300 ease-in-out text-sm sm:px-4 sm:py-2 sm:text-base"
           >
-            <PhoneIcon className="w-4 h-4 sm:w-5 sm:h-5" /> {/* Adjusted icon size for mobile */}
+            <PhoneIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             Help?
           </button>
           {showHelpContact && (
-            <div className="mt-2 p-3 bg-white rounded-lg shadow-md text-gray-800 text-sm font-semibold animate-fade-in-up w-auto max-w-[200px] sm:max-w-none"> {/* Added max-w for small screens */}
-              Call us: <a href="tel:+919876543210" className="text-[#2180d3] hover:underline whitespace-nowrap">+91 98765 43210</a>
+            <div className="mt-2 p-3 bg-white rounded-lg shadow-md text-gray-800 text-sm font-semibold animate-fade-in-up w-auto max-w-[200px] sm:max-w-none">
+              Call us: <a href="tel:+914040316406" className="text-[#2180d3] hover:underline whitespace-nowrap">+91 40403 16406</a>
             </div>
           )}
         </div>
@@ -726,7 +733,7 @@ const SubscriptionPage = () => {
 
         {showSuccessAnimation && (
           <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 animate-fade-in">
-            <div className="bg-white p-6 rounded-lg shadow-2xl text-center transform scale-0 animate-pop-in relative mx-4 max-w-sm w-full"> {/* Added mx-4 and max-w-sm for mobile */}
+            <div className="bg-white p-6 rounded-lg shadow-2xl text-center transform scale-0 animate-pop-in relative mx-4 max-w-sm w-full">
               {/* Close button for the popup */}
               <button
                 onClick={() => setShowSuccessAnimation(false)}
@@ -736,18 +743,18 @@ const SubscriptionPage = () => {
                 <XMarkIcon className="w-6 h-6" />
               </button>
 
-              <CheckCircleIcon className="w-16 h-16 sm:w-20 sm:h-20 text-green-500 mx-auto mb-3 sm:mb-4 animate-bounce-once" /> {/* Adjusted icon size for mobile */}
-              <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2"> {/* Adjusted text size for mobile */}
+              <CheckCircleIcon className="w-16 h-16 sm:w-20 sm:h-20 text-green-500 mx-auto mb-3 sm:mb-4 animate-bounce-once" />
+              <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
                 Congratulations!
               </h3>
-              <p className="text-base sm:text-lg text-gray-700"> {/* Adjusted text size for mobile */}
+              <p className="text-base sm:text-lg text-gray-700">
                 Your{" "}
                 <span className="font-semibold text-[#2180d3]">
                   {activatedPlanTitle}
                 </span>{" "}
                 is now active!
               </p>
-              <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2"> {/* Adjusted text size for mobile */}
+              <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2">
                 Get ready to unlock your property&apos;s full potential.
               </p>
             </div>

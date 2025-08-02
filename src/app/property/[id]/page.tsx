@@ -383,12 +383,12 @@ export default function PropertyDetailsPage() {
 
 
             <div className="hidden mt-8 lg:flex gap-6">
-                <button className="flex-1 px-6 py-3.5 font-bold text-white transition duration-300 ease-in-out transform rounded-lg shadow-lg bg-[#2180d3] hover:bg-[#1a66a7] hover:scale-105">
+                {/* <button className="flex-1 px-6 py-3.5 font-bold text-white transition duration-300 ease-in-out transform rounded-lg shadow-lg bg-[#2180d3] hover:bg-[#1a66a7] hover:scale-105">
                     <i className="mr-3 fas fa-paper-plane"></i> Contact Agent
-                </button>
-                <button className="flex-1 px-6 py-3.5 font-bold text-[#2180d3] transition duration-300 ease-in-out transform border-2 border-[#2180d3] rounded-lg shadow-lg hover:bg-[#e6f0f7] hover:scale-105">
+                </button> */}
+                {/* <button className="flex-1 px-6 py-3.5 font-bold text-[#2180d3] transition duration-300 ease-in-out transform border-2 border-[#2180d3] rounded-lg shadow-lg hover:bg-[#e6f0f7] hover:scale-105">
                     <i className="mr-3 fas fa-phone-alt"></i> Get Phone No.
-                </button>
+                </button> */}
             </div>
           </div>
 
@@ -410,9 +410,9 @@ export default function PropertyDetailsPage() {
                 <p className="flex items-center justify-center mb-4 text-sm text-gray-700">
                   <i className="mr-2 text-gray-500 fas fa-phone-alt"></i> +91-{user?.phone || 'Not Available'}
                 </p>
-                <button className="w-full py-3.5 font-bold text-white transition duration-300 ease-in-out transform rounded-lg shadow-md bg-[#2180d3] hover:bg-[#1a66a7] hover:scale-105 mb-3">
+                {/* <button className="w-full py-3.5 font-bold text-white transition duration-300 ease-in-out transform rounded-lg shadow-md bg-[#2180d3] hover:bg-[#1a66a7] hover:scale-105 mb-3">
                   <i className="mr-2 fas fa-phone-alt"></i> Get Phone No.
-                </button>
+                </button> */}
               </div>
 
               {/* <div className="p-6 text-center bg-white border border-gray-200 rounded-xl shadow-lg">

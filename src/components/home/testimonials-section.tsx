@@ -1,11 +1,11 @@
 // components/testimonials-section.tsx
 'use client';
 
-import React, { useEffect, useState } from 'react'; // Import useState explicitly
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { Carousel } from './slider'; // Import Carousel
-import { QuoteIcon, StarIcon } from './emojis'; // Import QuoteIcon and StarIcon
+import { Carousel } from './slider';
+import { QuoteIcon, StarIcon } from './emojis';
 
 // Define the structure of a testimonial as received from your API
 interface Testimonial {
@@ -76,7 +76,7 @@ export const TestimonialsSection = () => {
 
     if (loading) {
         return (
-            <section className="py-12 bg-[#1f8fff]/10 rounded-3xl shadow-inner mt-12 text-center text-gray-700">
+            <section className="py-8 bg-[#1f8fff]/10 rounded-3xl shadow-inner mt-12 text-center text-gray-700">
                 Loading testimonials...
             </section>
         );
@@ -84,7 +84,7 @@ export const TestimonialsSection = () => {
 
     if (error) {
         return (
-            <section className="py-12 bg-[#1f8fff]/10 rounded-3xl shadow-inner mt-12 text-center text-red-600">
+            <section className="py-8 bg-[#1f8fff]/10 rounded-3xl shadow-inner mt-12 text-center text-red-600">
                 {error}
             </section>
         );
@@ -92,47 +92,51 @@ export const TestimonialsSection = () => {
 
     if (testimonials.length === 0) {
         return (
-            <section className="py-12 bg-[#1f8fff]/10 rounded-3xl shadow-inner mt-12 text-center text-gray-700">
+            <section className="py-8 bg-[#1f8fff]/10 rounded-3xl shadow-inner mt-12 text-center text-gray-700">
                 No testimonials available at the moment.
             </section>
         );
     }
 
-    // --- Main Render Logic (unchanged design) ---
+    // --- Main Render Logic ---
     return (
         <motion.section
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            className="py-12 bg-[#1f8fff]/10 rounded-3xl shadow-inner mt-12"
-        >
-            <motion.h2
-                variants={itemVariants}
-                className="text-3xl font-bold text-center text-gray-800 mb-10"
-            >
-                What Our Clients Say
-            </motion.h2>
-            <div className="relative max-w-full lg:max-w-6xl mx-auto">
-                <Carousel cardWidthClass="w-full md:w-1/2 lg:w-1/3 p-4" snapAlign="snap-center" interval={5000}>
-                    {testimonials.map((testimonial) => (
-                        <motion.div
-                            key={testimonial._id} // Using _id as the key, as it's unique from MongoDB
-                            variants={itemVariants}
-                            className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 flex flex-col text-center transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]"
-                        >
-                            <QuoteIcon />
-                            <p className="text-lg text-gray-700 mb-5 italic font-light">&quot;{testimonial.review}&quot;</p>
-                            <div className="text-yellow-500 mb-2">
-                                {[...Array(5)].map((_, i) => (
-                                    <StarIcon key={i} fill={i < testimonial.rating} />
-                                ))}
-                            </div>
-                            <p className="font-bold text-gray-800">{testimonial.username}</p>
-                            <p className="text-sm text-gray-500">{testimonial.location}</p>
-                        </motion.div>
-                    ))}
-                </Carousel>
-            </div>
-        </motion.section>
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.2 }}
+    className="py-6 px-4 bg-[#1f8fff]/10 rounded-3xl shadow-inner mt-12 max-w-4xl mx-auto"
+>
+
+    <motion.h2
+        variants={itemVariants}
+        className="text-2xl font-bold text-center text-gray-800 mb-6"
+    >
+        What Our Clients Say
+    </motion.h2>
+    <div className="relative max-w-full lg:max-w-6xl mx-auto">
+        <Carousel cardWidthClass="w-full md:w-1/2 lg:w-1/3 p-4" snapAlign="snap-center" interval={5000}>
+            {testimonials.map((testimonial) => (
+                <motion.div
+                    key={testimonial._id}
+                    variants={itemVariants}
+                    className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex flex-col text-center transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] min-h-[220px]"
+                >
+                    <QuoteIcon />
+                    <p className="text-base text-gray-700 mb-4 italic font-light flex-grow h-[100px] overflow-hidden">
+                        &quot;{testimonial.review}&quot;
+                    </p>
+                    <div className="text-yellow-500 mb-2">
+                        {[...Array(5)].map((_, i) => (
+                            <StarIcon key={i} fill={i < testimonial.rating} />
+                        ))}
+                    </div>
+                    <p className="font-bold text-gray-800">{testimonial.username}</p>
+                    <p className="text-sm text-gray-500">{testimonial.location}</p>
+                </motion.div>
+            ))}
+        </Carousel>
+    </div>
+</motion.section>
+
     );
 };
