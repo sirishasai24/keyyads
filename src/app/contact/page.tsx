@@ -11,11 +11,10 @@ import {
   PaperAirplaneIcon,
   BuildingOfficeIcon,
   ClockIcon,
-  CalendarDaysIcon, // Note: CalendarDaysIcon is not used in the final version of info cards
-  ChatBubbleOvalLeftEllipsisIcon // Added for Live Chat card
+   // Note: CalendarDaysIcon is not used in the final version of info cards
+   // Added for Live Chat card
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast'; // Assuming you have react-hot-toast for notifications
-import Link from 'next/link'; // Import Link for navigation
 
 // If you don't have react-hot-toast, install it: npm install react-hot-toast
 // And add <Toaster /> to your root layout.tsx or a higher-level component.
@@ -86,7 +85,7 @@ export default function ContactPage() {
           </h1>
           {/* Reduced p from text-lg to text-base */}
           <p className="mt-4 text-base text-gray-600 max-w-2xl mx-auto">
-            Get in touch with our keyyard property specialists. We're here to help you find the
+            Get in touch with our keyyard property specialists. We&apos;re here to help you find the
             perfect secure property that matches your lifestyle and needs.
           </p>
         </div>

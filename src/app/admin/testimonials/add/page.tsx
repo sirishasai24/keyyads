@@ -119,6 +119,7 @@ export default function AddTestimonialPage() {
             }
           };
           reader.onerror = (error) => {
+            console.log(error)
             setImageUploading(false);
             reject(new Error("Failed to read image file."));
           };
@@ -160,12 +161,10 @@ export default function AddTestimonialPage() {
       setFormData({ username: "", review: "", rating: 0, location: "", profileImageURL: "" });
       setSelectedImageFile(null);
       setImagePreview(null);
-    } catch (error: any) { // Type 'any' for broader error handling
+    } catch (error) { // Type 'any' for broader error handling
       console.error("Submission error:", error);
-      const errorMessage = error.message || (axios.isAxiosError(error) && error.response?.data?.message)
-        ? error.response.data.message
-        : "Failed to submit testimonial.";
-      setMessage(errorMessage);
+
+      setMessage("Submission error:");
       setMessageType("error");
     } finally {
       setLoading(false);

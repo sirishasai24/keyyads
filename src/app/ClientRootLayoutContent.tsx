@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import Navbar from '@/components/NavBar';
 import { Toaster } from 'react-hot-toast';
 import Footer from '@/components/home/footer';
+import { Analytics } from "@vercel/analytics/next"
 
 export default function ClientRootLayoutContent({
   children,
@@ -27,6 +28,8 @@ export default function ClientRootLayoutContent({
         {children}
       </main>
       <Toaster position="top-right" />
+      <Analytics />
+
       {shouldShowFooter && <footer className="mt-20"><Footer /></footer>}
     </>
   );

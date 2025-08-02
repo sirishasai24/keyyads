@@ -6,7 +6,7 @@ import "leaflet/dist/leaflet.css";
 
 import Script from "next/script";
 import ClientRootLayoutContent from "@/app/ClientRootLayoutContent";
-import { Analytics } from "@vercel/analytics/next"
+
 
 const alata = Alata({
   weight: "400",

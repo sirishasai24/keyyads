@@ -263,7 +263,7 @@ export async function POST(req: NextRequest) {
 
     } catch (error) {
         console.error("Error processing contact form:", error);
-        let errorMessage = "Failed to send message due to a server error.";
+        const errorMessage = "Failed to send message due to a server error.";
 
         return NextResponse.json({ message: errorMessage, error: error || "Unknown error" }, { status: 500 });
     }
