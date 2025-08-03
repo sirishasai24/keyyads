@@ -96,12 +96,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://checkout.razorpay.com" crossOrigin="anonymous" />
-        {/* AdSense Preconnect is handled by its script */}
-        <link rel="preconnect" href="https://www.googletagmanager.com" /> {/* Preconnect for Analytics */}
-        <link rel="preconnect" href="https://www.google-analytics.com" /> {/* Preconnect for Analytics */}
-
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="anonymous" /><link rel="preconnect" href="https://checkout.razorpay.com" crossOrigin="anonymous" /><link rel="preconnect" href="https://www.googletagmanager.com" /><link rel="preconnect" href="https://www.google-analytics.com" />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -114,24 +109,20 @@ export default async function RootLayout({
           src="https://checkout.razorpay.com/v1/checkout.js"
           strategy="beforeInteractive"
         />
-
-        {/* Google AdSense Script */}
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1131720795071367"
           crossOrigin="anonymous"
-          strategy="afterInteractive" // Good for AdSense to load after the main content is visible
+          strategy="afterInteractive"
         />
-
-        {/* Google Analytics Scripts */}
         <Script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-Z6ZYMM28M3"
-          strategy="afterInteractive" // Good for Analytics to load after initial interactivity
+          strategy="afterInteractive"
         />
         <Script
           id="google-analytics-init"
-          strategy="afterInteractive" // Matches the above Script
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
