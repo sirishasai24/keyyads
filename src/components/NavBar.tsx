@@ -83,13 +83,13 @@ export default function Navbar() {
             <FaRupeeSign className="w-4 h-4" />
             Buy
           </Link>
-          {/* <Link
+          <Link
             href="/property?transactionType=rent"
             className="text-white hover:text-gray-200 flex items-center gap-1"
           >
             <KeyIcon className="w-5 h-5" />
             Rent
-          </Link> */}
+          </Link>
           <Link
             href="/admin/blog"
             className="text-white hover:text-gray-200 flex items-center gap-1"
@@ -120,13 +120,14 @@ export default function Navbar() {
               <ClipboardDocumentListIcon className="w-5 h-5" />
               Manage Properties
             </Link>
-          )}<Link
+          )}
+          {/* <Link
             href="/contact"
             className="text-white hover:text-gray-200 flex items-center gap-1"
           >
             <PhoneIcon className="w-5 h-5" />
             Contact Us
-          </Link>
+          </Link> */}
           <Link
             href="/property/add"
             className="bg-white text-[#2180d3] px-4 py-2 rounded-lg hover:bg-gray-100 transition flex items-center"
