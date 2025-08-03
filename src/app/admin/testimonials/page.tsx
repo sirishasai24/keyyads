@@ -79,7 +79,7 @@ export default function TestimonialsPage() {
     // Logic to limit visible page buttons (e.g., show 5 buttons at a time)
     const maxVisibleButtons = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisibleButtons / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+    const endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
 
     // Adjust startPage if we're near the end and can't fill maxVisibleButtons
     if (endPage - startPage + 1 < maxVisibleButtons) {
