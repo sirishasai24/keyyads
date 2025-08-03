@@ -96,6 +96,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="google-adsense-account" content="ca-pub-1131720795071367" />
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="anonymous" /><link rel="preconnect" href="https://checkout.razorpay.com" crossOrigin="anonymous" /><link rel="preconnect" href="https://www.googletagmanager.com" /><link rel="preconnect" href="https://www.google-analytics.com" />
         <link
           rel="stylesheet"
@@ -108,12 +109,6 @@ export default async function RootLayout({
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
           strategy="beforeInteractive"
-        />
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1131720795071367"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
         />
         <Script
           async
