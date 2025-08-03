@@ -13,70 +13,58 @@ const alata = Alata({
   variable: "--font-alata",
 });
 
-// Define a base URL for consistency in metadata URLs
 const BASE_URL = "https://keyyards.in";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL), // Use the defined base URL
-
-  // Primary Metadata: Crucial for Search Engine Results Pages (SERP)
+  metadataBase: new URL(BASE_URL),
   title: {
-    default: "Keyyards - Buy & Rent Property in India", // More descriptive default title
-    template: "%s | Keyyards", // Template for dynamic page titles
+    default: "Keyyards - Buy & Rent Property in India",
+    template: "%s | Keyyards",
   },
   description:
-    "Find your next home or investment property with Keyyards. Browse properties for sale and rent, connect with agents, and post your listings across India.", // Enhanced description with geo-specificity
+    "Find your next home or investment property with Keyyards. Browse properties for sale and rent, connect with agents, and post your listings across India.",
   icons: {
-    icon: "/images/tab.png", // Favicon for browser tabs
-    apple: "/images/apple-touch-icon.png", // Recommended for Apple devices (create this if you don't have it)
+    icon: "/images/tab.png",
+    apple: "/images/apple-touch-icon.png",
   },
-
-  // Open Graph (OG) Metadata: For rich social media sharing
   openGraph: {
-    title: "Keyyards - Your Trusted Partner for Property in India", // Specific title for social shares
+    title: "Keyyards - Your Trusted Partner for Property in India",
     description:
-      "Explore top real estate listings in India. Buy, rent, or sell homes, apartments, and commercial properties easily with Keyyards.", // Detailed description for social shares
-    url: BASE_URL, // Canonical URL for the site
+      "Explore top real estate listings in India. Buy, rent, or sell homes, apartments, and commercial properties easily with Keyyards.",
+    url: BASE_URL,
     siteName: "Keyyards",
     images: [
       {
-        url: `${BASE_URL}/images/keyyards-og.png`, // Use absolute URL for Open Graph image. Consider a higher-res image.
+        url: `${BASE_URL}/images/keyyards-og.png`,
         width: 1200,
         height: 630,
-        alt: "Keyyards Real Estate - Find Your Dream Property", // Descriptive alt text for the OG image
+        alt: "Keyyards Real Estate - Find Your Dream Property",
       },
-      // You can add more image sizes or variations if needed
     ],
-    locale: "en_IN", // Specific locale for India
-    type: "website", // Standard type for most websites
+    locale: "en_IN",
+    type: "website",
   },
-
-  // Twitter Card Metadata: For rich Twitter sharing
   twitter: {
     card: "summary_large_image",
-    title: "Keyyards | Discover Your Next Property in India", // Twitter-specific title
+    title: "Keyyards | Discover Your Next Property in India",
     description:
-      "Discover premium properties for sale and rent in your city across India. Trusted by thousands of buyers, sellers, and agents.", // Twitter-specific description
-    images: [`${BASE_URL}/images/keyyards-twitter.png`], // Use absolute URL for Twitter image (can be same as OG or optimized for Twitter)
-    creator: "@KeyyardsOfficial", // Use your actual Twitter handle if you have one
+      "Discover premium properties for sale and rent in your city across India. Trusted by thousands of buyers, sellers, and agents.",
+    images: [`${BASE_URL}/images/keyyards-twitter.png`],
+    creator: "@KeyyardsOfficial",
   },
-
-  // Robots Meta Tag: Crucial for crawler instructions
   robots: {
-    index: true, // Allow indexing
-    follow: true, // Allow following links
-    nocache: false, // Allow caching (default, but explicit can be good)
-    googleBot: { // Specific instructions for Googlebot
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
       index: true,
       follow: true,
       noimageindex: false,
-      "max-snippet": -1, // Allow full snippet in SERP
-      "max-video-preview": -1, // Allow full video preview
-      "max-image-preview": "large", // Allow large image preview
+      "max-snippet": -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
     },
   },
-
-  // Keywords: Less impactful for ranking directly, but still good for context
   keywords: [
     "real estate India",
     "buy home India",
@@ -90,14 +78,11 @@ export const metadata: Metadata = {
     "property portal",
     "flats for sale",
     "land for sale",
-    // Add more specific keywords relevant to your business and location (e.g., "property in Hyderabad", "flats in Bangalore")
   ],
-
-  // Author and Generator
-  authors: [{ name: "Keyyards Team", url: BASE_URL }], // More generic "Team" or your official company name
-  generator: "Next.js", // Good to keep
-  applicationName: "Keyyards", // Good to keep
-  category: "Real Estate", // More specific capitalization
+  authors: [{ name: "Keyyards Team", url: BASE_URL }],
+  generator: "Next.js",
+  applicationName: "Keyyards",
+  category: "Real Estate",
 };
 
 export default async function RootLayout({
@@ -111,10 +96,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Preconnect for faster loading of external resources */}
         <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://checkout.razorpay.com" crossOrigin="anonymous" />
-
+        {/* AdSense Preconnect is handled by its script */}
+        <link rel="preconnect" href="https://www.googletagmanager.com" /> {/* Preconnect for Analytics */}
+        <link rel="preconnect" href="https://www.google-analytics.com" /> {/* Preconnect for Analytics */}
 
         <link
           rel="stylesheet"
@@ -123,14 +109,38 @@ export default async function RootLayout({
           crossOrigin="anonymous"
           referrerPolicy="no-referrer"
         />
-        {/* Canonical URL is correctly implemented based on the dynamic pathname */}
         <link rel="canonical" href={`${BASE_URL}${pathname}`} />
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
           strategy="beforeInteractive"
         />
-        {/* Add a descriptive title for your page based on metadata (handled by Next.js automatically from `metadata` object) */}
-        {/* <title>Your Page Title</title> */}
+
+        {/* Google AdSense Script */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1131720795071367"
+          crossOrigin="anonymous"
+          strategy="afterInteractive" // Good for AdSense to load after the main content is visible
+        />
+
+        {/* Google Analytics Scripts */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-Z6ZYMM28M3"
+          strategy="afterInteractive" // Good for Analytics to load after initial interactivity
+        />
+        <Script
+          id="google-analytics-init"
+          strategy="afterInteractive" // Matches the above Script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-Z6ZYMM28M3');
+            `,
+          }}
+        />
       </head>
       <body
         className={`${alata.variable} font-sans antialiased bg-gray-50 text-gray-800`}

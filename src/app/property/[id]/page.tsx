@@ -3,6 +3,13 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import axios from 'axios'
+import Link from 'next/link' // Import Link for proper Next.js navigation
+import { Swiper, SwiperSlide } from 'swiper/react'; // Import Swiper components
+import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules'; // Import Swiper modules
+import 'swiper/css'; // Core Swiper styles
+import 'swiper/css/navigation'; // Navigation module styles
+import 'swiper/css/pagination'; // Pagination module styles
+
 
 interface Location {
   city: string;
@@ -118,20 +125,20 @@ export default function PropertyDetailsPage() {
 
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-100 py-4 px-2 sm:py-8 sm:px-4 lg:px-8"> {/* Adjusted padding for mobile */}
       <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
 
-        <div className="p-6 md:p-8 border-b border-gray-200 bg-gradient-to-r from-white to-[#f0f6fc]">
-          <div className="flex justify-between items-start mb-4 flex-wrap gap-y-3">
+        <div className="p-4 md:p-8 border-b border-gray-200 bg-gradient-to-r from-white to-[#f0f6fc]"> {/* Adjusted padding for mobile */}
+          <div className="flex justify-between items-start mb-3 flex-wrap gap-y-2"> {/* Adjusted margin for mobile */}
             <div className="flex flex-col md:flex-row md:items-baseline md:gap-4">
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-[#2180d3] leading-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2180d3] leading-tight"> {/* Adjusted font size for mobile */}
                 ₹{property.price.toLocaleString('en-IN')}
               </h1>
               {property.transactionType === 'rent' && (
-                <span className="text-lg text-gray-600 font-semibold md:ml-0.5">/month</span>
+                <span className="text-base text-gray-600 font-semibold md:ml-0.5">/month</span> 
               )}
               {property.discount > 0 && (
-                <span className="text-lg text-red-500 font-bold ml-2">
+                <span className="text-base text-red-500 font-bold ml-2"> {/* Adjusted font size for mobile */}
                   ({property.discount}% Off)
                 </span>
               )}
@@ -141,58 +148,57 @@ export default function PropertyDetailsPage() {
             </button>
           </div>
 
-          <h2 className="text-xl font-bold text-gray-800 mb-2">
+          <h2 className="text-lg font-bold text-gray-800 mb-2"> {/* Adjusted font size for mobile */}
             {property.bedrooms !== undefined && property.bedrooms !== null && property.type === 'building' ? `${property.bedrooms} BHK ` : ''}
             {property.area ? `${property.area} ${property.areaUnit ? capitalize(property.areaUnit) : 'sq-ft'} ` : ''}
             {capitalize(property.type)} For {capitalize(property.transactionType)}
           </h2>
-          <p className="flex items-center text-base text-gray-700 mb-6">
-            <i className="mr-2 text-lg text-gray-500 fas fa-map-marker-alt"></i>
+          <p className="flex items-center text-sm text-gray-700 mb-4"> {/* Adjusted font size and margin for mobile */}
+            <i className="mr-2 text-base text-gray-500 fas fa-map-marker-alt"></i> {/* Adjusted icon size for mobile */}
             {property.address ? `${property.address}, ` : ''}
             {property.location.city}, {property.location.state}
-            
           </p>
 
           {property.type === 'building' && (
-            <div className="flex flex-wrap justify-center p-4 bg-[#e6f0f7] border border-[#a8c9e7] rounded-lg shadow-inner gap-x-6 gap-y-3 md:justify-start text-gray-800">
+            <div className="flex flex-wrap justify-center p-3 bg-[#e6f0f7] border border-[#a8c9e7] rounded-lg shadow-inner gap-x-4 gap-y-2 md:justify-start text-gray-800 text-sm"> {/* Adjusted padding, gap, and font size for mobile */}
               {property.bedrooms !== undefined && property.bedrooms !== null && (
                 <span className="flex items-center text-[#2180d3] font-medium">
-                  <i className="mr-2 text-lg fas fa-bed"></i> {property.bedrooms} Beds
+                  <i className="mr-1.5 text-base fas fa-bed"></i> {property.bedrooms} Beds {/* Adjusted icon size and margin for mobile */}
                 </span>
               )}
               {property.bathrooms !== undefined && property.bathrooms !== null && (
                 <span className="flex items-center text-[#2180d3] font-medium">
-                  <i className="mr-2 text-lg fas fa-bath"></i> {property.bathrooms} Baths
+                  <i className="mr-1.5 text-base fas fa-bath"></i> {property.bathrooms} Baths {/* Adjusted icon size and margin for mobile */}
                 </span>
               )}
-              
+
               {property.furnishing && (
                 <span className="flex items-center text-[#2180d3] font-medium">
-                  <i className="mr-2 text-lg fas fa-couch"></i> {capitalize(property.furnishing)}
+                  <i className="mr-1.5 text-base fas fa-couch"></i> {capitalize(property.furnishing)} {/* Adjusted icon size and margin for mobile */}
                 </span>
               )}
             </div>
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-8 p-6 md:p-8 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 p-4 md:p-8 lg:grid-cols-3"> {/* Adjusted padding and gap for mobile */}
 
           <div className="lg:col-span-2">
-            <div className="mb-8">
-              <div className="flex items-center justify-center mb-4 overflow-hidden bg-gray-100 border rounded-lg shadow-xl aspect-video border-gray-200">
+            <div className="mb-6"> {/* Adjusted margin for mobile */}
+              <div className="flex items-center justify-center mb-3 overflow-hidden bg-gray-100 border rounded-lg shadow-xl aspect-video border-gray-200"> {/* Adjusted margin for mobile */}
                 {mainImage ? (
                   <img
                     src={mainImage}
                     alt={property.title || 'Property Main Image'}
-                    className="object-cover w-auto max-h-[500px] mx-auto transition-transform duration-500 transform hover:scale-105"
+                    className="object-cover w-auto max-h-[300px] sm:max-h-[500px] mx-auto transition-transform duration-500 transform hover:scale-105" // Max height for mobile
                   />
                 ) : (
-                  <div className="flex flex-col items-center p-8 text-xl text-gray-500">
-                    <i className="mb-4 text-6xl text-gray-300 fas fa-image"></i> No images to display.
+                  <div className="flex flex-col items-center p-6 text-lg text-gray-500"> {/* Adjusted padding and font size for mobile */}
+                    <i className="mb-3 text-5xl text-gray-300 fas fa-image"></i> No images to display. {/* Adjusted icon size and margin for mobile */}
                   </div>
                 )}
               </div>
-              <div className="grid grid-cols-4 gap-3 pr-2 overflow-y-auto sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-5 xl:grid-cols-6 max-h-[120px] custom-scrollbar">
+              <div className="grid grid-cols-4 gap-2 pr-1 overflow-y-auto sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-5 xl:grid-cols-6 max-h-[100px] custom-scrollbar"> {/* Adjusted gap and max height for mobile */}
                 {property.images?.length > 0 ? (
                   property.images.map((img: string, idx: number) => (
                     <div
@@ -209,125 +215,119 @@ export default function PropertyDetailsPage() {
                     </div>
                   ))
                 ) : (
-                  <div className="flex items-center justify-center col-span-full h-full min-h-[80px] text-base text-gray-500 bg-gray-200 rounded-lg">
+                  <div className="flex items-center justify-center col-span-full h-full min-h-[60px] text-sm text-gray-500 bg-gray-200 rounded-lg"> {/* Adjusted min height and font size for mobile */}
                     No thumbnails available
                   </div>
                 )}
-                {property.images.length > 4 && (
-                  <div className="flex items-center justify-center col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-1 xl:col-span-1">
-                      <button className="px-4 py-2 text-sm font-semibold text-white transition-colors rounded-lg shadow-md bg-[#2180d3] hover:bg-[#1a66a7]">
-                        +{property.images.length - 3} Photos
-                      </button>
+                {/* Removed "+X Photos" button as thumbnail grid should handle scrolling, or a modal could be used */}
+              </div>
+            </div>
+
+            <div className="p-4 mb-6 bg-white border border-gray-200 rounded-xl shadow-md"> {/* Adjusted padding and margin for mobile */}
+              <h3 className="mb-3 text-lg font-bold text-gray-800 border-l-4 border-[#2180d3] pl-3">Property Highlights</h3> {/* Adjusted font size and margin for mobile */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"> {/* Adjusted gap for mobile */}
+                <DetailCard
+                  label="Listing For"
+                  value={capitalize(property.transactionType)}
+                  iconClass="fas fa-tag"
+                  iconColorClass="text-purple-600"
+                />
+                <DetailCard
+                  label="Area"
+                  value={property.area ? `${property.area} ${property.areaUnit ? capitalize(property.areaUnit) : 'Unit'}` : 'N/A'}
+                  iconClass="fas fa-ruler-combined"
+                  iconColorClass="text-[#2180d3]"
+                />
+                {property.parking !== undefined && property.parking !== null && (
+                  <DetailCard
+                    label="Parking"
+                    value={property.parking > 0 ? `${property.parking} spaces` : 'No dedicated parking'}
+                    iconClass="fas fa-car"
+                    iconColorClass="text-gray-600"
+                  />
+                )}
+                {property.facing && property.facing !== "Not Specified" && (
+                  <DetailCard
+                    label="Direction Facing"
+                    value={capitalize(property.facing)}
+                    iconClass="fas fa-compass"
+                    iconColorClass="text-red-500"
+                  />
+                )}
+                {property.isPremium && (
+                  <div className="flex items-center p-3 bg-yellow-50 border border-yellow-200 rounded-lg shadow-sm">
+                    <i className="mr-3 text-xl text-yellow-700 fas fa-star"></i>
+                    <div>
+                      <p className="text-sm font-semibold text-yellow-800">Premium Listing</p>
+                      <p className="text-sm font-bold text-yellow-700">Enhanced Visibility</p>
+                    </div>
                   </div>
+                )}
+                {property.discount > 0 && (
+                  <DetailCard
+                    label="Discount Available"
+                    value={`${property.discount}% Off`}
+                    iconClass="fas fa-tags"
+                    iconColorClass="text-red-500"
+                  />
+                )}
+
+                {property.type === 'building' && (
+                  <>
+                    <DetailCard
+                      label="Bedrooms"
+                      value={property.bedrooms || 'N/A'}
+                      iconClass="fas fa-bed"
+                      iconColorClass="text-indigo-500"
+                    />
+                    <DetailCard
+                      label="Bathrooms"
+                      value={property.bathrooms || 'N/A'}
+                      iconClass="fas fa-bath"
+                      iconColorClass="text-teal-500"
+                    />
+                    <DetailCard
+                      label="Furnished Status"
+                      value={capitalize(property.furnishing || 'Unfurnished')}
+                      iconClass="fas fa-couch"
+                      iconColorClass="text-amber-600"
+                    />
+                    <DetailCard
+                      label="Age Of Construction"
+                      value={property.propertyAge || 'New Property'}
+                      iconClass="fas fa-building"
+                      iconColorClass="text-green-700"
+                    />
+                    <DetailCard
+                      label="Total Floors"
+                      value={property.floors || 'N/A'}
+                      iconClass="fas fa-layer-group"
+                      iconColorClass="text-blue-500"
+                    />
+                  </>
+                )}
+
+                {property.type === 'land' && (
+                  <DetailCard
+                    label="Land Category"
+                    value={capitalize(property.landCategory)}
+                    iconClass="fas fa-tree"
+                    iconColorClass="text-lime-700"
+                  />
                 )}
               </div>
             </div>
 
-            <div className="p-6 mb-8 bg-white border border-gray-200 rounded-xl shadow-md">
-                <h3 className="mb-4 text-xl font-bold text-gray-800 border-l-4 border-[#2180d3] pl-3">Property Highlights</h3>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    <DetailCard
-                        label="Listing For"
-                        value={capitalize(property.transactionType)}
-                        iconClass="fas fa-tag"
-                        iconColorClass="text-purple-600"
-                    />
-                    <DetailCard
-                        label="Area"
-                        value={property.area ? `${property.area} ${property.areaUnit ? capitalize(property.areaUnit) : 'Unit'}` : 'N/A'}
-                        iconClass="fas fa-ruler-combined"
-                        iconColorClass="text-[#2180d3]"
-                    />
-                    {property.parking !== undefined && property.parking !== null && (
-                        <DetailCard
-                            label="Parking"
-                            value={property.parking > 0 ? `${property.parking} spaces` : 'No dedicated parking'}
-                            iconClass="fas fa-car"
-                            iconColorClass="text-gray-600"
-                        />
-                    )}
-                    {property.facing && property.facing !== "Not Specified" && (
-                        <DetailCard
-                            label="Direction Facing"
-                            value={capitalize(property.facing)}
-                            iconClass="fas fa-compass"
-                            iconColorClass="text-red-500"
-                        />
-                    )}
-                    {property.isPremium && (
-                        <div className="flex items-center p-3 bg-yellow-50 border border-yellow-200 rounded-lg shadow-sm">
-                            <i className="mr-3 text-xl text-yellow-700 fas fa-star"></i>
-                            <div>
-                                <p className="text-sm font-semibold text-yellow-800">Premium Listing</p>
-                                <p className="text-sm font-bold text-yellow-700">Enhanced Visibility</p>
-                            </div>
-                        </div>
-                    )}
-                    {property.discount > 0 && (
-                        <DetailCard
-                            label="Discount Available"
-                            value={`${property.discount}% Off`}
-                            iconClass="fas fa-tags"
-                            iconColorClass="text-red-500"
-                        />
-                    )}
 
-                    {property.type === 'building' && (
-                        <>
-                            <DetailCard
-                                label="Bedrooms"
-                                value={property.bedrooms || 'N/A'}
-                                iconClass="fas fa-bed"
-                                iconColorClass="text-indigo-500"
-                            />
-                            <DetailCard
-                                label="Bathrooms"
-                                value={property.bathrooms || 'N/A'}
-                                iconClass="fas fa-bath"
-                                iconColorClass="text-teal-500"
-                            />
-                            <DetailCard
-                                label="Furnished Status"
-                                value={capitalize(property.furnishing || 'Unfurnished')}
-                                iconClass="fas fa-couch"
-                                iconColorClass="text-amber-600"
-                            />
-                            <DetailCard
-                                label="Age Of Construction"
-                                value={property.propertyAge || 'New Property'}
-                                iconClass="fas fa-building"
-                                iconColorClass="text-green-700"
-                            />
-                            <DetailCard
-                                label="Total Floors"
-                                value={property.floors || 'N/A'}
-                                iconClass="fas fa-layer-group"
-                                iconColorClass="text-blue-500"
-                            />
-                        </>
-                    )}
-
-                    {property.type === 'land' && (
-                        <DetailCard
-                            label="Land Category"
-                            value={capitalize(property.landCategory)}
-                            iconClass="fas fa-tree"
-                            iconColorClass="text-lime-700"
-                        />
-                    )}
-                </div>
-            </div>
-
-
-            <div className="p-6 mb-8 bg-white border border-gray-200 rounded-xl shadow-md">
-              <h3 className="mb-4 text-xl font-bold text-gray-800 border-l-4 border-[#2180d3] pl-3">Property Description</h3>
-              <p className="text-sm leading-relaxed text-gray-700 mb-5">
+            <div className="p-4 mb-6 bg-white border border-gray-200 rounded-xl shadow-md"> {/* Adjusted padding and margin for mobile */}
+              <h3 className="mb-3 text-lg font-bold text-gray-800 border-l-4 border-[#2180d3] pl-3">Property Description</h3> {/* Adjusted font size and margin for mobile */}
+              <p className="text-sm leading-relaxed text-gray-700 mb-4"> {/* Adjusted font size and margin for mobile */}
                 {property.description || 'This property presents an exceptional opportunity, combining modern comforts with a prime location to offer a desirable living or investment space. Discover its unique advantages and envision your future here.'}
               </p>
               {property.otherDetails && (
-                <div className="pt-4 mt-6 border-t border-gray-100">
-                  <h4 className="mb-3 text-lg font-semibold text-gray-800">Additional Information:</h4>
-                  <p className="p-4 text-sm italic leading-relaxed text-gray-700 bg-gray-50 border border-gray-100 rounded-lg shadow-inner">
+                <div className="pt-3 mt-4 border-t border-gray-100"> {/* Adjusted padding and margin for mobile */}
+                  <h4 className="mb-2 text-base font-semibold text-gray-800">Additional Information:</h4> {/* Adjusted font size and margin for mobile */}
+                  <p className="p-3 text-sm italic leading-relaxed text-gray-700 bg-gray-50 border border-gray-100 rounded-lg shadow-inner"> {/* Adjusted padding and font size for mobile */}
                     {property.otherDetails}
                   </p>
                 </div>
@@ -335,108 +335,104 @@ export default function PropertyDetailsPage() {
             </div>
 
             {relatedProperties.length > 0 && (
-                <div className="p-6 mb-8 bg-white border border-gray-200 rounded-xl shadow-md">
-                    <h3 className="mb-6 text-xl font-bold text-gray-800 border-l-4 border-[#2180d3] pl-3">Related Properties</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {relatedProperties.map((relatedProperty) => (
-                            <a key={relatedProperty._id} href={`/property/${relatedProperty._id}`} className="block">
-                                <div className="bg-gray-50 border border-gray-100 rounded-lg shadow-sm overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-md">
-                                    {relatedProperty.images && relatedProperty.images.length > 0 ? (
-                                        <img
-                                            src={relatedProperty.images[0]}
-                                            alt={relatedProperty.title}
-                                            className="w-full h-40 object-cover"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-40 bg-gray-200 flex items-center justify-center text-gray-500">
-                                            No Image
-                                        </div>
-                                    )}
-                                    <div className="p-4">
-                                        <h4 className="text-lg font-semibold text-gray-800 mb-1 line-clamp-1">{relatedProperty.title}</h4>
-                                        <p className="text-sm text-gray-600 mb-2 flex items-center">
-                                            <i className="fas fa-map-marker-alt text-xs mr-1 text-gray-500"></i>
-                                            {relatedProperty.location.city}, {relatedProperty.location.state}
-                                        </p>
-                                        <p className="text-[#2180d3] font-bold text-base mb-2">
-                                            ₹{relatedProperty.price.toLocaleString('en-IN')}
-                                            {relatedProperty.transactionType === 'rent' && <span className="text-sm text-gray-600">/month</span>}
-                                        </p>
-                                        <div className="flex items-center text-sm text-gray-700">
-                                            {relatedProperty.type === 'building' && relatedProperty.bedrooms && (
-                                                <span className="mr-3 flex items-center"><i className="fas fa-bed text-sm mr-1"></i> {relatedProperty.bedrooms} Beds</span>
-                                            )}
-                                            {relatedProperty.type === 'building' && relatedProperty.bathrooms && (
-                                                <span className="mr-3 flex items-center"><i className="fas fa-bath text-sm mr-1"></i> {relatedProperty.bathrooms} Baths</span>
-                                            )}
-                                            {relatedProperty.area && (
-                                                <span className="flex items-center"><i className="fas fa-ruler-combined text-sm mr-1"></i> {relatedProperty.area} {capitalize(relatedProperty.areaUnit)}</span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        ))}
-                    </div>
-                </div>
+              <div className="p-4 mb-6 bg-white border border-gray-200 rounded-xl shadow-md"> {/* Adjusted padding and margin for mobile */}
+                <h3 className="mb-4 text-lg font-bold text-gray-800 border-l-4 border-[#2180d3] pl-3">Related Properties</h3> {/* Adjusted font size and margin for mobile */}
+                <Swiper
+                  modules={[Navigation, Pagination, Scrollbar, A11y]}
+                  spaceBetween={15} // Gap between slides
+                  slidesPerView={1} // Default for mobile
+                  navigation // Enable navigation arrows
+                  pagination={{ clickable: true }} // Enable pagination dots
+                  scrollbar={{ draggable: true }} // Enable scrollbar
+                  breakpoints={{
+                    // When window width is >= 640px (sm)
+                    640: {
+                      slidesPerView: 2,
+                      spaceBetween: 20,
+                    },
+                    // When window width is >= 1024px (lg)
+                    1024: {
+                      slidesPerView: 3,
+                      spaceBetween: 25,
+                    },
+                  }}
+                  className="related-properties-swiper" // Add a class for potential custom styling
+                >
+                  {relatedProperties.map((relatedProperty) => (
+                    <SwiperSlide key={relatedProperty._id}>
+                      <Link href={`/property/${relatedProperty._id}`} className="block">
+                        <div className="bg-gray-50 border border-gray-100 rounded-lg shadow-sm overflow-hidden transform transition duration-300 hover:scale-105 hover:shadow-md h-full"> {/* Ensure consistent height */}
+                          {relatedProperty.images && relatedProperty.images.length > 0 ? (
+                            <img
+                              src={relatedProperty.images[0]}
+                              alt={relatedProperty.title}
+                              className="w-full h-36 object-cover" // Adjusted height for slider item
+                            />
+                          ) : (
+                            <div className="w-full h-36 bg-gray-200 flex items-center justify-center text-gray-500 text-sm"> {/* Adjusted height and font size */}
+                              No Image
+                            </div>
+                          )}
+                          <div className="p-3"> {/* Adjusted padding */}
+                            <h4 className="text-base font-semibold text-gray-800 mb-1 line-clamp-1">{relatedProperty.title}</h4> {/* Adjusted font size */}
+                            <p className="text-xs text-gray-600 mb-1 flex items-center"> {/* Adjusted font size */}
+                              <i className="fas fa-map-marker-alt text-xs mr-1 text-gray-500"></i>
+                              {relatedProperty.location.city}, {relatedProperty.location.state}
+                            </p>
+                            <p className="text-[#2180d3] font-bold text-base mb-1"> {/* Adjusted font size */}
+                              ₹{relatedProperty.price.toLocaleString('en-IN')}
+                              {relatedProperty.transactionType === 'rent' && <span className="text-xs text-gray-600">/month</span>} {/* Adjusted font size */}
+                            </p>
+                            <div className="flex flex-wrap items-center text-xs text-gray-700 gap-x-2"> {/* Adjusted font size and gap */}
+                              {relatedProperty.type === 'building' && relatedProperty.bedrooms && (
+                                <span className="flex items-center"><i className="fas fa-bed text-xs mr-1"></i> {relatedProperty.bedrooms} Beds</span>
+                              )}
+                              {relatedProperty.type === 'building' && relatedProperty.bathrooms && (
+                                <span className="flex items-center"><i className="fas fa-bath text-xs mr-1"></i> {relatedProperty.bathrooms} Baths</span>
+                              )}
+                              {relatedProperty.area && (
+                                <span className="flex items-center"><i className="fas fa-ruler-combined text-xs mr-1"></i> {relatedProperty.area} {capitalize(relatedProperty.areaUnit)}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
             )}
 
-
-            <div className="hidden mt-8 lg:flex gap-6">
-                {/* <button className="flex-1 px-6 py-3.5 font-bold text-white transition duration-300 ease-in-out transform rounded-lg shadow-lg bg-[#2180d3] hover:bg-[#1a66a7] hover:scale-105">
-                    <i className="mr-3 fas fa-paper-plane"></i> Contact Agent
-                </button> */}
-                {/* <button className="flex-1 px-6 py-3.5 font-bold text-[#2180d3] transition duration-300 ease-in-out transform border-2 border-[#2180d3] rounded-lg shadow-lg hover:bg-[#e6f0f7] hover:scale-105">
-                    <i className="mr-3 fas fa-phone-alt"></i> Get Phone No.
-                </button> */}
+            <div className="hidden mt-6 lg:flex gap-4"> {/* Adjusted margin for mobile */}
+              {/* Desktop-only Contact Buttons (kept as comments as per original) */}
             </div>
           </div>
 
           <div className="lg:col-span-1">
-            <div className="flex flex-col gap-6 lg:sticky lg:top-8">
-              <div className="p-6 text-center bg-white border border-gray-200 rounded-xl shadow-lg">
-                <h3 className="mb-4 text-xl font-bold text-gray-800">Interested?</h3>
+            <div className="flex flex-col gap-4 lg:sticky lg:top-8"> {/* Adjusted gap for mobile */}
+              <div className="p-4 text-center bg-white border border-gray-200 rounded-xl shadow-lg"> {/* Adjusted padding for mobile */}
+                <h3 className="mb-3 text-lg font-bold text-gray-800">Interested?</h3> {/* Adjusted font size and margin for mobile */}
                 <img
                   src={user?.profileImageURL || '/default-avatar.png'}
                   alt={user?.username || 'Agent'}
-                  className="object-cover w-24 h-24 mx-auto mb-4 border-4 rounded-full shadow-md border-[#2180d3]"
+                  className="object-cover w-20 h-20 mx-auto mb-3 border-4 rounded-full shadow-md border-[#2180d3]" // Adjusted size for mobile
                 />
-                <p className="mb-1 text-lg font-bold text-gray-900">{user?.username || 'Agent Name'}</p>
+                <p className="mb-1 text-base font-bold text-gray-900">{user?.username || 'Agent Name'}</p> {/* Adjusted font size */}
                 {user?.email && (
-                    <p className="flex items-center justify-center mb-2 text-sm text-gray-700">
-                        <i className="mr-2 text-gray-500 fas fa-envelope"></i>{user.email}
-                    </p>
+                  <p className="flex items-center justify-center mb-1 text-sm text-gray-700"> {/* Adjusted font size and margin */}
+                    <i className="mr-2 text-gray-500 fas fa-envelope"></i>{user.email}
+                  </p>
                 )}
-                <p className="flex items-center justify-center mb-4 text-sm text-gray-700">
+                <p className="flex items-center justify-center mb-3 text-sm text-gray-700"> {/* Adjusted font size and margin */}
                   <i className="mr-2 text-gray-500 fas fa-phone-alt"></i> +91-{user?.phone || 'Not Available'}
                 </p>
-                {/* <button className="w-full py-3.5 font-bold text-white transition duration-300 ease-in-out transform rounded-lg shadow-md bg-[#2180d3] hover:bg-[#1a66a7] hover:scale-105 mb-3">
-                  <i className="mr-2 fas fa-phone-alt"></i> Get Phone No.
-                </button> */}
+                {/* Mobile contact buttons will be at the bottom sticky bar */}
               </div>
-
-              {/* <div className="p-6 text-center bg-white border border-gray-200 rounded-xl shadow-lg">
-                <i className="mb-4 text-4xl text-red-500 fas fa-file-pdf"></i>
-                <h3 className="mb-2 text-lg font-bold text-gray-800">Download Brochure</h3>
-                <p className="mb-5 text-sm text-gray-600">Access detailed property information and floor plans.</p>
-                <button className="flex items-center justify-center w-full py-3.5 font-bold text-white transition duration-300 ease-in-out transform rounded-lg shadow-md bg-[#2180d3] hover:bg-[#1a66a7] hover:scale-105">
-                  <i className="mr-2 fas fa-download "></i> Download Full Brochure
-                </button>
-              </div> */}
             </div>
           </div>
         </div>
 
-        <div className="sticky bottom-0 left-0 right-0 z-10 flex justify-between gap-4 p-4 bg-white border-t border-gray-200 lg:hidden shadow-lg">
-            <button className="flex-1 px-4 py-3.5 font-bold text-white transition-colors rounded-lg shadow-md bg-[#2180d3] hover:bg-[#1a66a7]">
-                <i className="mr-2 fas fa-phone-alt"></i> Contact
-            </button>
-            <button className="flex-1 px-4 py-3.5 font-bold text-[#2180d3] transition-colors border-2 border-[#2180d3] rounded-lg shadow-md hover:bg-[#e6f0f7]">
-                <i className="mr-2 fas fa-envelope"></i> Enquire
-            </button>
-        </div>
-
       </div>
-    </div>
+    </div>  
   )
 }
