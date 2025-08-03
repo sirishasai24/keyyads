@@ -25,8 +25,6 @@ export const Carousel: React.FC<CarouselProps> = ({
     const cardsPerDesktopSlide = 3; 
 
     // Calculate total number of "pages" or "slides" for desktop view
-    const totalDesktopSlides = Math.ceil(children.length / cardsPerDesktopSlide);
-
     // This ref will be used to determine the actual number of cards visible
     // depending on the screen size. For now, we'll use a simplified approach
     // assuming `lg:w-1/3` means 3 cards on desktop.
