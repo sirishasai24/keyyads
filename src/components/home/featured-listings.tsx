@@ -51,7 +51,11 @@ export const FeaturedListings = () => {
                 setLoading(true);
                 setError(null);
                 const response = await axios.get<{ listings: PropertyListing[] }>('/api/property/featured');
-                setFeaturedListings(response.data.listings);
+                
+                // Shuffle the listings and take up to 9
+                const shuffledListings = response.data.listings.sort(() => 0.5 - Math.random());
+                setFeaturedListings(shuffledListings.slice(0, 9));
+
             } catch (err) {
                 console.error("Failed to fetch featured listings:", err);
                 if (axios.isAxiosError(err) && err.response) {

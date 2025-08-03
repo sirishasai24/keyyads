@@ -8,8 +8,6 @@ export const GET = async () => {
 
     const listings = await Property.find({ isPremium: true })
       .sort({ createdAt: -1 })
-      .limit(15)
-      .lean();
 
     return NextResponse.json({ listings });
   } catch (error) {

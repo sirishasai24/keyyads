@@ -1,4 +1,3 @@
-// components/testimonials-section.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -54,7 +53,9 @@ export const TestimonialsSection = () => {
 
                 // Check if the 'testimonials' array exists in the response data
                 if (response.data && Array.isArray(response.data.testimonials)) {
-                    setTestimonials(response.data.testimonials);
+                    // Shuffle the testimonials and take up to 9
+                    const shuffledTestimonials = response.data.testimonials.sort(() => 0.5 - Math.random());
+                    setTestimonials(shuffledTestimonials.slice(0, 9));
                 } else {
                     // Handle cases where the data format is unexpected
                     console.error("API response did not contain an array under 'testimonials' key:", response.data);
@@ -113,7 +114,8 @@ export const TestimonialsSection = () => {
             >
                 What Our Clients Say
             </motion.h2>
-            <div className="relative max-w-full lg:max-w-6xl mx-auto">
+            <div className="relative max-w-full lg:max-6xl mx-auto">
+                {/* Ensure the cardWidthClass allows for 3 cards on desktop if you want them to be visible */}
                 <Carousel cardWidthClass="w-full md:w-1/2 lg:w-1/3 p-4" snapAlign="snap-center" interval={7000}>
                     {testimonials.map((testimonial) => (
                         <motion.div
