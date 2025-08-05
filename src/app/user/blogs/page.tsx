@@ -25,7 +25,7 @@ const Home = () => {
       try {
         setLoading(true);
         setError(null); // Clear any previous errors
-        const response = await axios.get("/api/admin/blog");
+        const response = await axios.get("/api/user/blogs");
         // Assuming the API always returns ALL blogs without pagination
         setAllBlogs(response.data?.blogs || []);
       } catch (err) {
@@ -219,7 +219,7 @@ const Home = () => {
                   {new Date(blog.createdAt).toLocaleDateString()}
                 </p>
                 <a
-                  href={`/admin/blog/${blog._id}`}
+                  href={`/user/blogs/${blog._id}`}
                   className="mt-auto inline-block text-center text-white bg-[#2180d3] px-4 py-2 rounded-lg hover:bg-[#1a66a7] transition"
                 >
                   Read More

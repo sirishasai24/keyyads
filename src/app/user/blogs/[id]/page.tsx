@@ -45,7 +45,7 @@ export default function Blog() {
 
   const fetchBlog = async () => {
     try {
-      const response = await axios.get(`/api/admin/blog/${id}`);
+      const response = await axios.get(`/api/user/blogs/${id}`);
       setBlog(response.data.blog);
       setBlogUser(response.data.user);
     } catch (err) {

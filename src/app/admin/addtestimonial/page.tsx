@@ -154,7 +154,7 @@ export default function AddTestimonialPage() {
       }
 
 
-      const response = await axios.post("/api/admin/testimonials/add", finalFormData);
+      const response = await axios.post("/api/admin/addTestimonial", finalFormData);
       setMessage(response.data.message || "Testimonial submitted successfully!");
       setMessageType("success");
       // Reset form after successful submission

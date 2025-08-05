@@ -75,7 +75,7 @@ export default function AddBlog() {
       const response = await axios.post("/api/admin/addBlog", updatedBlog);
       const id = response.data.blog._id;
       toast.success("Blog created successfully!");
-      router.push(`/admin/blog/${id}`);
+      router.push(`/user/blogs/${id}`);
     } catch (error) {
       console.log("Error", error);
       toast.error("Failed to create blog. Please check your inputs.");

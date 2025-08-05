@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Share Your Story with Keyyards',
     description: 'Provide your valuable feedback and testimonial about your experience with Keyyards.',
-    url: 'https://keyyards.in/admin/testimonials/add', // Adjust if your actual URL path is different
+    url: 'https://keyyards.in/admin/addtestimonial/', // Adjust if your actual URL path is different
     type: 'website',
   },
   twitter: {

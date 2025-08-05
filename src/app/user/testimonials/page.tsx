@@ -34,7 +34,7 @@ export default function TestimonialsPage() {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get("/api/admin/testimonials");
+        const response = await axios.get("/api/user/testimonials");
         // Assuming the API returns ALL testimonials without pagination
         setAllTestimonials(response.data.testimonials || []);
       } catch (err) {

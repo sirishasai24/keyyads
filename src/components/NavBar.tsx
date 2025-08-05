@@ -91,14 +91,14 @@ export default function Navbar() {
             Rent
           </Link>
           <Link
-            href="/admin/blog"
+            href="/user/blogs"
             className="text-white hover:text-gray-200 flex items-center gap-1"
           >
             <DocumentTextIcon className="w-5 h-5" />
             Blog
           </Link>
           <Link
-            href="/admin/testimonials"
+            href="/user/testimonials"
             className="text-white hover:text-gray-200 flex items-center gap-1"
           >
             <ChatBubbleBottomCenterTextIcon className="w-5 h-5" />
@@ -197,7 +197,7 @@ export default function Navbar() {
             Rent
           </Link>
           <Link
-            href="/admin/blog"
+            href="/user/blogs"
             onClick={() => setIsOpen(false)}
             className="hover:text-gray-200 flex items-center gap-2"
           >
@@ -205,7 +205,7 @@ export default function Navbar() {
             Blog
           </Link>
           <Link
-            href="/admin/testimonials"
+            href="/user/testimonials"
             onClick={() => setIsOpen(false)}
             className="hover:text-gray-200 flex items-center gap-2"
           >
