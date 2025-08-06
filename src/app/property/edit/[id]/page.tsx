@@ -37,6 +37,7 @@ const initialPropertyState: Property = {
     lat: undefined,
     lng: undefined,
   },
+  isApproved: true, 
   images: [],
   description: "",
   createdAt: "", // Not editable
