@@ -49,7 +49,7 @@ export const TestimonialsSection = () => {
                 setError(null); // Clear any previous errors
 
                 // Make the API request, expecting the ApiResponse structure
-                const response = await axios.get<ApiResponse>("/api/admin/testimonials");
+                const response = await axios.get<ApiResponse>("/api/user/testimonials");
 
                 // Check if the 'testimonials' array exists in the response data
                 if (response.data && Array.isArray(response.data.testimonials)) {
