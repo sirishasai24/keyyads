@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { connectDb } from "@/dbConfig/dbConfig";
 import Property from "@/models/propertyModel";
 connectDb();
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
    
     const properties = await Property.find({ }).sort({
