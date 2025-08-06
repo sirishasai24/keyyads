@@ -2,55 +2,24 @@
 
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { Property } from "@/types/property";
+import { Property } from "@/types/property"; // Adjust path as needed
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
-import ConfirmationModal from "@/components/ConfirmationalModal";
-import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
+import { AiOutlineLeft, AiOutlineRight, AiOutlineCheckCircle, AiOutlineClose } from "react-icons/ai";
+import { motion, AnimatePresence } from "framer-motion";
 
-// interface Property {
-//   _id: string;
-//   title: string;
-//   username: string;
-//   contact: string;
-//   address: string;
-//   type: string;
-//   transactionType: string;
-//   price: number;
-//   discount: number;
-//   floors?: number;
-//   parking?: number;
-//   landCategory?: string;
-//   bedrooms?: string;
-//   bathrooms?: string;
-//   propertyAge?: string;
-//   furnishing?: string;
-//   facing?: string;
-//   otherDetails?: string;
-//   isPremium: boolean;
-//   area: number;
-//   areaUnit: string;
-//   location: {
-//     state: string;
-//     city: string;
-//     lat?: number;
-//     lng?: number;
-//   };
-//   images: string[];
-//   description?: string;
-//   isApproved: boolean; // Added isApproved
-//   createdAt: string;
-//   createdBy: string;
-// }
+const modalVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.2 } },
+};
 
-export default function ManagePropertiesPage() {
-    const [allProperties, setAllProperties] = useState<Property[]>([]);
+export default function AdminPropertyApprovalPage() {
+    const [allUnapprovedProperties, setAllUnapprovedProperties] = useState<Property[]>([]);
     const [properties, setProperties] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [filterStatus, setFilterStatus] = useState<string>("All");
     const [searchQuery, setSearchQuery] = useState<string>("");
 
     // Pagination state
@@ -58,23 +27,24 @@ export default function ManagePropertiesPage() {
     const [totalPages, setTotalPages] = useState(1);
     const itemsPerPage = 12;
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [propertyToDelete, setPropertyToDelete] = useState<Property | null>(null);
+    // State for the custom confirmation modal
+    const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
+    const [propertyToApprove, setPropertyToApprove] = useState<Property | null>(null);
 
-    const fetchAllProperties = useCallback(async () => {
+    const fetchAllUnapprovedProperties = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const propertiesResponse = await axios.get("/api/user/properties");
-            setAllProperties(propertiesResponse.data.properties);
+            const response = await axios.get("/api/admin/manage-properties/unapproved");
+            setAllUnapprovedProperties(response.data.properties);
         } catch (err) {
-            console.error("Error fetching data:", err);
+            console.error("Error fetching unapproved properties:", err);
             if (axios.isAxiosError(err) && err.response?.data?.error) {
                 setError(err.response.data.error);
                 toast.error(err.response.data.error);
             } else {
-                setError("Failed to fetch data. Please try again.");
-                toast.error("Failed to fetch data. Please try again.");
+                setError("Failed to fetch unapproved properties. Please try again.");
+                toast.error("Failed to fetch unapproved properties.");
             }
         } finally {
             setLoading(false);
@@ -82,16 +52,11 @@ export default function ManagePropertiesPage() {
     }, []);
 
     useEffect(() => {
-        fetchAllProperties();
-    }, [fetchAllProperties]);
+        fetchAllUnapprovedProperties();
+    }, [fetchAllUnapprovedProperties]);
 
     useEffect(() => {
-        const filtered = allProperties.filter((property) => {
-            const matchesStatus =
-                filterStatus === "All" ||
-                (property.transactionType === "sale" && filterStatus === "For Sale") ||
-                (property.transactionType === "rent" && filterStatus === "For Rent");
-
+        const filtered = allUnapprovedProperties.filter((property) => {
             const lowerCaseSearchQuery = searchQuery.toLowerCase();
             const matchesSearch =
                 property.title.toLowerCase().includes(lowerCaseSearchQuery) ||
@@ -99,8 +64,7 @@ export default function ManagePropertiesPage() {
                 property.location.city.toLowerCase().includes(lowerCaseSearchQuery) ||
                 property._id.toLowerCase().includes(lowerCaseSearchQuery) ||
                 (property.description && property.description.toLowerCase().includes(lowerCaseSearchQuery));
-
-            return matchesStatus && matchesSearch;
+            return matchesSearch;
         });
 
         const newTotalPages = Math.ceil(filtered.length / itemsPerPage);
@@ -109,29 +73,32 @@ export default function ManagePropertiesPage() {
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         setProperties(filtered.slice(startIndex, endIndex));
+    }, [allUnapprovedProperties, currentPage, searchQuery]);
 
-    }, [allProperties, currentPage, searchQuery, filterStatus]);
-
-    const confirmDelete = (property: Property) => {
-        setPropertyToDelete(property);
-        setIsModalOpen(true);
+    // Function to open the confirmation modal
+    const confirmApproval = (property: Property) => {
+        setPropertyToApprove(property);
+        setIsApprovalModalOpen(true);
     };
 
-    const executeDelete = async () => {
-        if (!propertyToDelete) return;
+    // Function to handle the actual approval after confirmation
+    const executeApproval = async () => {
+        if (!propertyToApprove) return;
 
-        setIsModalOpen(false);
+        setIsApprovalModalOpen(false);
         try {
-            await axios.delete(`/api/user/properties/${propertyToDelete._id}`);
-            toast.success("Property deleted successfully!");
-            setAllProperties((prev) => prev.filter((p) => p._id !== propertyToDelete._id));
-            setPropertyToDelete(null);
+            await axios.patch(`/api/admin/manage-properties/unapproved/${propertyToApprove._id}`);
+            toast.success("Property approved successfully!");
+
+            // Optimistically remove the approved property from the state
+            setAllUnapprovedProperties((prev) => prev.filter((p) => p._id !== propertyToApprove._id));
+            setPropertyToApprove(null);
         } catch (err) {
-            console.error("Error deleting property:", err);
+            console.error("Error approving property:", err);
             if (axios.isAxiosError(err) && err.response?.data?.error) {
                 toast.error(err.response.data.error);
             } else {
-                toast.error("Failed to delete property. Please try again.");
+                toast.error("Failed to approve property. Please try again.");
             }
         }
     };
@@ -169,20 +136,14 @@ export default function ManagePropertiesPage() {
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
-        setCurrentPage(1);
+        setCurrentPage(1); // Reset to page 1 on new search
     };
-
-    const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setFilterStatus(e.target.value);
-        setCurrentPage(1);
-    };
-
 
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-[calc(100vh-80px)] bg-gray-50">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2180d3]"></div>
-                <p className="ml-4 text-lg text-gray-700">Loading properties...</p>
+                <p className="ml-4 text-lg text-gray-700">Loading unapproved properties...</p>
             </div>
         );
     }
@@ -192,7 +153,7 @@ export default function ManagePropertiesPage() {
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] bg-gray-50 text-red-600">
                 <p className="text-xl font-semibold mb-4">Error: {error}</p>
                 <button
-                    onClick={fetchAllProperties}
+                    onClick={fetchAllUnapprovedProperties}
                     className="px-6 py-3 bg-[#2180d3] text-white rounded-lg hover:bg-[#1a6fb0] transition-colors shadow-md"
                 >
                     Retry
@@ -204,55 +165,30 @@ export default function ManagePropertiesPage() {
     return (
         <div className="container mx-auto p-6 min-h-[calc(100vh-80px)] bg-gray-50">
             <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-6 text-center">
-                Your Property Listings
+                Property Approval Queue
             </h1>
             <p className="text-lg text-gray-600 mb-10 text-center max-w-2xl mx-auto">
-                Effortlessly manage your posted properties. View, edit, or remove listings with ease.
+                Review and approve new property listings to make them visible on the platform.
             </p>
 
-            <div className="flex flex-col md:flex-row justify-between items-center mb-8 space-y-4 md:space-y-0 md:space-x-6">
-                <Link href="/property/add" className="w-full md:w-auto">
-                    <button className="w-full md:w-auto bg-[#2180d3] hover:bg-[#1a6fb0] text-white font-semibold py-3 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 flex items-center justify-center text-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Add New Property
-                    </button>
-                </Link>
-
-                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full md:w-auto">
-                    <input
-                        type="text"
-                        placeholder="Search listings..."
-                        className="p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#2180d3] focus:border-[#2180d3] w-full sm:w-80 transition-all duration-200"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                    />
-                    <select
-                        className="p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#2180d3] focus:border-[#2180d3] w-full sm:w-48 transition-all duration-200 bg-white"
-                        value={filterStatus}
-                        onChange={handleFilterChange}
-                    >
-                        <option value="All">All Statuses</option>
-                        <option value="For Sale">For Sale</option>
-                        <option value="For Rent">For Rent</option>
-                    </select>
-                </div>
+            <div className="flex justify-center mb-8">
+                <input
+                    type="text"
+                    placeholder="Search unapproved listings..."
+                    className="p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-[#2180d3] focus:border-[#2180d3] w-full max-w-md transition-all duration-200"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                />
             </div>
 
             {properties.length === 0 && !loading && !error && (
                 <div className="text-center py-20 bg-white rounded-xl shadow-md border border-gray-100">
                     <p className="text-2xl font-semibold text-gray-700 mb-4">
-                        No properties found.
+                        No unapproved properties found.
                     </p>
-                    <p className="text-lg text-gray-500 mb-6">
-                        It looks like you haven&apos;t posted any properties yet, or your search/filters yielded no results.
+                    <p className="text-lg text-gray-500">
+                        All properties are currently approved, or there are no new listings.
                     </p>
-                    <Link href="/property/add">
-                        <button className="mt-6 px-8 py-3 bg-[#2180d3] text-white font-semibold rounded-full hover:bg-[#1a6fb0] transition duration-300 shadow-md">
-                            Start Listing Your Property Now!
-                        </button>
-                    </Link>
                 </div>
             )}
 
@@ -260,8 +196,12 @@ export default function ManagePropertiesPage() {
                 <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {properties.map((property) => (
-                            <div
+                            <motion.div
                                 key={property._id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.3 }}
                                 className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100 flex flex-col group"
                             >
                                 {property.images && property.images.length > 0 ? (
@@ -273,16 +213,9 @@ export default function ManagePropertiesPage() {
                                             objectFit="cover"
                                             className="rounded-t-2xl transform group-hover:scale-105 transition-transform duration-300"
                                         />
-                                        {property.isPremium && (
-                                            <div className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">
-                                                PREMIUM
-                                            </div>
-                                        )}
-                                        {!property.isApproved && (
-                                            <div className="absolute top-2 right-2 bg-gray-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">
-                                                APPROVAL PENDING
-                                            </div>
-                                        )}
+                                        <div className="absolute top-2 right-2 bg-gray-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">
+                                            PENDING APPROVAL
+                                        </div>
                                     </div>
                                 ) : (
                                     <div className="relative w-full h-48 sm:h-56 bg-gray-100 flex items-center justify-center text-gray-400 rounded-t-2xl text-sm">
@@ -290,16 +223,9 @@ export default function ManagePropertiesPage() {
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
                                         No Image
-                                        {property.isPremium && (
-                                            <div className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">
-                                                PREMIUM
-                                            </div>
-                                        )}
-                                        {!property.isApproved && (
-                                            <div className="absolute top-2 right-2 bg-gray-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">
-                                                APPROVAL PENDING
-                                            </div>
-                                        )}
+                                        <div className="absolute top-2 right-2 bg-gray-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">
+                                            PENDING APPROVAL
+                                        </div>
                                     </div>
                                 )}
 
@@ -375,26 +301,16 @@ export default function ManagePropertiesPage() {
                                                 View
                                             </button>
                                         </Link>
-                                        <Link href={`/property/edit/${property._id}`} className="flex-1">
-                                            <button className="w-full px-4 py-2 bg-[#2180d3] text-white rounded-md hover:bg-[#1a6fb0] transition-colors text-sm font-medium flex items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                </svg>
-                                                Edit
-                                            </button>
-                                        </Link>
                                         <button
-                                            onClick={() => confirmDelete(property)}
-                                            className="flex-1 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-sm font-medium flex items-center justify-center"
+                                            onClick={() => confirmApproval(property)}
+                                            className="flex-1 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm font-medium flex items-center justify-center"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                            Delete
+                                            <AiOutlineCheckCircle className="h-4 w-4 mr-1" />
+                                            Approve
                                         </button>
                                     </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
 
@@ -422,16 +338,48 @@ export default function ManagePropertiesPage() {
                 </>
             )}
 
-            <ConfirmationModal
-                isOpen={isModalOpen}
-                onConfirm={executeDelete}
-                onCancel={() => {
-                    setIsModalOpen(false);
-                    setPropertyToDelete(null);
-                }}
-                title={propertyToDelete?.title || ""}
-            />
+            <AnimatePresence>
+                {isApprovalModalOpen && (
+                    <motion.div
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={modalVariants}
+                        className="fixed inset-0  bg-opacity-50 flex items-center justify-center p-4 z-50"
+                    >
+                        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-xl font-bold text-gray-800">Confirm Approval</h3>
+                                <button
+                                    onClick={() => setIsApprovalModalOpen(false)}
+                                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                    <AiOutlineClose size={20} />
+                                </button>
+                            </div>
+                            <p className="text-gray-600">
+                                Are you sure you want to approve this property?
+                            </p>
+                            <div className="flex justify-end space-x-4 mt-6">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsApprovalModalOpen(false)}
+                                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={executeApproval}
+                                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
+                                >
+                                    Confirm
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
-

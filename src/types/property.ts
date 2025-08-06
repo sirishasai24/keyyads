@@ -37,6 +37,7 @@ export interface Property {
     lng?: number;
   };
   images: string[];
+  isApproved: boolean; 
   description?: string;
   createdAt: string; // Date string
   createdBy: string; // User ID

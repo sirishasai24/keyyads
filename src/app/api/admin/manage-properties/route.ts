@@ -6,7 +6,7 @@ connectDb();
 export async function GET() {
   try {
    
-    const properties = await Property.find({ }).sort({
+    const properties = await Property.find({isApproved:true}).sort({
       createdAt: -1,
     });
     if (!properties) {

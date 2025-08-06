@@ -6,7 +6,7 @@ export const GET = async () => {
   try {
     await connectDb();
 
-    const listings = await Property.find({ isPremium: true })
+    const listings = await Property.find({ isPremium: true ,isApproved: true })
       .sort({ createdAt: -1 })
 
     return NextResponse.json({ listings });

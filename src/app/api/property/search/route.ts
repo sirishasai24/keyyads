@@ -59,6 +59,7 @@ export async function GET(req: NextRequest) {
         filters.builtYear = { $lte: currentYear - 10 };
       }
     }
+    filters.isApproved = true; 
 
     console.log('Applied Filters:', filters);
 

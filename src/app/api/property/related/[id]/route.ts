@@ -12,6 +12,7 @@ interface Query {
   'location.city'?: string;
   furnishing?: string;
   landCategory?: string;
+  isApproved?: boolean;
 }
 
 export async function GET(request: NextRequest) {
@@ -35,6 +36,7 @@ export async function GET(request: NextRequest) {
       type: currentProperty.type,
       transactionType: currentProperty.transactionType,
       'location.city': currentProperty.location.city,
+      isApproved: true,
     };
 
     if (currentProperty.type === 'building') {

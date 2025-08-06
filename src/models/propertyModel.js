@@ -149,6 +149,10 @@ const PropertySchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  isApproved:{
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
