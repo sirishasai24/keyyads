@@ -223,7 +223,7 @@ export default function AddUserPage() {
                     <div className="flex justify-end space-x-4">
                         <button
                             type="button"
-                            onClick={() => router.push('/admin/users')}
+                            onClick={() => router.push('/admin/manage-users')}
                             className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-100 transition-colors"
                         >
                             Cancel
