@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Property from "@/models/propertyModel";
 import { connectDb } from "@/dbConfig/dbConfig";
-import { getDataFromToken } from "@/helpers/getDataFromToken"; // Assuming this returns user object with role
 import mongoose from 'mongoose';
 
 connectDb();
