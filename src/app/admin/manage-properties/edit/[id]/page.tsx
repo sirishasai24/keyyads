@@ -37,6 +37,7 @@ const initialPropertyState: Property = {
         lng: undefined,
     },
     images: [],
+    isApproved: true, // Not editable
     description: "",
     createdAt: "", // Not editable
     createdBy: "", // Not editable
