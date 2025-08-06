@@ -33,9 +33,9 @@ export async function PATCH(request: NextRequest) {
             user: updatedUser,
         }, { status: 200 });
 
-    } catch (error: any) {
+    } catch (error) {
         console.error("Error updating user status:", error);
-        return NextResponse.json({ error: "Failed to update user status", details: error.message }, { status: 500 });
+        return NextResponse.json({ error: "Failed to update user status", details: error }, { status: 500 });
     }
 }
 

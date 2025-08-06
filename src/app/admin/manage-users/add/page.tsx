@@ -64,9 +64,9 @@ export default function AddUserPage() {
             await axios.post('/api/admin/manage-users/add', formData);
             toast.success('User added successfully!');
             router.push('/admin/manage-users'); // Redirect back to the dashboard
-        } catch (err: any) {
+        } catch (err) {
             console.error('Failed to add user:', err);
-            const errorMessage = err.response?.data?.error || 'Failed to add user. Please try again.';
+            const errorMessage = 'Failed to add user. Please try again.';
             toast.error(errorMessage);
         } finally {
             setSubmitting(false);

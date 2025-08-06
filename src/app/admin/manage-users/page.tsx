@@ -340,7 +340,7 @@ export default function AdminDashboard() {
                                 </button>
                             </div>
                             <p className="text-gray-600">
-                                Are you sure you want to delete user "{selectedUser?.username}"? This action cannot be undone.
+                                Are you sure you want to delete user &quot;{selectedUser?.username}&quot;? This action cannot be undone.
                             </p>
                             <div className="flex justify-end space-x-4 mt-6">
                                 <button
@@ -381,7 +381,7 @@ export default function AdminDashboard() {
                                 </button>
                             </div>
                             <p className="text-gray-600">
-                                Are you sure you want to {selectedUser.isActive ? 'deactivate' : 'reactivate'} user "{selectedUser.username}"?
+                                Are you sure you want to {selectedUser.isActive ? 'deactivate' : 'reactivate'} user &quot;{selectedUser.username}&quot;?
                             </p>
                             <div className="flex justify-end space-x-4 mt-6">
                                 <button
