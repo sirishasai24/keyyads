@@ -14,10 +14,10 @@ export default function ClientRootLayoutContent({
 }) {
   const pathname = usePathname();
 
-  const excludeNavbarPaths = ['/auth', '/auth/resetpassword', '/auth/forgotpassword', '/auth/resetpassword','/auth/verifyemail'];
+  const excludeNavbarPaths = ['/auth', '/auth/resetpassword', '/auth/forgotpassword', '/auth/resetpassword','/auth/verifyemail','/privacy-policy','/terms-conditions'];
 
   const shouldShowNavbar = !excludeNavbarPaths.includes(pathname);
-  const excludeFooterPaths = ['/auth', '/auth/resetpassword', '/auth/forgotpassword', '/auth/resetpassword','/auth/verifyemail','/property/add'];
+  const excludeFooterPaths = ['/auth', '/auth/resetpassword', '/auth/forgotpassword', '/auth/resetpassword','/auth/verifyemail','/property/add','/privacy-policy','/terms-conditions'];
 
   const shouldShowFooter = !excludeFooterPaths.includes(pathname);
 
