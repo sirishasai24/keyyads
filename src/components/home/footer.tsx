@@ -149,10 +149,10 @@ export default function Footer() {
           {/* Added version here */}
         </p>
         <div className="flex justify-center gap-3 md:gap-4 flex-wrap">
-          <Link href="/privacy" className="hover:text-white transition">
+          <Link href="/privacy-policy" className="hover:text-white transition">
             Privacy Policy
           </Link>
-          <Link href="/terms" className="hover:text-white transition">
+          <Link href="/terms-conditions" className="hover:text-white transition">
             Terms of Service
           </Link>
           <Link href="/contact" className="hover:text-white transition">
