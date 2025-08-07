@@ -16,8 +16,8 @@ const backendPlans = [
         socialMedia: true,
         moneyBack: false,
         teleCalling: false,
-        price: "₹8,999",
-        originalPrice: "₹17,998",
+        price: 8999,
+        originalPrice: 17998,
         note: "Inclusive of GST",
         order: 1,
     },
@@ -31,8 +31,8 @@ const backendPlans = [
         socialMedia: true,
         moneyBack: false,
         teleCalling: true,
-        price: "₹17,999",
-        originalPrice: "₹35,998",
+        price: 17999,
+        originalPrice: 35998,
         note: "Inclusive of GST",
         order: 2,
     },
@@ -46,8 +46,8 @@ const backendPlans = [
         socialMedia: true,
         moneyBack: "Yes (After 6th month)",
         teleCalling: true,
-        price: "₹29,988",
-        originalPrice: "₹59,976",
+        price: 29988,
+        originalPrice: 59976,
         note: "Inclusive of GST",
         order: 3,
     },
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ success: false, message: "Duplicate transaction" }, { status: 409 });
         }
 
-        const newPlanPrice = parsePrice(newPlanDetails.price);
+        const newPlanPrice = newPlanDetails.price;
         const newStartDate = new Date();
         const newExpiryDate = new Date(newStartDate);
         newExpiryDate.setMonth(newExpiryDate.getMonth() + PLAN_DURATIONS_MONTHS[newPlanDetails.title]);

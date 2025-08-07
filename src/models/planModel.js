@@ -59,11 +59,11 @@ const planSchema = new mongoose.Schema({
         default: false,
     },
     pricePaid: {
-        type: String,
+        type: Number,
         required: true,
     },
     originalPrice: {
-        type: String,
+        type: Number,
     },
     note: {
         type: String,
