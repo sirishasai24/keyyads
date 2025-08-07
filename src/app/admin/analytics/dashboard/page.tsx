@@ -5,7 +5,7 @@ import axios from 'axios';
 import { ResponsivePie } from '@nivo/pie';
 import { ResponsiveBar } from '@nivo/bar';
 import { motion } from 'framer-motion';
-import { FaUsers, FaDollarSign, FaClipboardList, FaCheckCircle, FaSitemap, FaStar, FaCogs, FaChartBar, FaChartPie, FaChartLine, FaImages } from 'react-icons/fa';
+import { FaUsers, FaDollarSign, FaClipboardList, FaCheckCircle, FaSitemap, FaStar, FaCogs, FaChartBar, FaChartPie } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 interface DashboardData {

@@ -59,8 +59,6 @@ const PLAN_DURATIONS_MONTHS: { [key: string]: number } = {
     "Annual Plan": 12,
 };
 
-const parsePrice = (priceString: string): number =>
-    parseInt(priceString.replace(/[₹,\/-]/g, ""), 10);
 
 export async function POST(req: NextRequest) {
     try {

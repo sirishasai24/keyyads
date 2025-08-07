@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { connectDb } from "@/dbConfig/dbConfig";
 import User from "@/models/userModel";
 import Property from "@/models/propertyModel";
@@ -6,7 +6,7 @@ import Plan from "@/models/planModel";
 
 connectDb();
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
         // Fetching user data
         const totalUsers = await User.countDocuments({});
