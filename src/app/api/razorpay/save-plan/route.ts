@@ -169,6 +169,7 @@ export async function POST(request: NextRequest) {
       plan: savedPlan,
     });
   } catch (error) {
+    console.error("Error saving plan:", error);
     return NextResponse.json(
       { error: "Failed to save plan." },
       { status: 500 }
