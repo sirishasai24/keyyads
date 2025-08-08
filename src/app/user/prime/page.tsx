@@ -149,7 +149,7 @@ const plans: Plan[] = [
         socialMedia: true,
         moneyBack: false,
         teleCalling: false,
-        price: 8999,
+        price: 1,
         originalPrice: 17998,
         note: "Inclusive of GST",
         order: 1,
