@@ -4,6 +4,7 @@ import Plan from "@/models/planModel";
 import User from "@/models/userModel";
 import crypto from "crypto";
 import { getDataFromToken } from "@/helpers/getDataFromToken";
+import { sendInvoiceEmail } from "@/helpers/sendInvoiceEmail"; // New mailer for invoices
 
 connectDb();
 
@@ -55,7 +56,10 @@ const plans = [
 export async function POST(request: NextRequest) {
   const userId = await getDataFromToken(request);
   if (!userId) {
-    return NextResponse.json({ message: "Unauthorized access." }, { status: 401 });
+    return NextResponse.json(
+      { message: "Unauthorized access." },
+      { status: 401 }
+    );
   }
 
   try {
@@ -66,29 +70,49 @@ export async function POST(request: NextRequest) {
       plan: purchasedPlanDetails,
     } = await request.json();
 
-    const shasum = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!);
+    const shasum = crypto.createHmac(
+      "sha256",
+      process.env.RAZORPAY_KEY_SECRET!
+    );
     shasum.update(`${razorpay_order_id}|${razorpay_payment_id}`);
     const digest = shasum.digest("hex");
 
     if (digest !== razorpay_signature) {
-      return NextResponse.json({ message: "Transaction not legit!" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Transaction not legit!" },
+        { status: 400 }
+      );
     }
 
-    const selectedPlan = plans.find(p => p.title === purchasedPlanDetails.title);
+    const selectedPlan = plans.find(
+      (p) => p.title === purchasedPlanDetails.title
+    );
     if (!selectedPlan) {
-      return NextResponse.json({ message: "Invalid plan selected." }, { status: 400 });
+      return NextResponse.json(
+        { message: "Invalid plan selected." },
+        { status: 400 }
+      );
     }
 
     const startDate = new Date();
     const expiryDate = new Date(startDate);
-    if (selectedPlan.title === "Quarterly Plan") expiryDate.setMonth(expiryDate.getMonth() + 3);
-    else if (selectedPlan.title === "Half Yearly Plan") expiryDate.setMonth(expiryDate.getMonth() + 6);
-    else if (selectedPlan.title === "Annual Plan") expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+    if (selectedPlan.title === "Quarterly Plan")
+      expiryDate.setMonth(expiryDate.getMonth() + 3);
+    else if (selectedPlan.title === "Half Yearly Plan")
+      expiryDate.setMonth(expiryDate.getMonth() + 6);
+    else if (selectedPlan.title === "Annual Plan")
+      expiryDate.setFullYear(expiryDate.getFullYear() + 1);
 
-    const existingPlan = await Plan.findOne({ transactionId: razorpay_payment_id });
+    const existingPlan = await Plan.findOne({
+      transactionId: razorpay_payment_id,
+    });
     if (existingPlan) {
       return NextResponse.json(
-        { message: "This transaction has already been processed.", success: false, plan: existingPlan },
+        {
+          message: "This transaction has already been processed.",
+          success: false,
+          plan: existingPlan,
+        },
         { status: 409 }
       );
     }
@@ -113,24 +137,41 @@ export async function POST(request: NextRequest) {
       planDetailsSnapshot: selectedPlan,
     });
 
-    const savedPlan = await newPlan.save();
+    const savedPlan = await newPlan.save(); // 🔄 Update user with plan info
 
-    // 🔄 Update user with plan info
     await User.findByIdAndUpdate(userId, {
       plan: selectedPlan.title,
       listings: selectedPlan.listings,
       premiumBadging: selectedPlan.premiumBadging,
       planId: savedPlan._id,
-      shows: selectedPlan.shows
-    });
+      shows: selectedPlan.shows,
+    }); // 📧 Send invoice email
+
+    try {
+      const user = await User.findById(userId);
+      if (user) {
+        await sendInvoiceEmail({
+          toEmail: user.email,
+          planDetails: savedPlan.planDetailsSnapshot,
+          transactionId: savedPlan.transactionId,
+          startDate: savedPlan.startDate,
+          expiryDate: savedPlan.expiryDate,
+          username: user.username,
+        });
+      }
+    } catch (emailError) {
+      console.error("Failed to send invoice email:", emailError); // Optionally, you can decide whether to fail the main response or just log the error. // Here, we'll continue with the successful payment response since the core transaction is complete.
+    }
 
     return NextResponse.json({
       message: "Payment successful and plan saved!",
       success: true,
       plan: savedPlan,
     });
-
   } catch (error) {
-    return NextResponse.json({ error: error || "Failed to save plan." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to save plan." },
+      { status: 500 }
+    );
   }
 }
