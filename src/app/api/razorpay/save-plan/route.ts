@@ -19,7 +19,7 @@ const plans = [
     socialMedia: true,
     moneyBack: false,
     teleCalling: false,
-    price: 1,
+    price: 8999,
     originalPrice: 17998,
     note: "Inclusive of GST",
   },
