@@ -3,17 +3,18 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import axios from 'axios'
-import Link from 'next/link' // Import Link for proper Next.js navigation
-import { Swiper, SwiperSlide } from 'swiper/react'; // Import Swiper components
-import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules'; // Import Swiper modules
-import 'swiper/css'; // Core Swiper styles
-import 'swiper/css/navigation'; // Navigation module styles
-import 'swiper/css/pagination'; // Pagination module styles
-
+import Link from 'next/link'
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 interface Location {
   city: string;
   state: string;
+  lat?: number;
+  lng?: number;
 }
 
 interface Property {
@@ -49,44 +50,97 @@ interface User {
   profileImageURL?: string;
 }
 
+interface LoggedInUser extends User {
+  plan: 'Free' | 'Quarterly Plan' | 'Half Yearly Plan' | 'Annual Plan';
+}
+
+const DEFAULT_FREE_USER: LoggedInUser = {
+  _id: 'guest',
+  username: 'Guest User',
+  email: '',
+  phone: '',
+  profileImageURL: '/profile.png',
+  plan: 'Free',
+};
+
+const keyyardsAdmin: User = {
+  _id: 'admin',
+  username: 'Keyyards Support',
+  email: 'support@keyyards.in',
+  phone: '04049449339',
+  profileImageURL: '/profile.png'
+};
+
 export default function PropertyDetailsPage() {
-  const { id } = useParams()
-  const [property, setProperty] = useState<Property | null>(null)
-  const [user, setUser] = useState<User | null>(null)
-  const [relatedProperties, setRelatedProperties] = useState<Property[]>([])
-  const [loading, setLoading] = useState(true)
-  const [mainImage, setMainImage] = useState<string | null>(null)
+  const { id } = useParams();
+  const [property, setProperty] = useState<Property | null>(null);
+  const [seller, setSeller] = useState<User | null>(null);
+  const [loggedInUser, setLoggedInUser] = useState<LoggedInUser | null>(DEFAULT_FREE_USER);
+  const [relatedProperties, setRelatedProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [mainImage, setMainImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
       try {
-        setLoading(true)
-        const res = await axios.get(`/api/property/${id}`)
-        setProperty(res.data.property)
-        setUser(res.data.user)
-        if (res.data.property.images && res.data.property.images.length > 0) {
-          setMainImage(res.data.property.images[0])
+        setLoading(true);
+        const res = await axios.get(`/api/property/${id}`);
+        setProperty(res.data.property);
+        setSeller(res.data.user);
+
+        if (res.data.property.images?.length > 0) {
+          setMainImage(res.data.property.images[0]);
         }
 
-        const relatedRes = await axios.get(`/api/property/related/${id}`)
-        setRelatedProperties(relatedRes.data.relatedProperties)
+        const relatedRes = await axios.get(`/api/property/related/${id}`);
+        setRelatedProperties(relatedRes.data.relatedProperties);
+
+        try {
+          const userRes = await axios.get('/api/auth/me');
+          if (userRes.data?.user) {
+            setLoggedInUser(userRes.data.user as LoggedInUser);
+          }
+        } catch (userError) {
+          console.error('Failed to fetch logged-in user, assuming Free plan:', userError);
+        }
 
       } catch (error) {
-        console.error('Failed to fetch property details or related properties:', error)
-        setProperty(null)
-        setRelatedProperties([])
+        console.error('Failed to fetch property details or related properties:', error);
+        setProperty(null);
+        setRelatedProperties([]);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    if (id) fetchPropertyDetails()
-  }, [id])
+    if (id) fetchPropertyDetails();
+  }, [id]);
 
   const capitalize = (str: string | null | undefined) => {
     if (str === null || str === undefined || str === "") return 'N/A';
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: property?.title,
+          text: property?.description || 'Check out this amazing property!',
+          url: window.location.href,
+        });
+        console.log('Successfully shared');
+      } catch (error) {
+        console.error('Error sharing:', error);
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href)
+        .then(() => alert('Link copied to clipboard!'))
+        .catch(err => console.error('Failed to copy:', err));
+    }
+  };
+
+  const isSubscriber = loggedInUser && loggedInUser.plan !== 'Free';
 
   if (loading) {
     return (
@@ -123,7 +177,6 @@ export default function PropertyDetailsPage() {
     );
   };
 
-
   return (
     <div className="min-h-screen bg-gray-100 py-4 px-2 sm:py-8 sm:px-4 lg:px-8">
       <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
@@ -143,9 +196,20 @@ export default function PropertyDetailsPage() {
                 </span>
               )}
             </div>
-            <button className="p-2 text-gray-500 transition-colors rounded-full hover:text-gray-700 hover:bg-gray-100">
-              <i className="text-lg fas fa-ellipsis-h"></i>
-            </button>
+            <div className="flex gap-2">
+                {/* 🔄 This is the updated share button */}
+                <button
+                    onClick={handleShare}
+                    className="flex items-center px-4 py-2 text-sm font-semibold text-white bg-[#2180d3] rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer hover:bg-[#1a6cb2] focus:outline-none focus:ring-2 focus:ring-[#2180d3]/50"
+                    title="Share this property"
+                >
+                    <i className="fas fa-share-alt mr-2"></i>
+                    <span>Share</span>
+                </button>
+                <button className="p-2 text-gray-500 transition-colors rounded-full hover:text-gray-700 hover:bg-gray-100">
+                    <i className="text-lg fas fa-ellipsis-h"></i>
+                </button>
+            </div>
           </div>
 
           <h2 className="text-lg font-bold text-gray-800 mb-2">
@@ -190,7 +254,7 @@ export default function PropertyDetailsPage() {
                   <img
                     src={mainImage}
                     alt={property.title || 'Property Main Image'}
-                    className="object-contain w-auto max-h-[300px] sm:max-h-[500px] mx-auto transition-transform duration-500 transform hover:scale-105"
+                    className="object-contain w-auto max-h-[300px] sm:max-h-[500px] mx-auto transition-transform duration-500 transform"
                   />
                 ) : (
                   <div className="flex flex-col items-center p-6 text-lg text-gray-500">
@@ -204,7 +268,7 @@ export default function PropertyDetailsPage() {
                     <div
                       key={idx}
                       className={`aspect-square rounded-lg overflow-hidden cursor-pointer transition-all duration-300 transform hover:scale-105
-                                ${mainImage === img ? 'border-3 border-[#2180d3] shadow-md' : 'border border-gray-300 hover:border-[#2180d3]/50 shadow-sm'}`}
+                                  ${mainImage === img ? 'border-3 border-[#2180d3] shadow-md' : 'border border-gray-300 hover:border-[#2180d3]/50 shadow-sm'}`}
                       onClick={() => setMainImage(img)}
                     >
                       <img
@@ -317,7 +381,6 @@ export default function PropertyDetailsPage() {
               </div>
             </div>
 
-
             <div className="p-4 mb-6 bg-white border border-gray-200 rounded-xl shadow-md">
               <h3 className="mb-3 text-lg font-bold text-gray-800 border-l-4 border-[#2180d3] pl-3">Property Description</h3>
               <p className="text-sm leading-relaxed text-gray-700 mb-4">
@@ -338,24 +401,22 @@ export default function PropertyDetailsPage() {
                 <h3 className="mb-4 text-lg font-bold text-gray-800 border-l-4 border-[#2180d3] pl-3">Related Properties</h3>
                 <Swiper
                   modules={[Navigation, Pagination, Scrollbar, A11y]}
-                  spaceBetween={15} // Gap between slides
-                  slidesPerView={1} // Default for mobile
-                  navigation // Enable navigation arrows
-                  pagination={{ clickable: true }} // Enable pagination dots
-                  scrollbar={{ draggable: true }} // Enable scrollbar
+                  spaceBetween={15}
+                  slidesPerView={1}
+                  navigation
+                  pagination={{ clickable: true }}
+                  scrollbar={{ draggable: true }}
                   breakpoints={{
-                    // When window width is >= 640px (sm)
                     640: {
                       slidesPerView: 2,
                       spaceBetween: 20,
                     },
-                    // When window width is >= 1024px (lg) - This applies Swiper to desktop
                     1024: {
                       slidesPerView: 3,
                       spaceBetween: 25,
                     },
                   }}
-                  className="related-properties-swiper" // Add a class for potential custom styling
+                  className="related-properties-swiper"
                 >
                   {relatedProperties.map((relatedProperty) => (
                     <SwiperSlide key={relatedProperty._id}>
@@ -413,28 +474,61 @@ export default function PropertyDetailsPage() {
 
           <div className="lg:col-span-1">
             <div className="flex flex-col gap-4 lg:sticky lg:top-8">
+              {/* Conditional Contact Card */}
               <div className="p-4 text-center bg-white border border-gray-200 rounded-xl shadow-lg">
-                <h3 className="mb-3 text-lg font-bold text-gray-800">Interested?</h3>
-                <img
-                  src={user?.profileImageURL || '/default-avatar.png'}
-                  alt={user?.username || 'Agent'}
-                  className="object-cover w-20 h-20 mx-auto mb-3 border-4 rounded-full shadow-md border-[#2180d3]"
-                />
-                <p className="mb-1 text-base font-bold text-gray-900">{user?.username || 'Agent Name'}</p>
-                {user?.email && (
-                  <p className="flex items-center justify-center mb-1 text-sm text-gray-700">
-                    <i className="mr-2 text-gray-500 fas fa-envelope"></i>{user.email}
+                <h3 className="mb-4 text-lg font-bold text-gray-800">Interested? Contact Us!</h3>
+
+                {/* Always show Keyyards Admin details */}
+                <div className="mb-4 pb-4 border-b border-gray-200">
+                  <h4 className="mb-2 text-base font-semibold text-gray-900">Keyyards Admin</h4>
+                  <img
+                    src={keyyardsAdmin.profileImageURL}
+                    alt={keyyardsAdmin.username}
+                    className="object-cover w-16 h-16 mx-auto mb-2 border-2 rounded-full border-gray-300 shadow-sm"
+                  />
+                  <p className="text-sm font-bold text-gray-800">{keyyardsAdmin.username}</p>
+                  <p className="flex items-center justify-center mt-1 text-sm text-gray-700">
+                    <i className="fas fa-envelope mr-2 text-gray-500"></i>
+                    <a href={`mailto:${keyyardsAdmin.email}`} className="hover:underline">{keyyardsAdmin.email}</a>
                   </p>
+                  <p className="flex items-center justify-center text-sm text-gray-700">
+                    <i className="fas fa-phone-alt mr-2 text-gray-500"></i>
+                    <a href={`tel:+91-${keyyardsAdmin.phone}`} className="hover:underline">{keyyardsAdmin.phone}</a>
+                  </p>
+                </div>
+
+                {isSubscriber ? (
+                  // Display seller details for subscribers
+                  <div>
+                    <h4 className="mb-2 text-base font-semibold text-gray-900">Seller Details</h4>
+                    <img
+                      src={seller?.profileImageURL || '/default-avatar.png'}
+                      alt={seller?.username || 'Seller'}
+                      className="object-cover w-16 h-16 mx-auto mb-2 border-2 rounded-full border-[#2180d3] shadow-sm"
+                    />
+                    <p className="text-sm font-bold text-gray-800">{seller?.username || 'Seller Name'}</p>
+                    <p className="flex items-center justify-center mt-1 text-sm text-gray-700">
+                      <i className="fas fa-envelope mr-2 text-gray-500"></i>
+                      <a href={`mailto:${seller?.email}`} className="hover:underline">{seller?.email || 'N/A'}</a>
+                    </p>
+                    <p className="flex items-center justify-center text-sm text-gray-700">
+                      <i className="fas fa-phone-alt mr-2 text-gray-500"></i>
+                      <a href={`tel:+91-${seller?.phone}`} className="hover:underline">+91-{seller?.phone || 'N/A'}</a>
+                    </p>
+                  </div>
+                ) : (
+                  // Display a message for free users to subscribe
+                  <div className="p-3 bg-gray-100 rounded-lg text-sm text-gray-600">
+                    <p>Contact details for the seller are available for subscribers.</p>
+                    <Link href="/user/prime" className="text-[#2180d3] font-semibold hover:underline mt-1 block">
+                      Subscribe now to view!
+                    </Link>
+                  </div>
                 )}
-                <p className="flex items-center justify-center mb-3 text-sm text-gray-700">
-                  <i className="mr-2 text-gray-500 fas fa-phone-alt"></i> +91-{user?.phone || 'Not Available'}
-                </p>
-                {/* Mobile contact buttons will be at the bottom sticky bar */}
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   )

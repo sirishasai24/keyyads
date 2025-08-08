@@ -28,7 +28,7 @@ const inputBaseClass =
 
 const LoginRegister: React.FC = () => {
   const router = useRouter();
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(true);
   const [loginPasswordVisible, setLoginPasswordVisible] = useState(false);
   const [registerPasswordVisible, setRegisterPasswordVisible] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });

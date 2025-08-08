@@ -9,9 +9,9 @@ import {
 } from "@heroicons/react/24/outline";
 import {
   FaFacebookF,
-  FaTwitter,
   FaInstagram,
   FaLinkedinIn,
+  FaYoutube,
 } from "react-icons/fa";
 
 export default function Footer() {
@@ -110,28 +110,28 @@ export default function Footer() {
           </h3>
           <div className="flex gap-2.5 sm:gap-3 mt-2">
             <a
-              href="#"
+              href="#" target="_blank"
               aria-label="Facebook"
               className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-[#2e7bbd] hover:bg-[#bcdfff] text-white hover:text-[#155a96] transition duration-300 shadow-md"
             >
               <FaFacebookF size={16} />
             </a>
             <a
-              href="https://www.linkedin.com/company/keyyards"
-              aria-label="Twitter"
+              href="https://www.youtube.com/@Keyyards" target="_blank"
+              aria-label="Youtube"
               className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-[#2e7bbd] hover:bg-[#bcdfff] text-white hover:text-[#155a96] transition duration-300 shadow-md"
             >
-              <FaTwitter size={16} />
+              <FaYoutube size={16} />
             </a>
             <a
-              href="https://www.linkedin.com/company/keyyards"
+              href="https://www.linkedin.com/company/keyyards" target="_blank"
               aria-label="Instagram"
               className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-[#2e7bbd] hover:bg-[#bcdfff] text-white hover:text-[#155a96] transition duration-300 shadow-md"
             >
               <FaInstagram size={16} />
             </a>
             <a
-              href="#"
+              href="#" target="_blank"
               aria-label="LinkedIn"
               className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-[#2e7bbd] hover:bg-[#bcdfff] text-white hover:text-[#155a96] transition duration-300 shadow-md"
             >
