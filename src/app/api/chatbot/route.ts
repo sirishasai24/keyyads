@@ -82,6 +82,7 @@ export async function POST(request: NextRequest) {
                 promptMessage += `- Type: ${prop.bedrooms ? `${prop.bedrooms} BHK ` : ''}${prop.type}\n`;
                 promptMessage += `- Link: /property/${prop._id}\n`;
             });
+            promptMessage += `\nwebsite URL: https://keyyards.in\n`;
             promptMessage += `\nEnd of data. Now, generate your professional response.`;
         } else {
             promptMessage += `\nI searched my database and found no properties matching the criteria "${message}". Please respond in a helpful, conversational tone, and ask the user to try a different query.`;
