@@ -20,19 +20,12 @@ interface PropertyQuery {
 
 export async function POST(request: NextRequest) {
     try {
-        // Optional: Authenticate the user if needed
-        // const userId = await getDataFromToken(request);
-        // if (!userId) {
-        //     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        // }
-
         const { message } = await request.json();
         if (!message) {
             return NextResponse.json({ error: "Message is required" }, { status: 400 });
         }
 
         // --- Step 1: Pre-process the user's query to search your database ---
-        // Using the new, type-safe interface
         const keywords = message.toLowerCase().split(/\s+/);
         const query: PropertyQuery = {};
 
@@ -63,11 +56,22 @@ export async function POST(request: NextRequest) {
             query.price = { $lte: priceValue };
         }
 
-        // --- Step 2: Query your database for relevant properties ---
-        const relevantProperties = await Property.find(query)
-            .select('title address price transactionType bedrooms bathrooms area areaUnit images')
-            .limit(3)
-            .lean();
+        // --- Step 2: Query your database for relevant properties using aggregation pipeline for randomization ---
+        const relevantProperties = await Property.aggregate([
+            { $match: query }, // Filter documents based on the parsed query
+            { $sample: { size: 3 } }, // Randomly select 3 documents from the filtered set
+            { $project: { // Select the required fields
+                title: 1,
+                address: 1,
+                price: 1,
+                transactionType: 1,
+                bedrooms: 1,
+                bathrooms: 1,
+                area: 1,
+                areaUnit: 1,
+                images: 1,
+            }}
+        ]);
 
         // --- Step 3: Format the data for the AI model's prompt ---
         let promptMessage = `You are a helpful real estate chatbot for Keyyards. The user's query is: "${message}".\n`;
@@ -108,11 +112,6 @@ export async function POST(request: NextRequest) {
         const aiResponse = response.choices && response.choices[0] && response.choices[0].message
             ? response.choices[0].message.content
             : "Sorry, I couldn't generate a response at this time.";
-
-        // NOTE ON LATENCY: For a truly low-latency feel, you would need to implement streaming
-        // on both the backend and frontend. This API is ready for it, but the
-        // frontend would need to be refactored to consume a ReadableStream instead of waiting
-        // for the full JSON response.
 
         return NextResponse.json({ aiResponse }, { status: 200 });
 

@@ -17,11 +17,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Property not found' }, { status: 404 });
     }
     const userId=property.createdBy;
-    const user = await User.findById(userId).select('username phone email profileImageURL');
+    // 💡 Add 'plan' to the fields to be selected for the seller
+    const user = await User.findById(userId).select('username phone email profileImageURL plan');
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    return NextResponse.json({property,user},{status: 200});
+    // Return both the property and the user (seller) with their plan
+    return NextResponse.json({ property, user }, { status: 200 });
     
   } catch (error) {
     return NextResponse.json({ error: error }, { status: 500 });

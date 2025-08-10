@@ -48,6 +48,8 @@ interface User {
   email: string;
   phone?: string;
   profileImageURL?: string;
+  // 💡 Add the 'plan' field to the User interface to handle the new data
+  plan?: 'Free' | 'Quarterly Plan' | 'Half Yearly Plan' | 'Annual Plan';
 }
 
 interface LoggedInUser extends User {
@@ -84,6 +86,7 @@ export default function PropertyDetailsPage() {
     const fetchPropertyDetails = async () => {
       try {
         setLoading(true);
+        // 💡 The API call now returns the seller's plan
         const res = await axios.get(`/api/property/${id}`);
         setProperty(res.data.property);
         setSeller(res.data.user);
@@ -140,7 +143,8 @@ export default function PropertyDetailsPage() {
     }
   };
 
-  const isSubscriber = loggedInUser && loggedInUser.plan !== 'Free';
+  // 💡 Check if the SELLER is a paid subscriber
+  const sellerIsPaidSubscriber = seller && seller.plan && seller.plan !== 'Free';
 
   if (loading) {
     return (
@@ -197,18 +201,18 @@ export default function PropertyDetailsPage() {
               )}
             </div>
             <div className="flex gap-2">
-                {/* 🔄 This is the updated share button */}
-                <button
-                    onClick={handleShare}
-                    className="flex items-center px-4 py-2 text-sm font-semibold text-white bg-[#2180d3] rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer hover:bg-[#1a6cb2] focus:outline-none focus:ring-2 focus:ring-[#2180d3]/50"
-                    title="Share this property"
-                >
-                    <i className="fas fa-share-alt mr-2"></i>
-                    <span>Share</span>
-                </button>
-                <button className="p-2 text-gray-500 transition-colors rounded-full hover:text-gray-700 hover:bg-gray-100">
-                    <i className="text-lg fas fa-ellipsis-h"></i>
-                </button>
+              {/* 🔄 This is the updated share button */}
+              <button
+                onClick={handleShare}
+                className="flex items-center px-4 py-2 text-sm font-semibold text-white bg-[#2180d3] rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer hover:bg-[#1a6cb2] focus:outline-none focus:ring-2 focus:ring-[#2180d3]/50"
+                title="Share this property"
+              >
+                <i className="fas fa-share-alt mr-2"></i>
+                <span>Share</span>
+              </button>
+              <button className="p-2 text-gray-500 transition-colors rounded-full hover:text-gray-700 hover:bg-gray-100">
+                <i className="text-lg fas fa-ellipsis-h"></i>
+              </button>
             </div>
           </div>
 
@@ -474,31 +478,12 @@ export default function PropertyDetailsPage() {
 
           <div className="lg:col-span-1">
             <div className="flex flex-col gap-4 lg:sticky lg:top-8">
-              {/* Conditional Contact Card */}
+              {/* 💡 Updated logic for the contact card based on seller's plan */}
               <div className="p-4 text-center bg-white border border-gray-200 rounded-xl shadow-lg">
                 <h3 className="mb-4 text-lg font-bold text-gray-800">Interested? Contact Us!</h3>
 
-                {/* Always show Keyyards Admin details */}
-                <div className="mb-4 pb-4 border-b border-gray-200">
-                  <h4 className="mb-2 text-base font-semibold text-gray-900">Keyyards Admin</h4>
-                  <img
-                    src={keyyardsAdmin.profileImageURL}
-                    alt={keyyardsAdmin.username}
-                    className="object-cover w-16 h-16 mx-auto mb-2 border-2 rounded-full border-gray-300 shadow-sm"
-                  />
-                  <p className="text-sm font-bold text-gray-800">{keyyardsAdmin.username}</p>
-                  <p className="flex items-center justify-center mt-1 text-sm text-gray-700">
-                    <i className="fas fa-envelope mr-2 text-gray-500"></i>
-                    <a href={`mailto:${keyyardsAdmin.email}`} className="hover:underline">{keyyardsAdmin.email}</a>
-                  </p>
-                  <p className="flex items-center justify-center text-sm text-gray-700">
-                    <i className="fas fa-phone-alt mr-2 text-gray-500"></i>
-                    <a href={`tel:+91-${keyyardsAdmin.phone}`} className="hover:underline">{keyyardsAdmin.phone}</a>
-                  </p>
-                </div>
-
-                {isSubscriber ? (
-                  // Display seller details for subscribers
+                {sellerIsPaidSubscriber ? (
+                  // Display seller details if the seller has a paid plan
                   <div>
                     <h4 className="mb-2 text-base font-semibold text-gray-900">Seller Details</h4>
                     <img
@@ -517,12 +502,29 @@ export default function PropertyDetailsPage() {
                     </p>
                   </div>
                 ) : (
-                  // Display a message for free users to subscribe
-                  <div className="p-3 bg-gray-100 rounded-lg text-sm text-gray-600">
-                    <p>Contact details for the seller are available for subscribers.</p>
-                    <Link href="/user/prime" className="text-[#2180d3] font-semibold hover:underline mt-1 block">
-                      Subscribe now to view!
-                    </Link>
+                  // Display Keyyards Admin details if the seller is on the 'Free' plan
+                  <div>
+                    <h4 className="mb-2 text-base font-semibold text-gray-900">Keyyards Admin</h4>
+                    <img
+                      src={keyyardsAdmin.profileImageURL}
+                      alt={keyyardsAdmin.username}
+                      className="object-cover w-16 h-16 mx-auto mb-2 border-2 rounded-full border-gray-300 shadow-sm"
+                    />
+                    <p className="text-sm font-bold text-gray-800">{keyyardsAdmin.username}</p>
+                    <p className="flex items-center justify-center mt-1 text-sm text-gray-700">
+                      <i className="fas fa-envelope mr-2 text-gray-500"></i>
+                      <a href={`mailto:${keyyardsAdmin.email}`} className="hover:underline">{keyyardsAdmin.email}</a>
+                    </p>
+                    <p className="flex items-center justify-center text-sm text-gray-700">
+                      <i className="fas fa-phone-alt mr-2 text-gray-500"></i>
+                      <a href={`tel:+91-${keyyardsAdmin.phone}`} className="hover:underline">+91-{keyyardsAdmin.phone}</a>
+                    </p>
+                    <div className="p-3 mt-4 bg-gray-100 rounded-lg text-sm text-gray-600">
+                        <p>Seller contact details are only visible for premium listings.</p>
+                        <Link href="/user/prime" className="text-[#2180d3] font-semibold hover:underline mt-1 block">
+                            Upgrade your plan to get more visibility!
+                        </Link>
+                    </div>
                   </div>
                 )}
               </div>
