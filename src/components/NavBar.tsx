@@ -58,8 +58,8 @@ export default function Navbar() {
           <Image
             src="/images/navlogo.png"
             alt="Keyyards Logo"
-            width={40}
-            height={40}
+            width={25}
+            height={25}
             className="rounded-md"
             priority
           />
