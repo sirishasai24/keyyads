@@ -52,18 +52,18 @@ interface User {
   plan?: 'Free' | 'Quarterly Plan' | 'Half Yearly Plan' | 'Annual Plan';
 }
 
-interface LoggedInUser extends User {
-  plan: 'Free' | 'Quarterly Plan' | 'Half Yearly Plan' | 'Annual Plan';
-}
+// interface LoggedInUser extends User {
+//   plan: 'Free' | 'Quarterly Plan' | 'Half Yearly Plan' | 'Annual Plan';
+// }
 
-const DEFAULT_FREE_USER: LoggedInUser = {
-  _id: 'guest',
-  username: 'Guest User',
-  email: '',
-  phone: '',
-  profileImageURL: '/profile.png',
-  plan: 'Free',
-};
+// const DEFAULT_FREE_USER: LoggedInUser = {
+//   _id: 'guest',
+//   username: 'Guest User',
+//   email: '',
+//   phone: '',
+//   profileImageURL: '/profile.png',
+//   plan: 'Free',
+// };
 
 const keyyardsAdmin: User = {
   _id: 'admin',
@@ -77,7 +77,7 @@ export default function PropertyDetailsPage() {
   const { id } = useParams();
   const [property, setProperty] = useState<Property | null>(null);
   const [seller, setSeller] = useState<User | null>(null);
-  const [loggedInUser, setLoggedInUser] = useState<LoggedInUser | null>(DEFAULT_FREE_USER);
+  // const [loggedInUser, setLoggedInUser] = useState<LoggedInUser | null>(DEFAULT_FREE_USER);
   const [relatedProperties, setRelatedProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [mainImage, setMainImage] = useState<string | null>(null);
@@ -98,14 +98,14 @@ export default function PropertyDetailsPage() {
         const relatedRes = await axios.get(`/api/property/related/${id}`);
         setRelatedProperties(relatedRes.data.relatedProperties);
 
-        try {
-          const userRes = await axios.get('/api/auth/me');
-          if (userRes.data?.user) {
-            setLoggedInUser(userRes.data.user as LoggedInUser);
-          }
-        } catch (userError) {
-          console.error('Failed to fetch logged-in user, assuming Free plan:', userError);
-        }
+        // try {
+        //   const userRes = await axios.get('/api/auth/me');
+        //   if (userRes.data?.user) {
+        //     setLoggedInUser(userRes.data.user as LoggedInUser);
+        //   }
+        // } catch (userError) {
+        //   console.error('Failed to fetch logged-in user, assuming Free plan:', userError);
+        // }
 
       } catch (error) {
         console.error('Failed to fetch property details or related properties:', error);
