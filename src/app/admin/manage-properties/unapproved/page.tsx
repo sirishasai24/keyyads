@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { AiOutlineLeft, AiOutlineRight, AiOutlineCheckCircle, AiOutlineClose } from "react-icons/ai";
 import { motion, AnimatePresence } from "framer-motion";
+import AdminNav from "@/components/AdminNav";
 
 const modalVariants = {
     hidden: { opacity: 0, scale: 0.95 },
@@ -163,6 +164,8 @@ export default function AdminPropertyApprovalPage() {
     }
 
     return (
+        <div className="flex h-screen bg-gray-100">
+                    <AdminNav />
         <div className="container mx-auto p-6 min-h-[calc(100vh-80px)] bg-gray-50">
             <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-6 text-center">
                 Property Approval Queue
@@ -380,6 +383,7 @@ export default function AdminPropertyApprovalPage() {
                     </motion.div>
                 )}
             </AnimatePresence>
+        </div>
         </div>
     );
 }

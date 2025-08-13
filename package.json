@@ -26,6 +26,8 @@
     "firebase": "^11.10.0",
     "framer-motion": "^12.23.12",
     "html2pdf.js": "^0.10.3",
+    "jose": "^6.0.12",
+    "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "lottie-react": "^2.4.1",
@@ -48,6 +50,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/js-cookie": "^3.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/leaflet": "^1.9.20",
     "@types/node": "^20",

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import AdminNav from "@/components/AdminNav"; // <-- IMPORT ADDED
 
 export default function AddBlog() {
   const router = useRouter();
@@ -15,8 +16,8 @@ export default function AddBlog() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const primaryColor = "#2180d3"; 
-  const secondaryColor = "#1a66a7"; 
+  const primaryColor = "#2180d3";
+  const secondaryColor = "#1a66a7";
 
   const handleImageURL = async (): Promise<string | null> => {
     if (!image) {
@@ -97,12 +98,11 @@ export default function AddBlog() {
   };
 
   return (
-    <>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex justify-center items-center px-4 sm:px-6 py-8">
-        {/* Main card container, now slightly more compact */}
+    <div className="flex h-screen bg-gray-100">
+      <AdminNav />
+      <main className="flex-1 overflow-y-auto bg-gradient-to-br from-gray-50 to-gray-100 flex justify-center items-center px-4 sm:px-6 py-8">
         <div className="w-full max-w-4xl p-5 sm:p-7 bg-white rounded-xl shadow-xl border border-gray-100 transform transition-all duration-300 hover:shadow-2xl">
           <h1 className="text-2xl font-extrabold text-center mb-6 flex items-center justify-center gap-2" style={{ color: primaryColor }}>
-            {/* Icon for blog post */}
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-7 h-7">
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14.25v4.75a2 2 0 01-2 2H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
             </svg>
@@ -115,7 +115,6 @@ export default function AddBlog() {
             }}
             className="flex flex-col md:flex-row gap-5"
           >
-            {/* Left section: Title and Image */}
             <div className="flex-1 space-y-5">
               <div className="space-y-1.5">
                 <label
@@ -143,7 +142,6 @@ export default function AddBlog() {
                   Cover Image
                 </label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 space-y-2 bg-gray-50 hover:bg-gray-100 transition-all duration-200 shadow-sm flex flex-col items-center justify-center cursor-pointer">
-                  {/* Icon for image upload */}
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-9 h-9 text-gray-400">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                   </svg>
@@ -153,9 +151,9 @@ export default function AddBlog() {
                     type="file"
                     id="coverImage"
                     name="coverImage"
-                    className="hidden" // Hide the default input to style the custom area
+                    className="hidden"
                     accept="image/*"
-                    required // Added required to ensure an image is selected
+                    required
                   />
                   {imagePreview && (
                     <div className="mt-3 w-full flex justify-center">
@@ -170,7 +168,6 @@ export default function AddBlog() {
               </div>
             </div>
 
-            {/* Right section: Blog Content */}
             <div className="flex-1 space-y-1.5">
               <label
                 htmlFor="body"
@@ -190,7 +187,6 @@ export default function AddBlog() {
             </div>
           </form>
 
-          {/* Submit button */}
           <div className="flex justify-center pt-6">
             <button
               type="submit"
@@ -199,11 +195,11 @@ export default function AddBlog() {
               className="w-full sm:w-auto px-7 py-2.5 text-white font-bold rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed text-base flex items-center justify-center gap-2"
               style={{
                 background: loading
-                  ? "#a0a0a0" // A neutral color when disabled
+                  ? "#a0a0a0"
                   : `linear-gradient(to right, ${primaryColor}, ${secondaryColor})`,
                 boxShadow: loading
                   ? "none"
-                  : `0 4px 15px rgba(33, 128, 211, 0.4)` // Adjusted shadow for depth
+                  : `0 4px 15px rgba(33, 128, 211, 0.4)`
               }}
               onMouseEnter={(e) => {
                 if (!loading) {
@@ -226,7 +222,6 @@ export default function AddBlog() {
                 </>
               ) : (
                 <>
-                  {/* Icon for publishing */}
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                     <path d="M12 1.5a.75.75 0 01.75.75V7.5h-1.5V2.25a.75.75 0 01.75-.75zM11.25 7.5v5.69l-1.72-1.72a.75.75 0 00-1.06 1.06l3 3a.75.75 0 001.06 0l3-3a.75.75 0 10-1.06-1.06l-1.72 1.72V7.5h3.75a3 3 0 013 3v11.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V10.5a3 3 0 013-3H9.75z" />
                   </svg>
@@ -236,7 +231,7 @@ export default function AddBlog() {
             </button>
           </div>
         </div>
-      </div>
-    </>
+      </main>
+    </div>
   );
 }

@@ -6,6 +6,7 @@ import axios from "axios";
 import { Property } from "@/types/property"; // Your Property interface
 import toast from "react-hot-toast";
 import { isValidPhoneNumber } from "@/helpers/phoneNumberValidation"; // You can use a regex for this helper
+import AdminNav from "@/components/AdminNav";
 
 // Define initial state for the form, matching your Property model
 const initialPropertyState: Property = {
@@ -275,6 +276,8 @@ export default function EditPropertyPage() {
     }
 
     return (
+        <div className="flex h-screen bg-gray-100">
+            <AdminNav />
         <div className="container mx-auto p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-[calc(100vh-80px)] font-sans">
             <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4 text-center leading-tight">
                 Edit Property Listing
@@ -718,6 +721,7 @@ export default function EditPropertyPage() {
                     </button>
                 </div>
             </form>
+        </div>
         </div>
     );
 }

@@ -37,16 +37,22 @@ const LoginRegister: React.FC = () => {
   const [isRegisterLoading, setIsRegisterLoading] = useState(false);
   const [socialLoadingType, setSocialLoadingType] = useState<null | "google" | "github">(null);
   
-  // NEW: Single state for both agreements
   const [agreedToPolicies, setAgreedToPolicies] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoginLoading(true);
     try {
-      await axios.post("/api/auth/signin", loginData);
-      toast.success("Login successful!");
-      setTimeout(() => router.push("/"), 1000);
+      const res = await axios.post("/api/auth/signin", loginData);
+      if (res.data.user.role === 'Admin') {
+        toast.success(`Welcome Admin, ${res.data.user.username}!`);
+        // UPDATED: Redirect immediately
+        router.push("/admin/analytics/dashboard");
+      } else {
+        toast.success(`Welcome, ${res.data.user.username}!`);
+        // UPDATED: Redirect immediately
+        router.push("/user/profile");
+      }
     } catch (error) {
       toast.error("Login failed. Please check your credentials.");
       console.error("Login error:", error);
@@ -57,7 +63,6 @@ const LoginRegister: React.FC = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    // NEW: Check if policies are accepted
     if (!agreedToPolicies) {
       toast.error("Please agree to the Terms and Conditions and Privacy Policy.");
       return;
@@ -70,7 +75,7 @@ const LoginRegister: React.FC = () => {
       toast.info("Please check your email to verify your account.");
       setIsRegistering(false);
       setRegisterData({ username: "", email: "", password: "" });
-      setAgreedToPolicies(false); // Reset checkbox after successful registration
+      setAgreedToPolicies(false);
     } catch (error) {
       toast.error("Registration failed. Email may already be in use.");
       console.error("Registration error:", error);
@@ -80,7 +85,6 @@ const LoginRegister: React.FC = () => {
   };
 
   const signInWithProvider = async (providerType: "google" | "github") => {
-    // NEW: Check if policies are accepted before social sign-in
     if (isRegistering && !agreedToPolicies) {
       toast.error("Please agree to the Terms and Conditions and Privacy Policy.");
       return;
@@ -94,17 +98,22 @@ const LoginRegister: React.FC = () => {
       const user = result.user;
       const username = user.displayName || user.email?.split("@")[0] || "User";
 
-      await axios.post("/api/auth/save-user", {
+      const res = await axios.post("/api/auth/save-user", {
         _id: user.uid,
         username,
         email: user.email,
         profileImageURL: user.photoURL,
       });
 
-      toast.success(`Welcome, ${username}!`);
-      setTimeout(() => {
+      if (res.data.user.role === 'Admin') {
+        toast.success(`Welcome Admin, ${username}!`);
+        // UPDATED: Redirect immediately
+        router.push("/admin/analytics/dashboard");
+      } else {
+        toast.success(`Welcome, ${username}!`);
+        // UPDATED: Redirect immediately
         router.push("/user/profile");
-      }, 1000);
+      }
     } catch (error) {
       toast.error("Sign-in failed. An account may already exist with a different method.");
       console.error("Sign-in error:", error);
@@ -155,7 +164,6 @@ const LoginRegister: React.FC = () => {
                 {isRegistering ? "Create Account" : "Welcome Back!"}
               </h1>
 
-              {/* Email Input (Common to both forms) */}
               <div className="mb-4">
                 <input
                   type="email"
@@ -171,7 +179,6 @@ const LoginRegister: React.FC = () => {
                 />
               </div>
 
-              {/* Conditional Form Fields for Registration */}
               <AnimatePresence mode="wait">
                 {isRegistering ? (
                   <motion.div
@@ -211,7 +218,6 @@ const LoginRegister: React.FC = () => {
                         {registerPasswordVisible ? "Hide" : "Show"}
                       </span>
                     </div>
-                    {/* NEW: Single checkbox for both policies */}
                     <div className="flex items-start space-y-3 mb-6 text-sm text-gray-600">
                       <input
                         type="checkbox"
