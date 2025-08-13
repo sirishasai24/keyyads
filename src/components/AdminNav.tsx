@@ -21,6 +21,7 @@ const navLinks = [
   { href: '/admin/analytics/dashboard', label: 'Dashboard', icon: <FaChartBar /> },
   { href: '/admin/manage-users', label: 'Users', icon: <FaUsers /> },
   { href: '/admin/manage-properties', label: 'Properties', icon: <FaHome /> },
+  { href: '/admin/manage-properties/unapproved', label: 'Unapproved', icon: <FaBell /> },
   { href: '/property/add', label: 'Add Property', icon: <FaPlus /> },
   { href: '/admin/addtestimonial', label: 'Add Testimonial', icon: <FaPlus /> },
   { href: '/admin/addBlog', label: 'Add Blog', icon: <FaPlus /> },
