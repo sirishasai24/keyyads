@@ -97,7 +97,12 @@ export default async function RootLayout({
     <html lang="en">
       <head>
         <meta name="google-adsense-account" content="ca-pub-1131720795071367" />
-        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="anonymous" /><link rel="preconnect" href="https://checkout.razorpay.com" crossOrigin="anonymous" /><link rel="preconnect" href="https://www.googletagmanager.com" /><link rel="preconnect" href="https://www.google-analytics.com" />
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://checkout.razorpay.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://www.google-analytics.com" />
+        <link rel="preconnect" href="//widget.trustpilot.com" crossOrigin="anonymous" />
+
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -105,7 +110,9 @@ export default async function RootLayout({
           crossOrigin="anonymous"
           referrerPolicy="no-referrer"
         />
+        
         <link rel="canonical" href={`${BASE_URL}${pathname}`} />
+
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
           strategy="beforeInteractive"
@@ -127,6 +134,13 @@ export default async function RootLayout({
             `,
           }}
         />
+        {/* START: Added Trustpilot Widget Script */}
+        <Script
+          id="trustpilot-widget"
+          src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
+          strategy="afterInteractive"
+        />
+        {/* END: Added Trustpilot Widget Script */}
       </head>
       <body
         className={`${alata.variable} font-sans antialiased bg-gray-50 text-gray-800`}
