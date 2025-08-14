@@ -30,21 +30,21 @@ export default function Footer() {
         >
           {/* Background pattern commented out as it was in the original code, but left for context if you wish to re-enable or change it */}
           {/* <pattern
-            id="stripes"
-            patternUnits="userSpaceOnUse"
-            width="40"
-            height="40"
-            patternTransform="rotate(45)"
-          >
-            <line
-              x1="0"
-              y1="0"
-              x2="0"
-              y2="40"
-              stroke="#ffffff"
-              strokeWidth="1"
-            />
-          </pattern> */}
+             id="stripes"
+             patternUnits="userSpaceOnUse"
+             width="40"
+             height="40"
+             patternTransform="rotate(45)"
+           >
+             <line
+               x1="0"
+               y1="0"
+               x2="0"
+               y2="40"
+               stroke="#ffffff"
+               strokeWidth="1"
+             />
+           </pattern> */}
           {/* <rect width="100%" height="100%" fill="url(#stripes)" /> */}
         </svg>
       </div>
@@ -92,7 +92,7 @@ export default function Footer() {
               <a
                 href="tel:+914040316406"
                 className="hover:text-[#bcdfff]"
-              > 
+              >
                 +91 40403 16406
               </a>
             </li>
@@ -110,34 +110,57 @@ export default function Footer() {
           </h3>
           <div className="flex gap-2.5 sm:gap-3 mt-2">
             <a
-              href="https://www.facebook.com/profile.php?id=61579001160970" target="_blank"
+              href="https://www.facebook.com/profile.php?id=61579001160970"
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label="Facebook"
               className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-[#2e7bbd] hover:bg-[#bcdfff] text-white hover:text-[#155a96] transition duration-300 shadow-md"
             >
               <FaFacebookF size={16} />
             </a>
             <a
-              href="https://www.youtube.com/@Keyyards" target="_blank"
+              href="https://www.youtube.com/@Keyyards"
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label="Youtube"
               className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-[#2e7bbd] hover:bg-[#bcdfff] text-white hover:text-[#155a96] transition duration-300 shadow-md"
             >
               <FaYoutube size={16} />
             </a>
             <a
-              href="https://www.linkedin.com/company/keyyards" target="_blank"
+              href="https://www.instagram.com/keyyards_in/"
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label="Instagram"
               className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-[#2e7bbd] hover:bg-[#bcdfff] text-white hover:text-[#155a96] transition duration-300 shadow-md"
             >
               <FaInstagram size={16} />
             </a>
             <a
-              href="#" target="_blank"
+              href="https://www.linkedin.com/company/keyyards"
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label="LinkedIn"
               className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-[#2e7bbd] hover:bg-[#bcdfff] text-white hover:text-[#155a96] transition duration-300 shadow-md"
             >
               <FaLinkedinIn size={16} />
             </a>
           </div>
+          {/* START: Added Glassdoor Badge */}
+          <a
+            href="https://www.glassdoor.com/Overview/Working-at-Keyyards-EI_IE10734033.11,19.htm"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-block" // Added margin for spacing
+          >
+            <img
+              src="https://www.glassdoor.co.in/pc-app/static/img/partnerCenter/badges/eng_BASIC_250x90.png"
+              alt="Find us on Glassdoor."
+              width={250}
+              height={90}
+            />
+          </a>
+          {/* END: Added Glassdoor Badge */}
         </div>
       </div>
 
