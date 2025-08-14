@@ -15,22 +15,16 @@ import {
 } from "react-icons/fa";
 
 export default function Footer() {
-  // You might get this from an environment variable (e.g., process.env.NEXT_PUBLIC_APP_VERSION)
-  // or a package.json version in a real application.
-  const appVersion = "1.0.0"; // Example version
+  const appVersion = "1.0.0";
 
   return (
-    // The top margin (mt) has been increased from mt-12 to mt-24 to create more space.
-    <footer className="bg-[#155a96] text-white py-5 md:py-6 mt-24 relative overflow-hidden">
-      {/* Subtle background pattern/gradient for visual interest */}
+    <footer className="bg-[#155a96] text-white py-5 md:py-6 mt-12 relative overflow-hidden">
       <div className="absolute inset-0 opacity-10">
         <svg
           className="w-full h-full"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Background pattern commented out as it was in the original code, but left for context if you wish to re-enable or change it */}
-        </svg>
+        ></svg>
       </div>
 
       {/* Main content grid */}
@@ -54,28 +48,6 @@ export default function Footer() {
             renting, or selling — we&apos;re your trusted real estate partner,
             dedicated to simplifying your property journey.
           </p>
-
-          {/* START: Trustpilot Widget */}
-          {/* TrustBox widget - Review Collector */}
-          <div
-            className="trustpilot-widget mt-4"
-            data-locale="en-US"
-            data-template-id="56278e9abfbbba0bdcd568bc"
-            data-businessunit-id="689daedfc64a551852d9014c"
-            data-style-height="52"
-            data-style-width="100%"
-            data-token="25410d41-6111-4c43-8e14-3f001025c8ed"
-          >
-            <a
-              href="https://www.trustpilot.com/review/keyyards.in"
-              target="_blank"
-              rel="noopener"
-            >
-              Trustpilot
-            </a>
-          </div>
-          {/* End TrustBox widget */}
-          {/* END: Trustpilot Widget */}
         </div>
 
         {/* Contact Info */}
@@ -87,7 +59,7 @@ export default function Footer() {
             <li className="flex items-start gap-2.5">
               <EnvelopeIcon className="w-4 h-4 md:w-5 md:h-5 text-[#bcdfff]" />
               <a
-                href="mailto: info@keyyards.in"
+                href="mailto:support@keyyards.in"
                 className="hover:text-[#bcdfff]"
               >
                 support@keyyards.in
@@ -101,7 +73,7 @@ export default function Footer() {
             </li>
             <li className="flex items-start gap-2.5">
               <MapPinIcon className="w-4 h-4 md:w-5 md:h-5 text-[#bcdfff]" />
-              <span>Gachibowli,Hyderabad India</span>
+              <span>Gachibowli, Hyderabad, India</span>
             </li>
           </ul>
         </div>
@@ -155,17 +127,17 @@ export default function Footer() {
             href="https://www.glassdoor.com/Overview/Working-at-Keyyards-EI_IE10734033.11,19.htm"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 inline-block" // Added margin for spacing
+            className="mt-4 inline-block"
           >
             <img
               src="https://www.glassdoor.co.in/pc-app/static/img/partnerCenter/badges/eng_BASIC_250x90.png"
               alt="Find us on Glassdoor."
-              width={200}
+              width={250}
               height={90}
             />
           </a>
 
-          {/* START: Added AmbitionBox Badge */}
+          {/* AmbitionBox Badge */}
           <a
             href="https://www.ambitionbox.com/overview/keyyards-overview?utm_source=employer-dashboard&utm_campaign=keyyards&utm_medium=badges"
             target="_blank"
@@ -175,11 +147,29 @@ export default function Footer() {
             <img
               src="https://employer.ambitionbox.com/api/badge/2110650?badge-type=employee-ratings2"
               alt="Keyyards AmbitionBox Employee Ratings"
-              width={200}
+              width={250}
               height={90}
             />
           </a>
-          {/* END: Added AmbitionBox Badge */}
+
+          {/* Trustpilot Widget */}
+          <div
+            className="trustpilot-widget mt-4 inline-block w-[250px]"
+            data-locale="en-US"
+            data-template-id="56278e9abfbbba0bdcd568bc"
+            data-businessunit-id="689daedfc64a551852d9014c"
+            data-style-height="52px"
+            data-style-width="100%"
+            data-token="25410d41-6111-4c43-8e14-3f001025c8ed"
+          >
+            <a
+              href="https://www.trustpilot.com/review/keyyards.in"
+              target="_blank"
+              rel="noopener"
+            >
+              Trustpilot
+            </a>
+          </div>
         </div>
       </div>
 
@@ -187,14 +177,16 @@ export default function Footer() {
       <div className="border-t border-[#2e7bbd] mt-5 md:mt-6 pt-3 pb-2 text-xs md:text-sm text-gray-200 text-center relative z-10 px-4">
         <p className="mb-0.5">
           &copy; {new Date().getFullYear()} Keyyards. All rights reserved.{" "}
-          <span className="ml-2 text-gray-300">v{appVersion}</span>{" "}
-          {/* Added version here */}
+          <span className="ml-2 text-gray-300">v{appVersion}</span>
         </p>
         <div className="flex justify-center gap-3 md:gap-4 flex-wrap">
           <Link href="/privacy-policy" className="hover:text-white transition">
             Privacy Policy
           </Link>
-          <Link href="/terms-conditions" className="hover:text-white transition">
+          <Link
+            href="/terms-conditions"
+            className="hover:text-white transition"
+          >
             Terms of Service
           </Link>
           <Link href="/contact" className="hover:text-white transition">
