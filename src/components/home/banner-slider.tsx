@@ -14,12 +14,12 @@ interface Banner {
 const BannerSlider: React.FC<{ interval?: number }> = ({ interval = 5000 }) => {
     // Define the banner data directly within the component
     const homeBanners: Banner[] = [
-        {
-            id: 'banner1',
-            imageUrl: '/banners/web banner-1.png', // Make sure this path exists in your public folder
-            altText: 'Discover Luxury Homes with Keyyards',
-            // linkUrl: '/properties?category=luxury' // linkUrl still removed as per previous request
-        },
+        // {
+        //     id: 'banner1',
+        //     imageUrl: '/banners/web banner-1.png', // Make sure this path exists in your public folder
+        //     altText: 'Discover Luxury Homes with Keyyards',
+        //     // linkUrl: '/properties?category=luxury' // linkUrl still removed as per previous request
+        // },
         {
             id: 'banner2',
             imageUrl: '/banners/web banner-2.png', // Make sure this path exists in your public folder
