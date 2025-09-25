@@ -7,7 +7,10 @@ import { FeaturedListings } from './featured-listings';
 import { TestimonialsSection } from './testimonials-section';
 import BannerSlider from './banner-slider';
 import BannerSlider2 from './banner-slider2';
-
+import { KeyyardTools } from './tools';
+import { AiCompanionSection } from './AiCompanion';
+import {PropertyAssistanceSection} from './propAssist';
+import { LatestUpdates } from './latestUpdates';
 export function HomePage() {
     return (
         <div className="min-h-screen bg-gray-50">
@@ -16,7 +19,11 @@ export function HomePage() {
                 <QuickFilters />
                 <BannerSlider/>
                 <FeaturedListings />
+                <KeyyardTools />
                 <BannerSlider2/>
+                <AiCompanionSection/>
+                <PropertyAssistanceSection/>
+                <LatestUpdates/>
                 <TestimonialsSection />
             </main>
         </div>
